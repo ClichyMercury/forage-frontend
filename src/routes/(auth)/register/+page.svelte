@@ -1,7 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import api from '$lib/api'
-  import { auth } from '$lib/stores/auth.svelte'
   import { toast } from '$lib/stores/toast.svelte'
 
   let fullName = $state('')
@@ -20,14 +19,11 @@
     loading = true
 
     try {
-      const res = await api.post('/auth/signup', {
+      const res = await api.post('/auth/register', {
         fullName, email, telephone, userType, password, passwordConfirmation,
       })
-      const payload = res.data?.data ?? res.data
-      const { user, token } = payload
-      auth.login(user, token)
-      toast.success('Compte créé !', 'Bienvenue sur ForageCI.')
-      goto('/client/dashboard')
+      toast.success('Compte créé', 'Connectez-vous avec votre email et mot de passe.')
+      goto('/login')
     } catch (err: any) {
       const data = err.response?.data
       if (err.response?.status === 422) {

@@ -48,14 +48,15 @@
   </a>
 </div>
 
-<!-- Stats -->
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<!-- Stats sur une seule ligne -->
+<div class="grid grid-cols-4 gap-3 mb-6">
   <StatCard title="Appels d'offres" value={stats().total} icon="campaign" color="blue" />
   <StatCard title="En cours" value={stats().ouverts} icon="lock_open" color="purple" />
   <StatCard title="Offres soumises" value={stats().soumises} icon="send" color="orange" />
   <StatCard title="Offres retenues" value={stats().retenues} icon="star" color="green" />
 </div>
 
+<!-- Deux blocs côte à côte en dessous -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
   <!-- Appels d'offres récents -->
   <div class="bg-white rounded-2xl border border-slate-100">
@@ -83,7 +84,7 @@
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-slate-800 truncate">
-                {ao.demande?.type_forage ?? 'Forage'} — {ao.demande?.localisation_adresse ?? ''}
+                {ao.demande?.typeForage ?? ao.demande?.type_forage ?? 'Forage'} — {ao.demande?.localisationAdresse ?? ao.demande?.localisation_adresse ?? ''}
               </p>
               <p class="text-xs {ao.compte_a_rebours?.expire ? 'text-red-400' : 'text-slate-400'} mt-0.5">
                 {ao.compte_a_rebours?.expire ? 'Délai expiré' : 'Ouvert'}

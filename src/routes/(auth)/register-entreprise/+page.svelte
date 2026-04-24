@@ -45,7 +45,7 @@
 
     loading = true
     try {
-      await api.post('/auth/signup/entreprise', {
+      await api.post('/auth/register/entreprise', {
         email, telephone, password, passwordConfirmation,
         raisonSociale, rccm: rccm || undefined,
         domaines, zonesGeographiques: zones,

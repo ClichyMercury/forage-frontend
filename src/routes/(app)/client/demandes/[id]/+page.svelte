@@ -6,6 +6,7 @@
   import { toast } from '$lib/stores/toast.svelte'
   import Badge from '$lib/components/ui/Badge.svelte'
   import FormPage from '$lib/components/layout/FormPage.svelte'
+  import DownloadButton from '$lib/components/ui/DownloadButton.svelte'
 
   let demande = $state<any>(null)
   let offreFinale = $state<any>(null)
@@ -34,7 +35,8 @@
       if (['offre_envoyee','acceptee','refusee'].includes(demande.statut)) {
         try {
           const ofRes = await api.get(`/demandes/${id}/offre-finale`)
-          offreFinale = ofRes.data
+          // Le backend peut envelopper dans { data: ... }
+          offreFinale = ofRes.data?.data ?? ofRes.data
         } catch {}
       }
     } catch {} finally { loading = false }
@@ -69,7 +71,9 @@
     </button>
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-2 flex-wrap">
-        <h2 class="text-xl font-bold text-slate-900">Demande #{id}</h2>
+        <h2 class="text-xl font-bold text-slate-900">
+          {demande ? `Forage ${demande.typeForage}` : `Demande #${id}`}
+        </h2>
         {#if demande}<Badge status={demande.statut} />{/if}
       </div>
       {#if demande}
@@ -135,36 +139,43 @@
     </div>
 
     <!-- Offre finale -->
-    {#if offreFinale}
+    {#if offreFinale || demande.statut === 'offre_envoyee'}
       <div class="bg-white rounded-2xl border-2 {demande.statut === 'offre_envoyee' ? 'border-blue-300' : 'border-slate-100'} p-5 mb-4">
         <div class="flex items-center justify-between mb-4">
           <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Offre finale reçue</p>
-          <Badge status={offreFinale.statut} />
+          {#if offreFinale}<Badge status={offreFinale.statut} />{/if}
         </div>
 
-        <div class="grid grid-cols-3 gap-3 mb-4">
-          <div class="p-4 rounded-xl bg-blue-50 text-center">
-            <p class="text-xs text-slate-500 mb-1">Prix final</p>
-            <p class="text-xl font-bold text-blue-700">{fmt(offreFinale.prixFinalClient)}</p>
-            <p class="text-xs text-slate-400">FCFA</p>
+        {#if offreFinale}
+          <div class="grid grid-cols-3 gap-3 mb-4">
+            <div class="p-4 rounded-xl bg-blue-50 text-center">
+              <p class="text-xs text-slate-500 mb-1">Prix final</p>
+              <p class="text-xl font-bold text-blue-700">{fmt(offreFinale.prixFinalClient)}</p>
+              <p class="text-xs text-slate-400">FCFA</p>
+            </div>
+            <div class="p-4 rounded-xl bg-emerald-50 text-center">
+              <p class="text-xs text-slate-500 mb-1">Délai</p>
+              <p class="text-xl font-bold text-emerald-700">{offreFinale.delaiExecution}</p>
+              <p class="text-xs text-slate-400">jours</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 text-center">
+              <p class="text-xs text-slate-500 mb-1">Reçue le</p>
+              <p class="text-sm font-semibold text-slate-700">
+                {new Date(offreFinale.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short' })}
+              </p>
+            </div>
           </div>
-          <div class="p-4 rounded-xl bg-emerald-50 text-center">
-            <p class="text-xs text-slate-500 mb-1">Délai</p>
-            <p class="text-xl font-bold text-emerald-700">{offreFinale.delaiExecution}</p>
-            <p class="text-xs text-slate-400">jours</p>
-          </div>
-          <div class="p-4 rounded-xl bg-slate-50 text-center">
-            <p class="text-xs text-slate-500 mb-1">Reçue le</p>
-            <p class="text-sm font-semibold text-slate-700">
-              {new Date(offreFinale.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short' })}
-            </p>
-          </div>
-        </div>
 
-        {#if offreFinale.resumePrestation}
-          <div class="p-4 bg-slate-50 rounded-xl mb-4">
-            <p class="text-xs text-slate-500 mb-1.5 font-medium">Résumé de la prestation</p>
-            <p class="text-sm text-slate-700 leading-relaxed">{offreFinale.resumePrestation}</p>
+          {#if offreFinale.resumePrestation}
+            <div class="p-4 bg-slate-50 rounded-xl mb-4">
+              <p class="text-xs text-slate-500 mb-1.5 font-medium">Résumé de la prestation</p>
+              <p class="text-sm text-slate-700 leading-relaxed">{offreFinale.resumePrestation}</p>
+            </div>
+          {/if}
+        {:else}
+          <div class="p-4 bg-blue-50 rounded-xl mb-4">
+            <p class="text-sm text-blue-700 font-medium">Une offre a été préparée pour votre demande.</p>
+            <p class="text-xs text-blue-600 mt-1">Acceptez ou refusez l'offre ci-dessous.</p>
           </div>
         {/if}
 
@@ -173,10 +184,10 @@
             <button onclick={() => handleDecision('refusee')} disabled={deciding}
               class="flex-1 py-3 rounded-xl border-2 border-red-200 text-red-600 font-semibold text-sm hover:bg-red-50 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
               <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">cancel</span>
-              Refuser
+              Refuser l'offre
             </button>
             <button onclick={() => handleDecision('acceptee')} disabled={deciding}
-              class="flex-1 py-3 rounded-xl gradient-blue text-white font-semibold text-sm shadow-md hover:scale-[1.01] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+              class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
               {#if deciding}
                 <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               {:else}
@@ -188,7 +199,6 @@
         {/if}
       </div>
     {/if}
-
     <!-- Documents -->
     {#if documents.length > 0}
       <div class="bg-white rounded-2xl border border-slate-100 p-5">
@@ -197,12 +207,7 @@
         </p>
         <div class="space-y-2">
           {#each documents as doc}
-            <a href="http://localhost:3333/api/v1/documents/{doc.id}/download" target="_blank"
-              class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-blue-50 transition-all group">
-              <span class="material-symbols-outlined text-slate-400 group-hover:text-blue-500 icon-filled" style="font-size: 20px;">description</span>
-              <span class="flex-1 text-sm text-slate-700 truncate">{doc.nomFichier}</span>
-              <span class="material-symbols-outlined text-slate-400 group-hover:text-blue-500 transition-colors" style="font-size: 18px;">download</span>
-            </a>
+            <DownloadButton docId={doc.id} nomFichier={doc.nomFichier} />
           {/each}
         </div>
       </div>

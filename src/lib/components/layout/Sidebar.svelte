@@ -26,6 +26,7 @@
       { href: '/admin/dashboard',     icon: 'grid_view',     label: 'Tableau de bord', badge: 0 },
       { href: '/admin/demandes',       icon: 'assignment',    label: 'Demandes',         badge: 0 },
       { href: '/admin/appels-offres',  icon: 'campaign',      label: "Appels d'offres",  badge: 0 },
+      { href: '/admin/offres',         icon: 'description',   label: 'Offres',           badge: 0 },
       { href: '/admin/utilisateurs',   icon: 'group',         label: 'Utilisateurs',     badge: 0 },
       { href: '/admin/messages',       icon: 'chat_bubble',   label: 'Messages',         badge: msgStore.unreadCount },
       { href: '/admin/notifications',  icon: 'notifications', label: 'Notifications',    badge: notifStore.count },
@@ -40,6 +41,7 @@
     return [
       { href: '/client/dashboard',     icon: 'grid_view',     label: 'Tableau de bord',  badge: 0 },
       { href: '/client/demandes',       icon: 'assignment',    label: 'Mes demandes',      badge: 0 },
+      { href: '/client/offres',         icon: 'description',   label: 'Mes offres',        badge: 0 },
       { href: '/client/demandes/new',   icon: 'add_circle',    label: 'Nouvelle demande',  badge: 0 },
       { href: '/client/messages',       icon: 'chat_bubble',   label: 'Messages',          badge: msgStore.unreadCount },
       { href: '/client/notifications',  icon: 'notifications', label: 'Notifications',     badge: notifStore.count },
