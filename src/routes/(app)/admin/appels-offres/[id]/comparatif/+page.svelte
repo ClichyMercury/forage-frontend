@@ -4,7 +4,6 @@
   import { page } from '$app/stores'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
-  import FormPage from '$lib/components/layout/FormPage.svelte'
   import DownloadButton from '$lib/components/ui/DownloadButton.svelte'
 
   const id = $derived($page.params.id)
@@ -14,7 +13,6 @@
   let margeAdmin = $state('')
   let resumePrestation = $state('')
   let selectedOffreId = $state<number | null>(null)
-  let panneauEl = $state<HTMLDivElement | null>(null)
 
   onMount(async () => {
     try {
@@ -39,7 +37,8 @@
       : false
   )
 
-  async function selectionner() {    if (!selectedOffreId || !margeAdmin || !resumePrestation) {
+  async function selectionner() {
+    if (!selectedOffreId || !margeAdmin || !resumePrestation) {
       toast.error('Champs requis', 'Remplissez tous les champs avant de continuer.')
       return
     }
@@ -60,16 +59,6 @@
       }
     } finally { selecting = false }
   }
-
-  // Scroll vers le panneau de marge quand une offre est sélectionnée
-  $effect(() => {
-    if (selectedOffreId && panneauEl) {
-      setTimeout(() => {
-        const y = panneauEl!.getBoundingClientRect().top + window.scrollY - 80
-        window.scrollTo({ top: y, behavior: 'smooth' })
-      }, 150)
-    }
-  })
 
   // Toast quand la marge change
   let lastDepasse = $state<boolean | null>(null)
@@ -237,77 +226,96 @@
         </div>
       </div>
 
-      <!-- Panneau de sélection -->
+      <!-- Modal sélection offre -->
       {#if selectedOffreId}
-      <div bind:this={panneauEl} class="bg-white rounded-2xl border border-blue-200 p-6 animate-fade-in-up">
-          <h3 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 20px;">check_circle</span>
-            Retenir l'offre #{selectedOffreId} — Appliquer votre marge
-          </h3>
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <!-- Backdrop -->
+          <button class="absolute inset-0 bg-white/40 backdrop-blur-sm" onclick={() => selectedOffreId = null} aria-label="Fermer"></button>
 
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="marge">
-                Marge commerciale (FCFA) *
-              </label>
-              <input id="marge" type="number" bind:value={margeAdmin} placeholder="Ex: 150 000" min="0"
-                class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm transition-all"
-                class:border-red-400={depasse} />
+          <!-- Modal -->
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto">
+            <!-- Header modal -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 20px;">check_circle</span>
+                <h3 class="font-semibold text-slate-800">Retenir l'offre #{selectedOffreId}</h3>
+              </div>
+              <button onclick={() => selectedOffreId = null}
+                class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 transition-all">
+                <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+              </button>
+            </div>
 
-              <!-- Visualisation marge disponible — bas gauche -->
-              <div class="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Marge disponible</p>
-                <div class="flex items-center justify-between text-sm mb-1">
-                  <span class="text-slate-500">Budget client</span>
-                  <span class="font-semibold text-amber-700">{fmt(data.budget_client)} FCFA</span>
-                </div>
-                <div class="flex items-center justify-between text-sm mb-1">
-                  <span class="text-slate-500">Prix prestataire TTC</span>
-                  <span class="font-semibold text-slate-700">− {selectedOffre ? fmt(selectedOffre.prix_ttc) : '—'} FCFA</span>
-                </div>
-                <div class="border-t border-slate-200 mt-2 pt-2 flex items-center justify-between">
-                  <span class="text-sm font-bold text-slate-800">Marge max disponible</span>
-                  <span class="text-base font-bold {selectedOffre && (data.budget_client - selectedOffre.prix_ttc) > 0 ? 'text-emerald-600' : 'text-red-500'}">
-                    {selectedOffre ? fmt(data.budget_client - selectedOffre.prix_ttc) : '—'} FCFA
-                  </span>
+            <div class="px-6 py-5 space-y-4">
+              <!-- Marge disponible -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Marge disponible</p>
+                <div class="space-y-1.5">
+                  <div class="flex items-center justify-between text-sm">
+                    <span class="text-slate-500">Budget client</span>
+                    <span class="font-semibold text-amber-700">{fmt(data.budget_client)} FCFA</span>
+                  </div>
+                  <div class="flex items-center justify-between text-sm">
+                    <span class="text-slate-500">Prix prestataire TTC</span>
+                    <span class="font-semibold text-slate-700">− {selectedOffre ? fmt(selectedOffre.prix_ttc) : '—'} FCFA</span>
+                  </div>
+                  <div class="border-t border-slate-200 pt-2 flex items-center justify-between">
+                    <span class="text-sm font-bold text-slate-800">Marge max disponible</span>
+                    <span class="text-base font-bold {selectedOffre && (data.budget_client - selectedOffre.prix_ttc) > 0 ? 'text-emerald-600' : 'text-red-500'}">
+                      {selectedOffre ? fmt(data.budget_client - selectedOffre.prix_ttc) : '—'} FCFA
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {#if margeAdmin && selectedOffre}
-                {#if depasse}
-                  <!-- Message inline discret quand dépasse -->
-                  <p class="mt-2 text-xs text-red-500 flex items-center gap-1">
-                    <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">warning</span>
+              <!-- Marge commerciale -->
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5" for="marge">
+                  Marge commerciale (FCFA) *
+                </label>
+                <input id="marge" type="number" bind:value={margeAdmin} placeholder="Ex: 150 000" min="0"
+                  class="w-full px-4 py-3 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500
+                    {depasse ? 'border-red-400 bg-red-50' : 'border-slate-200'}" />
+                {#if margeAdmin && depasse}
+                  <p class="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+                    <span class="material-symbols-outlined icon-filled" style="font-size: 13px;">warning</span>
                     Max autorisé : {fmt(Number(data.budget_client) - selectedOffre.prix_ttc)} FCFA
                   </p>
+                {:else if margeAdmin && !depasse}
+                  <p class="mt-1.5 text-xs text-emerald-600 flex items-center gap-1">
+                    <span class="material-symbols-outlined icon-filled" style="font-size: 13px;">check_circle</span>
+                    Prix final client : {fmt(selectedOffre.prix_ttc + Number(margeAdmin))} FCFA
+                  </p>
                 {/if}
-              {/if}
+              </div>
+
+              <!-- Résumé prestation -->
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5" for="resume">
+                  Résumé de la prestation *
+                </label>
+                <textarea id="resume" bind:value={resumePrestation} rows="4"
+                  placeholder="Décrivez la prestation pour le client : type de forage, profondeur, équipements, garanties..."
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+              </div>
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1.5" for="resume">
-                Résumé de la prestation *
-              </label>
-              <textarea id="resume" bind:value={resumePrestation} rows="5"
-                placeholder="Décrivez la prestation pour le client : type de forage, profondeur, équipements, garanties..."
-                class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm resize-none"></textarea>
+            <!-- Footer modal -->
+            <div class="px-6 py-4 border-t border-slate-100 flex gap-3">
+              <button onclick={() => selectedOffreId = null}
+                class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-all">
+                Annuler
+              </button>
+              <button onclick={selectionner} disabled={selecting || depasse || !margeAdmin || !resumePrestation}
+                class="flex-1 py-2.5 rounded-xl gradient-blue text-white font-semibold text-sm shadow-md hover:scale-[1.01] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                {#if selecting}
+                  <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                {:else}
+                  <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">check_circle</span>
+                {/if}
+                Retenir cette offre
+              </button>
             </div>
-          </div>
-
-          <div class="flex gap-3">
-            <button onclick={() => selectedOffreId = null}
-              class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-all">
-              Annuler
-            </button>
-            <button onclick={selectionner} disabled={selecting || depasse || !margeAdmin || !resumePrestation}
-              class="flex-1 py-2.5 rounded-xl gradient-blue text-white font-semibold text-sm shadow-md hover:scale-[1.01] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-              {#if selecting}
-                <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-              {:else}
-                <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">check_circle</span>
-              {/if}
-              Retenir cette offre
-            </button>
           </div>
         </div>
       {/if}

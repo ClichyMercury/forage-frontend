@@ -36,7 +36,7 @@
     </div>
   {:else}
     <div class="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-      <div class="col-span-1">#</div>
+      <div class="col-span-1"></div>
       <div class="col-span-3">Demande</div>
       <div class="col-span-2 text-right">Prix HT</div>
       <div class="col-span-2 text-right">Prix TTC</div>
@@ -52,7 +52,7 @@
           </div>
           <div class="col-span-3 min-w-0">
             <p class="text-sm font-medium text-slate-800 truncate">
-              {o.appelOffre?.demande?.localisation_adresse ?? o.appelOffre?.demande?.localisationAdresse ?? `AO #${o.appelOffreId}`}
+              {o.appelOffre?.demande?.localisation_adresse ?? o.appelOffre?.demande?.localisationAdresse ?? `AO ${o.appelOffreId}`}
             </p>
           </div>
           <div class="col-span-2 text-right">
