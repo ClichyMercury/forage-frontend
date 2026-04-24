@@ -70,11 +70,11 @@
     <h2 class="text-xl font-bold text-slate-900">Gestion des utilisateurs</h2>
     <p class="text-sm text-slate-500 mt-0.5">{users.length} utilisateur{users.length > 1 ? 's' : ''}</p>
   </div>
-  <a href="/admin/utilisateurs/pending"
+  <!-- <a href="/admin/utilisateurs/pending"
     class="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 font-semibold text-sm hover:bg-amber-100 transition-all">
     <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">pending</span>
     Entreprises en attente
-  </a>
+  </a> -->
 </div>
 
 <!-- Filtres -->
