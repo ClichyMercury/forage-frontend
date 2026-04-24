@@ -5,6 +5,7 @@
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
   import FormPage from '$lib/components/layout/FormPage.svelte'
+  import DownloadButton from '$lib/components/ui/DownloadButton.svelte'
 
   const id = $derived($page.params.id)
   let data = $state<any>(null)
@@ -70,6 +71,22 @@
     }
   })
 
+  // Toast quand la marge change
+  let lastDepasse = $state<boolean | null>(null)
+  $effect(() => {
+    if (!margeAdmin || !selectedOffre) { lastDepasse = null; return }
+    if (depasse && lastDepasse !== true) {
+      toast.error(
+        'Marge trop élevée',
+        `Maximum autorisé : ${fmt(Number(data?.budget_client) - selectedOffre.prix_ttc)} FCFA`
+      )
+      lastDepasse = true
+    } else if (!depasse && lastDepasse !== false && margeAdmin) {
+      toast.success('Marge acceptée', 'Le prix final est dans le budget du client.')
+      lastDepasse = false
+    }
+  })
+
   function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
 </script>
 
@@ -84,7 +101,9 @@
     </button>
     <div>
       <h2 class="text-xl font-bold text-slate-900">Comparatif des offres</h2>
-      <p class="text-sm text-slate-500">Appel d'offre #{id}</p>
+      <p class="text-sm text-slate-500">
+        {data ? `Forage ${data.comparatif?.[0]?.demande_type ?? ''} — ${data.comparatif?.[0]?.demande_adresse?.split(',')[0] ?? ''}` : `Appel d'offre #${id}`}
+      </p>
     </div>
   </div>
 
@@ -202,6 +221,18 @@
                 <p class="text-sm text-slate-700">{offre.description_technique}</p>
               </div>
             {/if}
+
+            <!-- Documents de l'offre si sélectionnée -->
+            {#if selectedOffreId === offre.offre_id && offre.documents?.length > 0}
+              <div class="px-5 py-3 bg-slate-50 border-t border-slate-100">
+                <p class="text-xs text-slate-500 mb-2 font-medium">Documents joints ({offre.documents.length})</p>
+                <div class="flex flex-wrap gap-2">
+                  {#each offre.documents as doc}
+                    <DownloadButton docId={doc.id} nomFichier={doc.nomFichier} variant="button" />
+                  {/each}
+                </div>
+              </div>
+            {/if}
           {/each}
         </div>
       </div>
@@ -222,32 +253,34 @@
               <input id="marge" type="number" bind:value={margeAdmin} placeholder="Ex: 150 000" min="0"
                 class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm transition-all"
                 class:border-red-400={depasse} />
-              {#if margeAdmin && selectedOffre}
-                <div class="mt-2 p-3 rounded-xl {depasse ? 'bg-red-50 border border-red-200' : 'bg-emerald-50 border border-emerald-200'}">
-                  <div class="flex items-center justify-between text-sm">
-                    <span class="text-slate-600">Prix prestataire TTC</span>
-                    <span class="font-medium">{fmt(selectedOffre.prix_ttc)} FCFA</span>
-                  </div>
-                  <div class="flex items-center justify-between text-sm mt-1">
-                    <span class="text-slate-600">+ Votre marge</span>
-                    <span class="font-medium">+ {fmt(Number(margeAdmin))} FCFA</span>
-                  </div>
-                  <div class="border-t border-slate-200 mt-2 pt-2 flex items-center justify-between">
-                    <span class="font-semibold text-slate-800">Prix final client</span>
-                    <span class="font-bold text-lg {depasse ? 'text-red-600' : 'text-emerald-700'}">
-                      {fmt(prixFinalPrevu!)} FCFA
-                    </span>
-                  </div>
-                  {#if depasse}
-                    <p class="text-xs text-red-600 mt-1 font-medium">
-                      ⚠️ Dépasse le budget de {fmt(prixFinalPrevu! - Number(data.budget_client))} FCFA
-                    </p>
-                  {:else}
-                    <p class="text-xs text-emerald-600 mt-1">
-                      ✓ Dans le budget — marge restante : {fmt(Number(data.budget_client) - prixFinalPrevu!)} FCFA
-                    </p>
-                  {/if}
+
+              <!-- Visualisation marge disponible — bas gauche -->
+              <div class="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Marge disponible</p>
+                <div class="flex items-center justify-between text-sm mb-1">
+                  <span class="text-slate-500">Budget client</span>
+                  <span class="font-semibold text-amber-700">{fmt(data.budget_client)} FCFA</span>
                 </div>
+                <div class="flex items-center justify-between text-sm mb-1">
+                  <span class="text-slate-500">Prix prestataire TTC</span>
+                  <span class="font-semibold text-slate-700">− {selectedOffre ? fmt(selectedOffre.prix_ttc) : '—'} FCFA</span>
+                </div>
+                <div class="border-t border-slate-200 mt-2 pt-2 flex items-center justify-between">
+                  <span class="text-sm font-bold text-slate-800">Marge max disponible</span>
+                  <span class="text-base font-bold {selectedOffre && (data.budget_client - selectedOffre.prix_ttc) > 0 ? 'text-emerald-600' : 'text-red-500'}">
+                    {selectedOffre ? fmt(data.budget_client - selectedOffre.prix_ttc) : '—'} FCFA
+                  </span>
+                </div>
+              </div>
+
+              {#if margeAdmin && selectedOffre}
+                {#if depasse}
+                  <!-- Message inline discret quand dépasse -->
+                  <p class="mt-2 text-xs text-red-500 flex items-center gap-1">
+                    <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">warning</span>
+                    Max autorisé : {fmt(Number(data.budget_client) - selectedOffre.prix_ttc)} FCFA
+                  </p>
+                {/if}
               {/if}
             </div>
 

@@ -4,119 +4,217 @@
   import { page } from '$app/stores'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
-  import FormPage from '$lib/components/layout/FormPage.svelte'
+  import Badge from '$lib/components/ui/Badge.svelte'
 
-  const demandeId = $derived($page.params.id)
+  const id = $derived($page.params.id)
+
   let demande = $state<any>(null)
+  let offreRetenue = $state<any>(null)
   let loading = $state(true)
   let sending = $state(false)
 
-  let resumePrestation = $state('')
+  // Formulaire offre finale
   let prixFinalClient = $state('')
   let delaiExecution = $state('')
+  let resumePrestation = $state('')
 
   onMount(async () => {
     try {
-      const res = await api.get(`/admin/demandes/${demandeId}`)
+      const res = await api.get(`/admin/demandes/${id}`)
       demande = res.data
-    } catch {} finally { loading = false }
+
+      if (demande.statut !== 'offres_recues') {
+        toast.error('Étape incorrecte', `Statut actuel: "${demande.statut}". Vous devez d'abord retenir une offre.`)
+        goto(`/admin/demandes/${id}`)
+        return
+      }
+
+      // Charger l'AO et l'offre retenue
+      const aoRes = await api.get('/admin/appels-offres')
+      const aos = aoRes.data.data ?? []
+      const ao = aos.find((a: any) => (a.demandeId ?? a.demande_id) === demande.id)
+      if (ao) {
+        const compRes = await api.get(`/admin/appels-offres/${ao.id}/comparatif`)
+        const comp = compRes.data.comparatif ?? []
+        offreRetenue = comp.find((o: any) => o.statut === 'retenue') ?? null
+        if (offreRetenue) {
+          // Pré-remplir le prix avec le prix TTC de l'offre retenue
+          prixFinalClient = String(offreRetenue.prix_ttc)
+          delaiExecution = String(offreRetenue.delai_execution_jours)
+          resumePrestation = offreRetenue.description_technique ?? ''
+        }
+      }
+    } catch (err: any) {
+      toast.error('Erreur', 'Impossible de charger la demande')
+      goto('/admin/demandes')
+    } finally {
+      loading = false
+    }
   })
 
-  async function handleSubmit(e: Event) {
+  async function envoyer(e: Event) {
     e.preventDefault()
+    const prix = parseFloat(prixFinalClient)
+    const delai = parseInt(delaiExecution)
+    const budget = parseFloat(demande?.budgetMax)
+
+    if (!prix || prix <= 0) { toast.error('Erreur', 'Prix final invalide'); return }
+    if (!delai || delai <= 0) { toast.error('Erreur', 'Délai invalide'); return }
+    if (!resumePrestation.trim()) { toast.error('Erreur', 'Le résumé de prestation est requis'); return }
+    if (prix > budget) {
+      toast.error('Dépassement budget', `Le prix final (${fmt(prix)} FCFA) dépasse le budget client (${fmt(budget)} FCFA)`)
+      return
+    }
+
     sending = true
     try {
-      await api.post(`/admin/demandes/${demandeId}/offre-finale`, {
-        resumePrestation,
-        prixFinalClient: Number(prixFinalClient),
-        delaiExecution: Number(delaiExecution),
+      await api.post(`/admin/demandes/${id}/offre-finale`, {
+        prixFinalClient: prix,
+        delaiExecution: delai,
+        resumePrestation: resumePrestation.trim(),
       })
-      toast.success('Offre finale envoyée !', 'Le client a été notifié.')
-      goto(`/admin/demandes/${demandeId}`)
+      toast.success('Offre envoyée', 'Le client a été notifié et peut maintenant accepter ou refuser.')
+      goto(`/admin/demandes/${id}`)
     } catch (err: any) {
-      const d = err.response?.data
-      if (d?.calcul) {
-        toast.error('Budget dépassé !', `Prix max autorisé: ${Number(d.calcul.prix_maximum_autorise).toLocaleString('fr-CI')} FCFA`)
-      } else {
-        toast.error('Erreur', d?.message)
-      }
-    } finally { sending = false }
+      const msg = err.response?.data?.message ?? 'Erreur lors de l\'envoi'
+      toast.error('Erreur', msg)
+    } finally {
+      sending = false
+    }
   }
+
+  function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
 </script>
 
-<svelte:head><title>Envoyer l'offre finale — Admin</title></svelte:head>
+<svelte:head><title>Offre finale — Demande #{id}</title></svelte:head>
 
-<FormPage maxWidth="max-w-xl">
+<div class="max-w-2xl mx-auto">
+
+  <!-- Header -->
   <div class="flex items-center gap-3 mb-6">
-    <button onclick={() => goto(`/admin/demandes/${demandeId}`)}
+    <button onclick={() => goto(`/admin/demandes/${id}`)}
       class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-all text-slate-600">
       <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
     </button>
     <div>
-      <h2 class="text-xl font-bold text-slate-900">Générer l'offre finale</h2>
-      <p class="text-sm text-slate-500">Demande #{demandeId}</p>
+      <h2 class="text-xl font-bold text-slate-900">Envoyer l'offre finale au client</h2>
+      {#if demande}
+        <p class="text-sm text-slate-500 mt-0.5">
+          Forage {demande.typeForage} — {demande.localisationAdresse?.split(',')[0]}
+        </p>
+      {/if}
     </div>
   </div>
 
   {#if loading}
-    <div class="skeleton h-48 rounded-2xl"></div>
-  {:else if demande}
-    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5">
-      <div class="flex items-center gap-2 mb-1">
-        <span class="material-symbols-outlined text-amber-600 icon-filled" style="font-size: 18px;">lock</span>
-        <p class="text-xs font-bold text-amber-700 uppercase">Budget client confidentiel</p>
-      </div>
-      <p class="text-xl font-bold text-amber-800">{Number(demande.budgetMax).toLocaleString('fr-CI')} FCFA</p>
-      <p class="text-xs text-amber-600 mt-1">Le prix final ne doit pas dépasser ce montant</p>
+    <div class="space-y-4">
+      {#each [1,2,3] as _}<div class="skeleton h-28 rounded-2xl"></div>{/each}
     </div>
 
-    <form onsubmit={handleSubmit} class="bg-white rounded-2xl border border-slate-100 p-6 space-y-5">
-      <h3 class="font-bold text-slate-800 flex items-center gap-2">
-        <span class="material-symbols-outlined text-blue-500 icon-filled">description</span>
-        Récapitulatif d'offre (CDC §3.3)
-      </h3>
+  {:else if demande}
 
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1.5" for="resume">Résumé de la prestation *</label>
-        <textarea id="resume" bind:value={resumePrestation} rows="4" required
-          placeholder="Décrivez la prestation : type de forage, profondeur, équipements, garanties..."
-          class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm resize-none"></textarea>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="prix">Prix final client (FCFA) *</label>
-          <div class="relative">
-            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">payments</span>
-            <input id="prix" type="number" bind:value={prixFinalClient} required
-              placeholder="Ex: 800000"
-              class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm" />
+    <!-- Offre retenue (résumé) -->
+    {#if offreRetenue}
+      <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 mb-5">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="material-symbols-outlined text-emerald-600 icon-filled" style="font-size: 18px;">check_circle</span>
+          <p class="text-sm font-bold text-emerald-700">Offre retenue — {offreRetenue.entreprise?.full_name ?? offreRetenue.entreprise?.email ?? '—'}</p>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="text-center">
+            <p class="text-xs text-emerald-600">Prix TTC prestataire</p>
+            <p class="text-base font-bold text-emerald-800">{fmt(offreRetenue.prix_ttc)} FCFA</p>
           </div>
-          {#if prixFinalClient && demande}
-            <p class="text-xs mt-1 {Number(prixFinalClient) > Number(demande.budgetMax) ? 'text-red-500 font-semibold' : 'text-emerald-600'}">
-              {Number(prixFinalClient) > Number(demande.budgetMax) ? '⚠️ Dépasse le budget !' : '✓ Dans le budget'}
-            </p>
+          <div class="text-center">
+            <p class="text-xs text-emerald-600">Budget client</p>
+            <p class="text-base font-bold text-emerald-800">{fmt(demande.budgetMax)} FCFA</p>
+          </div>
+          <div class="text-center">
+            <p class="text-xs text-emerald-600">Marge disponible</p>
+            <p class="text-base font-bold text-emerald-800">{fmt(parseFloat(demande.budgetMax) - offreRetenue.prix_ttc)} FCFA</p>
+          </div>
+        </div>
+      </div>
+    {/if}
+
+    <!-- Formulaire -->
+    <div class="bg-white rounded-2xl border border-slate-100 p-6">
+      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-5">Récapitulatif à envoyer au client</p>
+
+      <form onsubmit={envoyer} class="space-y-5">
+
+        <!-- Prix final client -->
+        <div>
+          <label for="prix" class="block text-sm font-medium text-slate-700 mb-1.5">
+            Prix final proposé au client (FCFA)
+            {#if demande.budgetMax}
+              <span class="text-slate-400 font-normal ml-1">— max {fmt(demande.budgetMax)} FCFA</span>
+            {/if}
+          </label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 icon-filled" style="font-size: 18px;">payments</span>
+            <input id="prix" type="number" bind:value={prixFinalClient} min="1" required
+              class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="Ex: 2500000" />
+          </div>
+          {#if prixFinalClient && demande.budgetMax}
+            {@const marge = parseFloat(demande.budgetMax) - parseFloat(prixFinalClient)}
+            {#if marge < 0}
+              <p class="text-red-500 text-xs mt-1 flex items-center gap-1">
+                <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">warning</span>
+                Dépasse le budget de {fmt(Math.abs(marge))} FCFA
+              </p>
+            {:else}
+              <p class="text-emerald-600 text-xs mt-1">Marge restante : {fmt(marge)} FCFA</p>
+            {/if}
           {/if}
         </div>
+
+        <!-- Délai -->
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="delai">Délai d'exécution (jours) *</label>
+          <label for="delai" class="block text-sm font-medium text-slate-700 mb-1.5">Délai d'exécution (jours)</label>
           <div class="relative">
-            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">schedule</span>
-            <input id="delai" type="number" bind:value={delaiExecution} required placeholder="30"
-              class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm" />
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 icon-filled" style="font-size: 18px;">schedule</span>
+            <input id="delai" type="number" bind:value={delaiExecution} min="1" required
+              class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="Ex: 30" />
           </div>
         </div>
-      </div>
 
-      <button type="submit" disabled={sending}
-        class="w-full py-3.5 rounded-xl gradient-blue text-white font-semibold text-sm shadow-lg shadow-blue-500/30 hover:scale-[1.01] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
-        {#if sending}
-          <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-        {:else}
-          <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">send</span>
-        {/if}
-        Envoyer l'offre au client
-      </button>
-    </form>
+        <!-- Résumé prestation -->
+        <div>
+          <label for="resume" class="block text-sm font-medium text-slate-700 mb-1.5">Résumé de la prestation</label>
+          <textarea id="resume" bind:value={resumePrestation} rows="5" required
+            class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+            placeholder="Décrivez la prestation proposée au client : nature des travaux, équipements, garanties..."></textarea>
+          <p class="text-xs text-slate-400 mt-1">Ce texte sera visible par le client dans son espace.</p>
+        </div>
+
+        <!-- Info -->
+        <div class="flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
+          <span class="material-symbols-outlined text-blue-500 icon-filled shrink-0 mt-0.5" style="font-size: 18px;">info</span>
+          <p class="text-xs text-blue-700 leading-relaxed">
+            Une fois envoyée, le client recevra une notification et pourra <strong>accepter ou refuser</strong> cette offre depuis son espace. Le nom du prestataire ne lui sera pas communiqué.
+          </p>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick={() => goto(`/admin/demandes/${id}`)}
+            class="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-all">
+            Annuler
+          </button>
+          <button type="submit" disabled={sending}
+            class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+            {#if sending}
+              <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              Envoi...
+            {:else}
+              <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">send</span>
+              Envoyer au client
+            {/if}
+          </button>
+        </div>
+      </form>
+    </div>
   {/if}
-</FormPage>
+</div>
