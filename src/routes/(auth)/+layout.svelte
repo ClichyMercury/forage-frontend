@@ -47,7 +47,7 @@
       </div>
     </div>
 
-    <div class="relative z-10 text-white/40 text-sm">© 2025 ForageCI — Côte d'Ivoire</div>
+    <div class="relative z-10 text-white/40 text-sm">© 2026 ForageCI — Côte d'Ivoire</div>
   </div>
 
   <!-- Panneau droit — formulaire -->
