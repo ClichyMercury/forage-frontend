@@ -63,7 +63,7 @@
     </div>
   {:else}
     <div class="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-      <div class="col-span-1">#</div>
+      <div class="col-span-1"></div>
       <div class="col-span-3">Localisation</div>
       <div class="col-span-2">Type</div>
       <div class="col-span-3">Délai restant</div>
@@ -76,7 +76,7 @@
         {@const expire = secondes <= 0}
         <div class="grid grid-cols-12 gap-4 px-5 py-4 items-center">
           <div class="col-span-1">
-            <span class="text-sm text-slate-500">#{ao.id}</span>
+            <span class="text-sm text-slate-500">{ao.id}</span>
           </div>
           <div class="col-span-3 min-w-0">
             <p class="text-sm font-medium text-slate-800 truncate">
