@@ -50,7 +50,7 @@
         raisonSociale, rccm: rccm || undefined,
         domaines, zonesGeographiques: zones,
       })
-      toast.success('Demande envoyée !', 'Votre compte est en attente de validation par l\'administrateur.')
+      toast.success('Demande envoyée !', 'Votre compte est en attente de validation par notre équipe.')
       goto('/login')
     } catch (err: any) {
       const data = err.response?.data
@@ -67,9 +67,19 @@
 
 <svelte:head><title>Inscription Entreprise — ForageCI</title></svelte:head>
 
-<div class="mb-6">
-  <h2 class="text-3xl font-bold text-slate-900">Inscription Entreprise</h2>
-  <p class="text-slate-500 mt-2">Votre compte sera activé après validation admin</p>
+<!-- Logo mobile -->
+<div class="lg:hidden flex items-center gap-2.5 mb-10">
+  <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background-color: #1e3fff">
+    <span class="material-symbols-outlined text-white icon-filled" style="font-size: 20px;">water_drop</span>
+  </div>
+  <span class="font-display font-black text-xl tracking-tight text-slate-900">ForageCI</span>
+</div>
+
+<div class="mb-8">
+  <h2 class="font-display font-black text-4xl tracking-tight leading-[1.05] text-slate-900">
+    Espace <span style="color: #b35d2e">prestataire</span>.
+  </h2>
+  <p class="text-slate-500 mt-3 text-base">Votre compte sera activé après validation par notre équipe.</p>
 </div>
 
 <form onsubmit={handleRegister} class="space-y-4">
@@ -177,17 +187,18 @@
   </div>
 
   <button type="submit" disabled={loading}
-    class="w-full py-3.5 rounded-xl gradient-blue text-white font-semibold text-sm shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-[1.01] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+    class="w-full py-4 rounded-2xl text-white font-semibold text-sm shadow-xl hover:scale-[1.01] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+    style="background-color: #b35d2e">
     {#if loading}
       <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
       Envoi en cours...
     {:else}
-      <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">send</span>
+      <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">arrow_forward</span>
       Soumettre la demande
     {/if}
   </button>
 </form>
 
 <p class="mt-5 text-center text-sm text-slate-500">
-  Déjà un compte ? <a href="/login" class="text-blue-600 font-semibold hover:text-blue-700">Se connecter</a>
+  Déjà un compte ? <a href="/login" class="text-brand-600 font-semibold hover:text-brand-700">Se connecter</a>
 </p>

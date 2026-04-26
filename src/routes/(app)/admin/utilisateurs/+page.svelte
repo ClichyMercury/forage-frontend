@@ -67,22 +67,19 @@
 
 <div class="mb-5 flex items-center justify-between flex-wrap gap-3">
   <div>
-    <h2 class="text-xl font-bold text-slate-900">Gestion des utilisateurs</h2>
-    <p class="text-sm text-slate-500 mt-0.5">{users.length} utilisateur{users.length > 1 ? 's' : ''}</p>
+    <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900">
+      Gestion des <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">utilisateurs</span>.
+    </h2>
+    <p class="text-sm text-slate-500 mt-1">{users.length} utilisateur{users.length > 1 ? 's' : ''} au total.</p>
   </div>
-  <!-- <a href="/admin/utilisateurs/pending"
-    class="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 font-semibold text-sm hover:bg-amber-100 transition-all">
-    <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">pending</span>
-    Entreprises en attente
-  </a> -->
 </div>
 
 <!-- Filtres -->
 <div class="flex gap-2 mb-4">
   {#each [{ value: '', label: 'Tous' }, { value: 'client', label: 'Clients' }, { value: 'entreprise', label: 'Entreprises' }] as f}
     <button onclick={() => filtreRole = f.value}
-      class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all border
-        {filtreRole === f.value ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}">
+      class="px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all border
+        {filtreRole === f.value ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}">
       {f.label}
     </button>
   {/each}
@@ -98,8 +95,8 @@
       <p class="text-sm mt-2">Aucun utilisateur trouvé</p>
     </div>
   {:else}
-    <!-- En-tête -->
-    <div class="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+    <!-- En-tête (desktop only) -->
+    <div class="hidden lg:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
       <div class="col-span-4">Utilisateur</div>
       <div class="col-span-2">Rôle</div>
       <div class="col-span-2">Statut</div>
@@ -108,37 +105,39 @@
     </div>
     <div class="divide-y divide-slate-50">
       {#each users as u}
-        <div class="grid grid-cols-12 gap-4 px-5 py-3.5 items-center">
-          <!-- Utilisateur -->
-          <div class="col-span-4 flex items-center gap-3 min-w-0">
-            <div class="w-8 h-8 rounded-full {u.role === 'entreprise' ? 'bg-indigo-100 text-indigo-700' : 'bg-blue-100 text-blue-700'} flex items-center justify-center text-xs font-bold shrink-0">
+        <div class="flex flex-col gap-3 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4 hover:bg-slate-50 transition-colors">
+          <!-- Utilisateur (cliquable vers détail) -->
+          <a href="/admin/utilisateurs/{u.id}" class="flex items-center gap-3 min-w-0 group lg:col-span-4">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0"
+                 style="background-color: {u.role === 'entreprise' ? '#b35d2e' : '#1e3fff'}">
               {(u.fullName ?? u.email).charAt(0).toUpperCase()}
             </div>
-            <div class="min-w-0">
-              <p class="text-sm font-medium text-slate-800 truncate">{u.fullName ?? u.email}</p>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-semibold text-slate-800 truncate group-hover:text-brand-700 transition-colors">{u.fullName ?? u.email}</p>
               <p class="text-xs text-slate-400 truncate">{u.email}</p>
             </div>
-          </div>
-          <!-- Rôle -->
-          <div class="col-span-2">
-            <span class="text-xs px-2 py-1 rounded-full font-medium capitalize {u.role === 'entreprise' ? 'bg-indigo-50 text-indigo-700' : 'bg-blue-50 text-blue-700'}">
+          </a>
+          <!-- Badges (rôle + statut) — sur mobile, les 2 sur la même ligne -->
+          <div class="flex items-center gap-2 flex-wrap pl-13 lg:pl-0 lg:col-span-2">
+            <span class="text-xs px-2.5 py-1 rounded-full font-semibold capitalize"
+                  style="background-color: {u.role === 'entreprise' ? '#fbf3ec' : '#eef1ff'}; color: {u.role === 'entreprise' ? '#743820' : '#1226a8'}">
               {u.role}
             </span>
           </div>
-          <!-- Statut -->
-          <div class="col-span-2">
-            <span class="text-xs px-2 py-1 rounded-full font-medium {u.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}">
+          <div class="flex items-center gap-2 flex-wrap pl-13 lg:pl-0 lg:col-span-2">
+            <span class="text-xs px-2.5 py-1 rounded-full font-semibold {u.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}">
               {u.isActive ? 'Actif' : 'Inactif'}
             </span>
           </div>
           <!-- Date -->
-          <div class="col-span-2">
+          <div class="flex items-center gap-1 pl-13 lg:pl-0 lg:col-span-2">
+            <span class="text-xs lg:hidden text-slate-400">Inscrit :</span>
             <span class="text-xs text-slate-400">
               {new Date(u.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short', year: 'numeric' })}
             </span>
           </div>
           <!-- Actions -->
-          <div class="col-span-2 flex items-center justify-end gap-1">
+          <div class="flex items-center gap-1 lg:justify-end lg:col-span-2 pl-13 lg:pl-0 flex-wrap">
             {#if !u.isActive && u.role === 'entreprise'}
               <button onclick={() => valider(u.id)} disabled={acting === u.id}
                 class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold hover:bg-emerald-100 transition-all disabled:opacity-60 border border-emerald-200">
@@ -147,18 +146,18 @@
             {/if}
             {#if u.isActive}
               <button onclick={() => suspendre(u.id)} disabled={acting === u.id}
-                class="p-1.5 rounded-lg text-amber-500 hover:bg-amber-50 transition-all disabled:opacity-60" title="Suspendre">
-                <span class="material-symbols-outlined" style="font-size: 16px;">pause_circle</span>
+                class="p-1.5 rounded-lg text-amber-600 hover:bg-amber-50 transition-all disabled:opacity-60" title="Suspendre">
+                <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">pause_circle</span>
               </button>
             {:else}
               <button onclick={() => reactiver(u.id)} disabled={acting === u.id}
-                class="p-1.5 rounded-lg text-emerald-500 hover:bg-emerald-50 transition-all disabled:opacity-60" title="Réactiver">
-                <span class="material-symbols-outlined" style="font-size: 16px;">play_circle</span>
+                class="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-all disabled:opacity-60" title="Réactiver">
+                <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">play_circle</span>
               </button>
             {/if}
             <button onclick={() => supprimer(u.id, u.fullName ?? u.email)} disabled={acting === u.id}
               class="p-1.5 rounded-lg text-red-400 hover:bg-red-50 transition-all disabled:opacity-60" title="Supprimer">
-              <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+              <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">delete</span>
             </button>
           </div>
         </div>

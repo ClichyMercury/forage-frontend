@@ -120,7 +120,7 @@
           <span class="material-symbols-outlined text-emerald-600 icon-filled" style="font-size: 18px;">check_circle</span>
           <p class="text-sm font-bold text-emerald-700">Offre retenue — {offreRetenue.entreprise?.full_name ?? offreRetenue.entreprise?.email ?? '—'}</p>
         </div>
-        <div class="grid grid-cols-3 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="text-center">
             <p class="text-xs text-emerald-600">Prix TTC prestataire</p>
             <p class="text-base font-bold text-emerald-800">{fmt(offreRetenue.prix_ttc)} FCFA</p>

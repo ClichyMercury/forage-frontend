@@ -49,12 +49,14 @@
 <svelte:head><title>Gestion des offres — Admin</title></svelte:head>
 
 <div class="mb-5">
-  <h2 class="text-xl font-bold text-slate-900">Offres des entreprises</h2>
-  <p class="text-sm text-slate-500 mt-0.5">Toutes les offres soumises sur les appels d'offres</p>
+  <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900">
+    Offres des <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">entreprises</span>.
+  </h2>
+  <p class="text-sm text-slate-500 mt-1">Toutes les offres soumises sur les appels d'offres.</p>
 </div>
 
 <!-- Filtres -->
-<div class="flex gap-2 mb-5">
+<div class="flex gap-2 mb-5 flex-wrap">
   {#each [
     { value: '', label: 'Toutes' },
     { value: 'soumise', label: 'Soumises' },
@@ -62,8 +64,8 @@
     { value: 'non_retenue', label: 'Non retenues' },
   ] as f}
     <button onclick={() => filtreStatut = f.value}
-      class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all border
-        {filtreStatut === f.value ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}">
+      class="px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all border
+        {filtreStatut === f.value ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}">
       {f.label}
     </button>
   {/each}
@@ -80,7 +82,7 @@
       <p class="text-slate-600 font-medium text-sm">Aucune offre trouvée</p>
     </div>
   {:else}
-    <div class="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+    <div class="hidden lg:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
       <div class="col-span-1">#</div>
       <div class="col-span-3">Entreprise</div>
       <div class="col-span-2">Demande</div>
@@ -92,35 +94,48 @@
     <div class="divide-y divide-slate-50">
       {#each offres as o}
         <a href="/admin/appels-offres/{o.appel_offre_id}/comparatif"
-          class="grid grid-cols-12 gap-4 px-5 py-3.5 hover:bg-slate-50 transition-all items-center group">
-          <div class="col-span-1">
-            <span class="text-sm text-slate-400">#{o.offre_id}</span>
+          class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4 hover:bg-slate-50 transition-all">
+          <!-- Ligne 1 mobile : Entreprise + Statut + ID -->
+          <div class="flex items-center gap-2 min-w-0 lg:col-span-1">
+            <span class="text-xs lg:hidden text-slate-400">Offre</span>
+            <span class="text-sm text-slate-500">#{o.offre_id}</span>
           </div>
-          <div class="col-span-3 flex items-center gap-2 min-w-0">
-            <div class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 text-xs font-bold shrink-0">
+          <div class="flex items-center gap-2 min-w-0 lg:col-span-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0" style="background-color: #b35d2e">
               {(o.entreprise?.fullName ?? o.entreprise?.email ?? '?').charAt(0).toUpperCase()}
             </div>
-            <span class="text-sm font-medium text-slate-800 truncate">
+            <span class="text-sm font-semibold text-slate-800 truncate flex-1">
               {o.entreprise?.fullName ?? o.entreprise?.email ?? '—'}
             </span>
+            <div class="lg:hidden shrink-0"><Badge status={o.statut} /></div>
           </div>
-          <div class="col-span-2 min-w-0">
+          <!-- Demande -->
+          <div class="flex items-center gap-1 min-w-0 pl-12 lg:pl-0 lg:col-span-2 lg:flex-col lg:items-start">
+            <span class="text-xs lg:hidden text-slate-400">Demande :</span>
             <p class="text-xs text-slate-600 truncate">{o.demande_adresse}</p>
-            <p class="text-xs text-slate-400 capitalize">{o.demande_type}</p>
+            <p class="text-xs text-slate-400 capitalize hidden lg:block">{o.demande_type}</p>
           </div>
-          <div class="col-span-2 text-right">
-            <span class="text-sm font-semibold text-slate-900">{fmt(o.prix_ttc)}</span>
-            <span class="text-xs text-slate-400 ml-1">FCFA</span>
+          <!-- Prix TTC -->
+          <div class="flex items-center justify-between gap-2 pl-12 lg:pl-0 lg:col-span-2 lg:justify-end">
+            <span class="text-xs lg:hidden text-slate-400">Prix TTC :</span>
+            <div>
+              <span class="text-sm font-semibold text-slate-900">{fmt(o.prix_ttc)}</span>
+              <span class="text-xs text-slate-400 ml-1">FCFA</span>
+            </div>
           </div>
-          <div class="col-span-1 text-right">
+          <!-- Délai + Budget : ligne unique mobile -->
+          <div class="flex items-center gap-4 pl-12 lg:pl-0 lg:col-span-1 lg:justify-end">
+            <span class="text-xs lg:hidden text-slate-400">Délai :</span>
             <span class="text-sm text-slate-600">{o.delai_execution_jours}j</span>
           </div>
-          <div class="col-span-1">
+          <div class="flex items-center gap-2 pl-12 lg:pl-0 lg:col-span-1">
+            <span class="text-xs lg:hidden text-slate-400">Dans budget :</span>
             <span class="text-xs font-semibold {o.dans_budget ? 'text-emerald-600' : 'text-red-500'}">
               {o.dans_budget ? '✓' : '✗'}
             </span>
           </div>
-          <div class="col-span-2">
+          <!-- Statut desktop only -->
+          <div class="hidden lg:block lg:col-span-2">
             <Badge status={o.statut} />
           </div>
         </a>

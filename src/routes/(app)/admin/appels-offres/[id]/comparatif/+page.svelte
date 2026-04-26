@@ -14,11 +14,22 @@
   let resumePrestation = $state('')
   let selectedOffreId = $state<number | null>(null)
 
+  let loadError = $state<string | null>(null)
+
   onMount(async () => {
+    const aoId = $page.params.id
+    if (!aoId) {
+      loadError = 'Identifiant de l\'appel d\'offre manquant'
+      loading = false
+      return
+    }
     try {
-      const res = await api.get(`/admin/appels-offres/${id}/comparatif`)
+      const res = await api.get(`/admin/appels-offres/${aoId}/comparatif`)
       data = res.data
-    } catch {} finally { loading = false }
+    } catch (err: any) {
+      console.error('[Comparatif] Erreur chargement:', err)
+      loadError = err.response?.data?.message ?? err.message ?? 'Erreur de chargement'
+    } finally { loading = false }
   })
 
   const selectedOffre = $derived(
@@ -60,6 +71,22 @@
     } finally { selecting = false }
   }
 
+  let rejecting = $state<number | null>(null)
+  async function rejeterOffre(offreId: number, nomEntreprise: string) {
+    if (!confirm(`Rejeter l'offre de "${nomEntreprise}" ?\n\nL'entreprise sera notifiée et l'offre passera en "non retenue".`)) return
+    rejecting = offreId
+    try {
+      await api.patch(`/admin/offres/${offreId}/rejeter`)
+      toast.success('Offre rejetée', 'L\'entreprise a été notifiée.')
+      // Recharger le comparatif pour refléter le nouveau statut
+      const res = await api.get(`/admin/appels-offres/${id}/comparatif`)
+      data = res.data
+      if (selectedOffreId === offreId) selectedOffreId = null
+    } catch (err: any) {
+      toast.error('Erreur', err.response?.data?.message ?? 'Impossible de rejeter cette offre')
+    } finally { rejecting = null }
+  }
+
   // Toast quand la marge change
   let lastDepasse = $state<boolean | null>(null)
   $effect(() => {
@@ -98,33 +125,50 @@
 
   {#if loading}
     <div class="space-y-4">{#each [1,2] as _}<div class="skeleton h-32 rounded-2xl"></div>{/each}</div>
+  {:else if loadError}
+    <div class="bg-white rounded-2xl border border-red-200 p-8 text-center">
+      <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center mx-auto mb-3">
+        <span class="material-symbols-outlined text-red-500 icon-filled" style="font-size: 24px;">error</span>
+      </div>
+      <p class="text-slate-700 font-semibold text-sm">Impossible de charger le comparatif</p>
+      <p class="text-slate-500 text-xs mt-1">{loadError}</p>
+      <button onclick={() => location.reload()}
+        class="mt-4 px-4 py-2 rounded-xl bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700 transition-all">
+        Réessayer
+      </button>
+    </div>
   {:else if data}
+    {@const comparatif = data.comparatif ?? []}
+    {@const resume = data.resume ?? { total_offres: 0, offres_dans_budget: 0, meilleur_prix_ttc: null }}
 
     <!-- Résumé budget -->
-    <div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
       <div class="bg-white rounded-2xl border border-slate-100 p-5">
         <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Budget client</p>
-        <p class="text-2xl font-bold text-amber-700">{fmt(data.budget_client)}</p>
+        <p class="font-display font-black text-2xl lg:text-3xl tracking-tight" style="color: #b35d2e">{fmt(data.budget_client ?? 0)}</p>
         <p class="text-xs text-slate-400 mt-1">FCFA — confidentiel</p>
       </div>
       <div class="bg-white rounded-2xl border border-slate-100 p-5">
         <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Offres reçues</p>
-        <p class="text-2xl font-bold text-slate-900">{data.resume.total_offres}</p>
-        <p class="text-xs text-slate-400 mt-1">{data.resume.offres_dans_budget} dans le budget</p>
+        <p class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900">{resume.total_offres ?? 0}</p>
+        <p class="text-xs text-slate-400 mt-1">{resume.offres_dans_budget ?? 0} dans le budget</p>
       </div>
       <div class="bg-white rounded-2xl border border-slate-100 p-5">
         <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Meilleur prix</p>
-        <p class="text-2xl font-bold {data.resume.offres_dans_budget > 0 ? 'text-emerald-700' : 'text-red-600'}">
-          {data.resume.meilleur_prix_ttc ? fmt(data.resume.meilleur_prix_ttc) : '—'}
+        <p class="font-display font-black text-2xl lg:text-3xl tracking-tight {(resume.offres_dans_budget ?? 0) > 0 ? 'text-emerald-700' : 'text-slate-400'}">
+          {resume.meilleur_prix_ttc ? fmt(resume.meilleur_prix_ttc) : '—'}
         </p>
         <p class="text-xs text-slate-400 mt-1">FCFA TTC</p>
       </div>
     </div>
 
-    {#if data.comparatif.length === 0}
-      <div class="bg-white rounded-2xl border border-slate-100 py-16 text-center text-slate-400">
-        <span class="material-symbols-outlined" style="font-size: 36px;">inbox</span>
-        <p class="text-sm mt-2">Aucune offre reçue pour cet appel d'offre</p>
+    {#if comparatif.length === 0}
+      <div class="bg-white rounded-2xl border border-slate-100 py-16 text-center">
+        <div class="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
+          <span class="material-symbols-outlined text-slate-400" style="font-size: 28px;">inbox</span>
+        </div>
+        <p class="text-slate-700 font-semibold text-sm">Aucune offre reçue pour cet appel d'offre</p>
+        <p class="text-slate-400 text-xs mt-1">Les offres apparaîtront ici dès leur soumission par les entreprises invitées.</p>
       </div>
     {:else}
       <!-- Tableau comparatif -->
@@ -134,74 +178,115 @@
           <p class="text-xs text-slate-400">Cliquez sur une ligne pour la sélectionner</p>
         </div>
 
-        <!-- En-tête -->
-        <div class="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+        <!-- En-tête (desktop only) -->
+        <div class="hidden lg:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
           <div class="col-span-1">#</div>
           <div class="col-span-3">Entreprise</div>
           <div class="col-span-2 text-right">Prix HT</div>
           <div class="col-span-2 text-right">Prix TTC</div>
-          <div class="col-span-2 text-right">Délai</div>
+          <div class="col-span-1 text-right">Délai</div>
           <div class="col-span-2 text-right">Marge dispo.</div>
+          <div class="col-span-1 text-right">Action</div>
         </div>
 
         <div class="divide-y divide-slate-50">
-          {#each data.comparatif as offre}
-            <button
-              onclick={() => selectedOffreId = offre.offre_id}
-              class="w-full grid grid-cols-12 gap-4 px-5 py-4 text-left transition-all items-center
-                {selectedOffreId === offre.offre_id
-                  ? 'bg-blue-50 border-l-2 border-l-blue-500'
-                  : 'hover:bg-slate-50'}
-                {offre.meilleure_offre ? 'relative' : ''}">
+          {#each comparatif as offre}
+            <div class="relative flex flex-col gap-3 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4 transition-all
+              {selectedOffreId === offre.offre_id ? 'bg-brand-50 lg:border-l-2 lg:border-l-brand-600' : 'hover:bg-slate-50'}">
 
-              <!-- Rang -->
-              <div class="col-span-1">
-                <span class="w-7 h-7 rounded-full {offre.meilleure_offre ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'} text-xs font-bold flex items-center justify-center">
+              <!-- Zone cliquable principale — desktop uniquement (mobile : on rendra l'entreprise cliquable) -->
+              <button
+                type="button"
+                onclick={() => selectedOffreId = offre.offre_id}
+                class="hidden lg:block absolute inset-0 right-[8.33%] cursor-pointer"
+                aria-label="Sélectionner l'offre #{offre.offre_id}"
+              ></button>
+
+              <!-- Ligne 1 mobile : Rang + Entreprise + Action -->
+              <div class="flex items-center gap-3 min-w-0 lg:col-span-1 relative lg:pointer-events-none">
+                <span class="w-8 h-8 rounded-full {offre.meilleure_offre ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'} text-xs font-bold flex items-center justify-center shrink-0">
                   {offre.rang}
                 </span>
               </div>
 
-              <!-- Entreprise -->
-              <div class="col-span-3 flex items-center gap-2 min-w-0">
-                <div class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 text-xs font-bold shrink-0">
+              <button
+                type="button"
+                onclick={() => selectedOffreId = offre.offre_id}
+                class="flex items-center gap-2 min-w-0 lg:col-span-3 relative text-left lg:pointer-events-none"
+              >
+                <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 text-xs font-bold shrink-0">
                   {(offre.entreprise?.fullName ?? offre.entreprise?.email ?? '?').charAt(0).toUpperCase()}
                 </div>
-                <div class="min-w-0">
-                  <p class="text-sm font-medium text-slate-800 truncate">
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-semibold text-slate-800 truncate">
                     {offre.entreprise?.fullName ?? offre.entreprise?.email ?? '—'}
                   </p>
                   {#if offre.meilleure_offre}
                     <span class="text-xs text-emerald-600 font-medium">Meilleure offre</span>
                   {/if}
                 </div>
-              </div>
+              </button>
 
               <!-- Prix HT -->
-              <div class="col-span-2 text-right">
-                <span class="text-sm text-slate-600">{fmt(offre.prix_ht)}</span>
-                <span class="text-xs text-slate-400 ml-1">FCFA</span>
+              <div class="flex items-center justify-between lg:justify-end lg:col-span-2 lg:text-right pl-11 lg:pl-0 relative lg:pointer-events-none">
+                <span class="text-xs lg:hidden text-slate-400">Prix HT :</span>
+                <div>
+                  <span class="text-sm text-slate-600">{fmt(offre.prix_ht)}</span>
+                  <span class="text-xs text-slate-400 ml-1">FCFA</span>
+                </div>
               </div>
 
               <!-- Prix TTC -->
-              <div class="col-span-2 text-right">
-                <span class="text-sm font-semibold text-slate-900">{fmt(offre.prix_ttc)}</span>
-                <span class="text-xs text-slate-400 ml-1">FCFA</span>
+              <div class="flex items-center justify-between lg:justify-end lg:col-span-2 lg:text-right pl-11 lg:pl-0 relative lg:pointer-events-none">
+                <span class="text-xs lg:hidden text-slate-400">Prix TTC :</span>
+                <div>
+                  <span class="text-sm font-semibold text-slate-900">{fmt(offre.prix_ttc)}</span>
+                  <span class="text-xs text-slate-400 ml-1">FCFA</span>
+                </div>
               </div>
 
               <!-- Délai -->
-              <div class="col-span-2 text-right">
-                <span class="text-sm text-slate-700">{offre.delai_execution_jours}</span>
-                <span class="text-xs text-slate-400 ml-1">jours</span>
+              <div class="flex items-center justify-between lg:justify-end lg:col-span-1 lg:text-right pl-11 lg:pl-0 relative lg:pointer-events-none">
+                <span class="text-xs lg:hidden text-slate-400">Délai :</span>
+                <div>
+                  <span class="text-sm text-slate-700">{offre.delai_execution_jours}</span>
+                  <span class="text-xs text-slate-400 ml-0.5">j</span>
+                </div>
               </div>
 
               <!-- Marge disponible -->
-              <div class="col-span-2 text-right">
-                <span class="text-sm font-semibold {offre.dans_budget ? 'text-emerald-600' : 'text-red-500'}">
-                  {offre.dans_budget ? '+' : ''}{fmt(offre.marge_disponible)}
-                </span>
-                <span class="text-xs text-slate-400 ml-1">FCFA</span>
+              <div class="flex items-center justify-between lg:justify-end lg:col-span-2 lg:text-right pl-11 lg:pl-0 relative lg:pointer-events-none">
+                <span class="text-xs lg:hidden text-slate-400">Marge :</span>
+                <div>
+                  <span class="text-sm font-semibold {offre.dans_budget ? 'text-emerald-600' : 'text-red-500'}">
+                    {offre.dans_budget ? '+' : ''}{fmt(offre.marge_disponible)}
+                  </span>
+                  <span class="text-xs text-slate-400 ml-1">FCFA</span>
+                </div>
               </div>
-            </button>
+
+              <!-- Action : Rejeter -->
+              <div class="flex items-center justify-end pl-11 lg:pl-0 lg:col-span-1 lg:text-right relative">
+                {#if offre.statut === 'retenue'}
+                  <span class="text-xs px-2 py-1 rounded-full font-semibold bg-emerald-50 text-emerald-700">Retenue</span>
+                {:else if offre.statut === 'non_retenue' || offre.statut === 'rejetee'}
+                  <span class="text-xs px-2 py-1 rounded-full font-semibold bg-red-50 text-red-600">Rejetée</span>
+                {:else}
+                  <button
+                    type="button"
+                    onclick={() => rejeterOffre(offre.offre_id, offre.entreprise?.fullName ?? offre.entreprise?.email ?? 'cette entreprise')}
+                    disabled={rejecting === offre.offre_id}
+                    class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-all disabled:opacity-60"
+                    title="Rejeter cette offre">
+                    {#if rejecting === offre.offre_id}
+                      <span class="w-4 h-4 border-2 border-red-200 border-t-red-500 rounded-full animate-spin block"></span>
+                    {:else}
+                      <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">cancel</span>
+                    {/if}
+                  </button>
+                {/if}
+              </div>
+            </div>
 
             <!-- Description technique si sélectionnée -->
             {#if selectedOffreId === offre.offre_id && offre.description_technique}

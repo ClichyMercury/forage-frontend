@@ -25,13 +25,13 @@
   })
 </script>
 
-<header class="sticky top-0 z-30 bg-white border-b border-slate-100 px-5 py-3 flex items-center justify-between">
+<header class="sticky top-0 z-30 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
   <div class="flex items-center gap-3">
     <button onclick={onToggleSidebar}
-      class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-all text-slate-500">
+      class="w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-all text-slate-600">
       <span class="material-symbols-outlined" style="font-size: 20px;">menu</span>
     </button>
-    <h1 class="text-base font-semibold text-slate-800">{pageTitle()}</h1>
+    <h1 class="font-display font-bold text-lg tracking-tight text-slate-900">{pageTitle()}</h1>
   </div>
 
   <div class="flex items-center gap-1">
@@ -39,10 +39,10 @@
     <div class="relative">
       <button
         onclick={() => { showNotifs = !showNotifs; if (showNotifs) notifStore.load() }}
-        class="relative w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-all text-slate-500">
+        class="relative w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-all text-slate-600">
         <span class="material-symbols-outlined icon-filled" style="font-size: 20px;">notifications</span>
         {#if notifStore.count > 0}
-          <span class="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+          <span class="absolute top-1 right-1 w-4 h-4 rounded-full text-white text-[9px] font-bold flex items-center justify-center" style="background-color: #b35d2e">
             {notifStore.count > 9 ? '9+' : notifStore.count}
           </span>
         {/if}
@@ -52,12 +52,12 @@
         <button class="fixed inset-0 z-40" onclick={() => showNotifs = false} aria-label="Fermer"></button>
         <div class="absolute right-0 top-10 w-80 bg-white rounded-xl shadow-lg border border-slate-100 z-50 overflow-hidden animate-fade-in-down">
           <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-            <span class="font-semibold text-slate-800 text-sm">Notifications</span>
+            <span class="font-display font-bold text-slate-900 text-sm">Notifications</span>
             <div class="flex items-center gap-2">
               {#if notifStore.count > 0}
-                <span class="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-medium">{notifStore.count} non lues</span>
+                <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background-color: #b35d2e">{notifStore.count} non lues</span>
                 <button onclick={() => notifStore.markAllRead()}
-                  class="text-xs text-slate-400 hover:text-blue-600 transition-colors">
+                  class="text-xs text-slate-400 hover:text-brand-600 transition-colors">
                   Tout lire
                 </button>
               {/if}
@@ -73,10 +73,10 @@
             {:else}
               {#each notifStore.items.slice(0, 8) as notif}
                 <button onclick={() => notifStore.markRead(notif.id)}
-                  class="w-full text-left px-4 py-3 hover:bg-slate-50 transition-all border-b border-slate-50 last:border-0 {!notif.lu ? 'bg-blue-50/40' : ''}">
+                  class="w-full text-left px-4 py-3 hover:bg-slate-50 transition-all border-b border-slate-50 last:border-0 {!notif.lu ? 'bg-brand-50/60' : ''}">
                   <div class="flex items-start gap-2.5">
-                    <div class="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
-                      <span class="material-symbols-outlined text-blue-600 icon-filled" style="font-size: 13px;">notifications</span>
+                    <div class="w-7 h-7 rounded-lg bg-brand-100 flex items-center justify-center shrink-0 mt-0.5">
+                      <span class="material-symbols-outlined text-brand-600 icon-filled" style="font-size: 13px;">notifications</span>
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="text-xs text-slate-700 leading-snug line-clamp-2">{notif.contenu}</p>
@@ -85,7 +85,7 @@
                       </p>
                     </div>
                     {#if !notif.lu}
-                      <div class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0 mt-1.5"></div>
+                      <div class="w-1.5 h-1.5 rounded-full bg-brand-600 shrink-0 mt-1.5"></div>
                     {/if}
                   </div>
                 </button>
@@ -95,7 +95,7 @@
 
           <div class="px-4 py-2.5 border-t border-slate-100">
             <a href="/{auth.user?.role}/notifications" onclick={() => showNotifs = false}
-              class="text-xs text-blue-600 font-medium hover:text-blue-700">
+              class="text-xs text-brand-600 font-semibold hover:text-brand-700">
               Voir toutes les notifications →
             </a>
           </div>
@@ -105,12 +105,12 @@
 
     <!-- Avatar -->
     <a href="/{auth.user?.role}/profile"
-      class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-all ml-1">
-      <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
+      class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition-all ml-1">
+      <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold">
         {auth.user?.initials ?? '?'}
       </div>
       <div class="hidden sm:block">
-        <p class="text-sm font-medium text-slate-800 leading-none">{auth.user?.fullName?.split(' ')[0] ?? 'Profil'}</p>
+        <p class="text-sm font-semibold text-slate-800 leading-none">{auth.user?.fullName?.split(' ')[0] ?? 'Profil'}</p>
       </div>
     </a>
   </div>

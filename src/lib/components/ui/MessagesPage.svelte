@@ -149,11 +149,12 @@
   })
 </script>
 
-<div class="flex gap-6 h-[calc(100vh-180px)]">
-  <!-- Liste des demandes -->
-  <div class="w-72 shrink-0 bg-white rounded-2xl card-shadow overflow-hidden flex flex-col">
+<div class="flex flex-col lg:flex-row gap-4 lg:gap-6 h-[calc(100vh-180px)]">
+  <!-- Liste des demandes : pleine largeur mobile (cachée si conversation ouverte), 288px desktop -->
+  <div class="w-full lg:w-72 lg:shrink-0 bg-white rounded-2xl card-shadow overflow-hidden flex-col
+              {selectedDemande ? 'hidden lg:flex' : 'flex'}">
     <div class="px-4 py-3.5 border-b border-slate-100">
-      <h3 class="font-bold text-slate-800">Conversations</h3>
+      <h3 class="font-display font-bold text-slate-900">Conversations</h3>
       <p class="text-xs text-slate-400 mt-0.5">Mise à jour automatique</p>
     </div>
     <div class="flex-1 overflow-y-auto">
@@ -169,11 +170,11 @@
           {@const unread = msgStore.unreadByDemande[d.id] ?? 0}
           <button onclick={() => selectDemande(d)}
             class="w-full text-left flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 transition-all border-b border-slate-50
-              {selectedDemande?.id === d.id ? 'bg-blue-50 border-l-2 border-l-blue-500' : ''}
+              {selectedDemande?.id === d.id ? 'bg-brand-50 lg:border-l-2 lg:border-l-brand-600' : ''}
               {unread > 0 ? 'bg-red-50/30' : ''}">
             <div class="relative shrink-0">
-              <div class="w-9 h-9 rounded-xl {unread > 0 ? 'bg-red-100' : 'gradient-blue-soft'} flex items-center justify-center">
-                <span class="material-symbols-outlined icon-filled {unread > 0 ? 'text-red-500' : 'text-blue-500'}" style="font-size: 16px;">
+              <div class="w-10 h-10 rounded-xl {unread > 0 ? 'bg-red-100' : 'bg-brand-50'} flex items-center justify-center">
+                <span class="material-symbols-outlined icon-filled {unread > 0 ? 'text-red-500' : 'text-brand-600'}" style="font-size: 16px;">
                   {unread > 0 ? 'mark_chat_unread' : 'water_drop'}
                 </span>
               </div>
@@ -191,52 +192,87 @@
                 {unread > 0 ? `${unread} message${unread > 1 ? 's' : ''} non lu${unread > 1 ? 's' : ''}` : (d.typeForage ?? '')}
               </p>
             </div>
+            <span class="material-symbols-outlined text-slate-300 lg:hidden" style="font-size: 18px;">chevron_right</span>
           </button>
         {/each}
       {/if}
     </div>
   </div>
 
-  <!-- Zone de chat -->
-  <div class="flex-1 bg-white rounded-2xl card-shadow overflow-hidden flex flex-col">
+  <!-- Zone de chat : pleine largeur mobile (cachée si pas de conversation), flex-1 desktop -->
+  <div class="flex-1 bg-white rounded-2xl card-shadow overflow-hidden flex-col
+              {selectedDemande ? 'flex' : 'hidden lg:flex'}">
     {#if !selectedDemande}
       <div class="flex-1 flex flex-col items-center justify-center text-slate-400">
-        <div class="w-16 h-16 rounded-2xl gradient-blue-soft flex items-center justify-center mb-4">
-          <span class="material-symbols-outlined text-blue-400" style="font-size: 32px;">chat</span>
+        <div class="w-16 h-16 rounded-2xl bg-brand-50 flex items-center justify-center mb-4">
+          <span class="material-symbols-outlined text-brand-400" style="font-size: 32px;">chat</span>
         </div>
         <p class="font-medium text-slate-500">Sélectionnez une conversation</p>
         <p class="text-sm mt-1">pour voir les messages</p>
       </div>
     {:else}
       <!-- Header chat -->
-      <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl gradient-blue flex items-center justify-center">
-            <span class="material-symbols-outlined text-white icon-filled" style="font-size: 16px;">water_drop</span>
+      <div class="px-4 lg:px-5 py-3 lg:py-3.5 border-b border-slate-100 flex items-center gap-2">
+        <!-- Bouton retour mobile -->
+        <button
+          type="button"
+          onclick={() => { selectedDemande = null; if (pollInterval) clearInterval(pollInterval) }}
+          class="lg:hidden w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-600 shrink-0 transition-all"
+          aria-label="Retour aux conversations"
+        >
+          <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+        </button>
+
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background-color: #1e3fff">
+            <span class="material-symbols-outlined text-white icon-filled" style="font-size: 16px;">
+              {auth.user?.role === 'admin' ? 'forum' : 'support_agent'}
+            </span>
           </div>
-          <div>
-            <p class="font-semibold text-slate-800 text-sm">{selectedDemande.localisationAdresse ?? `Demande #${selectedDemande.id}`}</p>
-            <p class="text-xs text-slate-400">Mise à jour toutes les 15s</p>
+          <div class="min-w-0 flex-1">
+            {#if auth.user?.role === 'admin'}
+              <p class="font-semibold text-slate-800 text-sm truncate">{selectedDemande.localisationAdresse ?? `Demande #${selectedDemande.id}`}</p>
+              <p class="text-xs text-slate-400">Mise à jour toutes les 15s</p>
+            {:else}
+              <p class="font-semibold text-slate-800 text-sm flex items-center gap-1.5 truncate">
+                Équipe ForageCI
+                <span class="material-symbols-outlined icon-filled text-slate-400 shrink-0" style="font-size: 13px;">verified</span>
+              </p>
+              <p class="text-xs text-slate-400 truncate">{selectedDemande.localisationAdresse ?? `Demande #${selectedDemande.id}`}</p>
+            {/if}
           </div>
         </div>
+
+        <!-- Sélecteur destinataire (admin) ou badge privé -->
         {#if auth.user?.role === 'admin'}
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-slate-500 font-medium">Répondre à :</span>
-            <select bind:value={adminReceiverId}
-              class="text-xs px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 font-medium">
-              {#if selectedDemande.clientId}
-                <option value={selectedDemande.clientId}>👤 {selectedDemande.clientNom ?? 'Client'}</option>
-              {/if}
-              {#each entreprisesAO as e}
-                <option value={e.id}>🏢 {e.fullName ?? e.email}</option>
-              {/each}
-            </select>
+          <select bind:value={adminReceiverId}
+            class="text-xs px-2 sm:px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 font-medium shrink-0 max-w-[140px] sm:max-w-none truncate">
+            {#if selectedDemande.clientId}
+              <option value={selectedDemande.clientId}>👤 {selectedDemande.clientNom ?? 'Client'}</option>
+            {/if}
+            {#each entreprisesAO as e}
+              <option value={e.id}>🏢 {e.fullName ?? e.email}</option>
+            {/each}
+          </select>
+        {:else}
+          <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 shrink-0">
+            <span class="material-symbols-outlined icon-filled text-emerald-600" style="font-size: 13px;">lock</span>
+            <span class="text-[11px] font-semibold text-emerald-700">Privée</span>
           </div>
         {/if}
       </div>
 
+      {#if auth.user?.role !== 'admin'}
+        <div class="px-4 lg:px-5 py-2 bg-brand-50/60 border-b border-brand-100">
+          <p class="text-[11px] text-brand-700 flex items-start gap-1.5 leading-snug">
+            <span class="material-symbols-outlined icon-filled shrink-0 mt-0.5" style="font-size: 13px;">info</span>
+            <span>Conversation privée et sécurisée par la plateforme. {auth.user?.role === 'client' ? "Les prestataires ne voient pas ce fil." : "Le client ne voit pas ce fil."}</span>
+          </p>
+        </div>
+      {/if}
+
       <!-- Messages -->
-      <div bind:this={chatEl} class="flex-1 overflow-y-auto p-5 space-y-3">
+      <div bind:this={chatEl} class="flex-1 overflow-y-auto p-4 lg:p-5 space-y-3">
         {#if loadingMessages}
           <div class="space-y-3">{#each [1,2,3] as _}<div class="skeleton h-12 rounded-xl"></div>{/each}</div>
         {:else if messages.length === 0}
@@ -247,27 +283,40 @@
         {:else}
           {#each messages as msg}
             {@const isMine = msg.senderId === auth.user?.id || msg.sender_id === auth.user?.id}
+            {@const isAdmin = auth.user?.role === 'admin'}
+            {@const otherParty = msg.sender?.role === 'admin' ? msg.receiver : msg.sender}
+            {@const canalRole = otherParty?.role}
             <div class="flex {isMine ? 'justify-end' : 'justify-start'}">
-              <div class="max-w-xs lg:max-w-md">
+              <div class="max-w-[85%] sm:max-w-xs lg:max-w-md">
                 {#if !isMine}
-                  <p class="text-xs text-slate-400 mb-1 ml-1 flex items-center gap-1">
-                    {msg.sender?.fullName ?? msg.sender?.email ?? 'Expéditeur'}
-                    <span class="px-1.5 py-0.5 rounded-full text-[10px] capitalize
-                      {msg.sender?.role === 'admin' ? 'bg-indigo-100 text-indigo-600' :
-                       msg.sender?.role === 'entreprise' ? 'bg-amber-100 text-amber-600' :
-                       'bg-blue-100 text-blue-600'}">
+                  <p class="text-xs text-slate-400 mb-1 ml-1 flex items-center gap-1 flex-wrap">
+                    <span class="truncate">{msg.sender?.fullName ?? msg.sender?.email ?? 'Expéditeur'}</span>
+                    <span class="px-1.5 py-0.5 rounded-full text-[10px] capitalize shrink-0
+                      {msg.sender?.role === 'admin' ? 'bg-slate-100 text-slate-600' :
+                       msg.sender?.role === 'entreprise' ? 'bg-terre-100 text-terre-700' :
+                       'bg-brand-100 text-brand-700'}">
                       {msg.sender?.role ?? ''}
                     </span>
                   </p>
                 {/if}
                 <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed
-                  {isMine ? 'gradient-blue text-white rounded-br-sm' : 'bg-slate-100 text-slate-800 rounded-bl-sm'}">
+                  {isMine ? 'text-white rounded-br-sm' : 'bg-slate-100 text-slate-800 rounded-bl-sm'}"
+                  style={isMine ? 'background-color: #1e3fff' : ''}>
                   {msg.contenu}
                 </div>
-                <p class="text-xs text-slate-400 mt-1 {isMine ? 'text-right mr-1' : 'ml-1'}">
-                  {new Date(msg.createdAt).toLocaleTimeString('fr-CI', { hour: '2-digit', minute: '2-digit' })}
+                <p class="text-xs text-slate-400 mt-1 flex items-center gap-1.5 flex-wrap {isMine ? 'justify-end mr-1' : 'ml-1'}">
+                  {#if isAdmin && canalRole}
+                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium max-w-[180px] truncate
+                      {canalRole === 'entreprise' ? 'bg-terre-50 text-terre-700 border border-terre-200' : 'bg-brand-50 text-brand-700 border border-brand-200'}">
+                      <span class="material-symbols-outlined icon-filled shrink-0" style="font-size: 11px;">
+                        {canalRole === 'entreprise' ? 'business' : 'person'}
+                      </span>
+                      <span class="truncate">Canal {canalRole === 'entreprise' ? `Entreprise · ${otherParty?.fullName ?? otherParty?.email ?? ''}` : 'Client'}</span>
+                    </span>
+                  {/if}
+                  <span>{new Date(msg.createdAt).toLocaleTimeString('fr-CI', { hour: '2-digit', minute: '2-digit' })}</span>
                   {#if isMine}
-                    <span class="ml-1 text-slate-300">✓</span>
+                    <span class="text-slate-300">✓</span>
                   {/if}
                 </p>
               </div>
@@ -277,18 +326,18 @@
       </div>
 
       <!-- Saisie message -->
-      <div class="px-5 py-4 border-t border-slate-100">
-        <div class="flex gap-3">
+      <div class="px-4 lg:px-5 py-3 lg:py-4 border-t border-slate-100">
+        <div class="flex gap-2 lg:gap-3">
           <textarea
             bind:value={newMessage}
             onkeydown={handleKey}
             rows="1"
-            placeholder="Écrivez votre message... (Entrée pour envoyer)"
-            class="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm resize-none transition-all"
+            placeholder="Écrivez votre message…"
+            class="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm resize-none transition-all min-w-0"
             style="min-height: 44px; max-height: 120px;"
           ></textarea>
           <button onclick={sendMessage} disabled={sending || !newMessage.trim()}
-            class="w-11 h-11 rounded-xl gradient-blue text-white flex items-center justify-center shadow-md hover:scale-[1.05] transition-all disabled:opacity-50 shrink-0">
+            class="w-11 h-11 rounded-xl bg-brand-600 hover:bg-brand-700 text-white flex items-center justify-center shadow-md transition-all disabled:opacity-50 shrink-0">
             {#if sending}
               <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
             {:else}
@@ -298,7 +347,8 @@
         </div>
         <p class="text-xs text-slate-400 mt-1.5 flex items-center gap-1">
           <span class="material-symbols-outlined icon-filled" style="font-size: 12px;">mail</span>
-          Le destinataire reçoit aussi un email de notification
+          <span class="hidden sm:inline">Le destinataire reçoit aussi un email de notification</span>
+          <span class="sm:hidden">Email envoyé au destinataire</span>
         </p>
       </div>
     {/if}

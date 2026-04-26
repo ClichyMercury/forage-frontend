@@ -39,9 +39,19 @@
 
 <svelte:head><title>Inscription — ForageCI</title></svelte:head>
 
+<!-- Logo mobile -->
+<div class="lg:hidden flex items-center gap-2.5 mb-10">
+  <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background-color: #1e3fff">
+    <span class="material-symbols-outlined text-white icon-filled" style="font-size: 20px;">water_drop</span>
+  </div>
+  <span class="font-display font-black text-xl tracking-tight text-slate-900">ForageCI</span>
+</div>
+
 <div class="mb-8">
-  <h2 class="text-3xl font-bold text-slate-900">Créer un compte</h2>
-  <p class="text-slate-500 mt-2">Rejoignez la plateforme ForageCI</p>
+  <h2 class="font-display font-black text-4xl tracking-tight leading-[1.05] text-slate-900">
+    Créer un compte.
+  </h2>
+  <p class="text-slate-500 mt-3 text-base">Rejoignez la plateforme ForageCI.</p>
 </div>
 
 <form onsubmit={handleRegister} class="space-y-4">
@@ -120,17 +130,17 @@
   </div>
 
   <button type="submit" disabled={loading}
-    class="w-full py-3.5 rounded-xl gradient-blue text-white font-semibold text-sm shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+    class="w-full py-4 rounded-2xl bg-brand-600 text-white font-semibold text-sm shadow-xl hover:bg-brand-700 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
     {#if loading}
       <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
       Création...
     {:else}
-      <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">person_add</span>
+      <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">arrow_forward</span>
       Créer mon compte
     {/if}
   </button>
 </form>
 
-<p class="mt-6 text-center text-sm text-slate-500">
-  Déjà un compte ? <a href="/login" class="text-blue-600 font-semibold hover:text-blue-700">Se connecter</a>
+<p class="mt-8 pt-6 border-t border-slate-100 text-center text-sm text-slate-500">
+  Déjà un compte ? <a href="/login" class="text-brand-600 font-semibold hover:text-brand-700">Se connecter</a>
 </p>

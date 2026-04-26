@@ -213,7 +213,7 @@
             Envoi...
           {:else}
             <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">send</span>
-            Soumettre la demande
+            Soumettre
           {/if}
         </button>
       </div>

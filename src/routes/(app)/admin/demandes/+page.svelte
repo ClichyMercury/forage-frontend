@@ -83,7 +83,7 @@
       <p class="text-sm mt-2">Aucune demande trouvée</p>
     </div>
   {:else}
-    <div class="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+    <div class="hidden lg:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
       <div class="col-span-3">Localisation</div>
       <div class="col-span-2">Client</div>
       <div class="col-span-2">Type</div>
@@ -94,32 +94,40 @@
     <div class="divide-y divide-slate-50">
       {#each demandes as d}
         <a href="/admin/demandes/{d.id}"
-          class="grid grid-cols-12 gap-4 px-5 py-4 hover:bg-slate-50 transition-all items-center group">
-          <div class="col-span-3 flex items-center gap-2 min-w-0">
-            <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-slate-500 icon-filled" style="font-size: 14px;">water_drop</span>
+          class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4 hover:bg-slate-50 transition-all">
+          <!-- Ligne 1 mobile : Localisation + Statut -->
+          <div class="flex items-center gap-2 min-w-0 lg:col-span-3">
+            <div class="w-9 h-9 rounded-xl bg-brand-50 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-brand-600 icon-filled" style="font-size: 15px;">water_drop</span>
             </div>
-            <span class="text-sm font-medium text-slate-800 truncate">{d.localisationAdresse}</span>
+            <span class="text-sm font-medium text-slate-800 truncate flex-1">{d.localisationAdresse}</span>
+            <div class="lg:hidden shrink-0">
+              <Badge status={d.statut} />
+            </div>
           </div>
-          <div class="col-span-2 min-w-0">
-            <span class="text-sm text-slate-600 truncate block">{d.client?.fullName ?? d.client?.email ?? '—'}</span>
+          <div class="flex items-center gap-1 pl-12 lg:pl-0 lg:col-span-2 min-w-0">
+            <span class="text-xs lg:hidden text-slate-400">Client :</span>
+            <span class="text-sm text-slate-600 truncate">{d.client?.fullName ?? d.client?.email ?? '—'}</span>
           </div>
-          <div class="col-span-2">
+          <div class="flex items-center gap-1 pl-12 lg:pl-0 lg:col-span-2">
+            <span class="text-xs lg:hidden text-slate-400">Type :</span>
             <span class="text-sm text-slate-600 capitalize">{d.typeForage}</span>
           </div>
-          <div class="col-span-2">
+          <div class="flex items-center gap-1 pl-12 lg:pl-0 lg:col-span-2">
+            <span class="text-xs lg:hidden text-slate-400">Budget :</span>
             {#if d.budgetMax}
-              <span class="text-sm font-semibold text-amber-700">{fmt(d.budgetMax)} FCFA</span>
+              <span class="text-sm font-semibold" style="color: #b35d2e">{fmt(d.budgetMax)} FCFA</span>
             {:else}
               <span class="text-slate-300">—</span>
             {/if}
           </div>
-          <div class="col-span-1">
+          <div class="flex items-center gap-1 pl-12 lg:pl-0 lg:col-span-1">
+            <span class="text-xs lg:hidden text-slate-400">Date :</span>
             <span class="text-xs text-slate-400">
               {new Date(d.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short' })}
             </span>
           </div>
-          <div class="col-span-2">
+          <div class="hidden lg:block lg:col-span-2">
             <Badge status={d.statut} />
           </div>
         </a>
