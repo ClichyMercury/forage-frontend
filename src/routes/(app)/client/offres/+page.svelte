@@ -43,7 +43,7 @@
 <div class="mb-5 flex items-center justify-between">
   <div>
     <h2 class="text-xl font-bold text-slate-900">Mes offres reçues</h2>
-    <p class="text-sm text-slate-500 mt-0.5">Offres finales préparées par l'administrateur</p>
+    <p class="text-sm text-slate-500 mt-0.5">Offres finales préparées pour vos demandes</p>
   </div>
   {#if offres.length > 0}
     <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium">{offres.length} offre{offres.length > 1 ? 's' : ''}</span>
@@ -57,7 +57,7 @@
   <div class="bg-white rounded-2xl border border-slate-100 py-14 text-center px-6">
     <span class="material-symbols-outlined text-slate-300 icon-filled" style="font-size: 40px;">description</span>
     <p class="text-slate-600 font-medium text-sm mt-3">Aucune offre reçue pour le moment</p>
-    <p class="text-slate-400 text-xs mt-1 mb-4">Les offres de l'administrateur apparaîtront ici</p>
+    <p class="text-slate-400 text-xs mt-1 mb-4">Les offres apparaîtront ici dès leur préparation</p>
     <button onclick={() => goto('/client/demandes')}
       class="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all">
       Voir mes demandes

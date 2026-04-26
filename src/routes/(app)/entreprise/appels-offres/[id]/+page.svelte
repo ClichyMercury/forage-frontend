@@ -51,7 +51,7 @@
       await api.post(`/appels-offres/${id}/offres`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
-      toast.success('Offre soumise !', "Votre offre a été transmise à l'administrateur.")
+      toast.success('Offre soumise !', 'Votre offre a bien été transmise.')
       goto('/entreprise/mes-offres')
     } catch (err: any) {
       toast.error('Erreur', err.response?.data?.message)
@@ -216,7 +216,7 @@
       <!-- Formulaire -->
       <form onsubmit={handleSubmit} class="p-6 space-y-4">
         <!-- Prix -->
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-slate-700 mb-1.5" for="prixHt">Prix HT (FCFA) *</label>
             <input id="prixHt" type="number" bind:value={prixHt} placeholder="Ex: 1 500 000" required

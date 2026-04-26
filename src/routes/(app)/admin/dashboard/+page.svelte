@@ -61,26 +61,27 @@
 <svelte:head><title>Tableau de bord — Admin ForageCI</title></svelte:head>
 
 <!-- Header -->
-<div class="mb-6 flex items-center justify-between flex-wrap gap-3">
-  <div>
-    <h2 class="text-xl font-bold text-slate-900">
-      Bonjour, {auth.user?.fullName?.split(' ')[0] ?? 'Admin'}
+<div class="mb-6 flex items-start lg:items-center justify-between flex-wrap gap-3">
+  <div class="min-w-0 flex-1">
+    <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900 wrap-break-word">
+      Bonjour, <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">{auth.user?.fullName?.split(' ')[0] ?? 'Admin'}</span>.
     </h2>
-    <p class="text-sm text-slate-500 mt-0.5">Vue d'ensemble de la plateforme</p>
+    <p class="text-sm text-slate-500 mt-1">Vue d'ensemble de la plateforme.</p>
   </div>
-  <div class="flex items-center gap-2">
+  <div class="flex items-center gap-2 flex-wrap">
     <div class="flex gap-1 bg-slate-100 rounded-xl p-1">
-      {#each [['semaine','Semaine'], ['mois','Mois'], ['annee','Année']] as [val, label]}
+      {#each [['semaine','Sem.'], ['mois','Mois'], ['annee','An.']] as [val, label]}
         <button onclick={() => periode = val}
-          class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {periode === val ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}">
+          class="px-3 py-1.5 rounded-lg text-sm font-semibold transition-all {periode === val ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}">
           {label}
         </button>
       {/each}
     </div>
     <a href="/admin/demandes"
-      class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-all shadow-sm">
+      class="flex items-center gap-2 px-4 lg:px-5 py-2.5 lg:py-3 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition-all shadow-sm whitespace-nowrap">
       <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">assignment</span>
-      Gérer les demandes
+      <span class="hidden sm:inline">Gérer les demandes</span>
+      <span class="sm:hidden">Gérer</span>
     </a>
   </div>
 </div>
@@ -117,8 +118,8 @@
   <!-- Demandes récentes — même style que la liste demandes -->
   <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-100 overflow-hidden">
     <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-      <h3 class="font-semibold text-slate-800">Demandes récentes</h3>
-      <a href="/admin/demandes" class="text-sm text-blue-600 hover:text-blue-700 font-medium">Voir tout</a>
+      <h3 class="font-display font-bold text-slate-900">Demandes récentes</h3>
+      <a href="/admin/demandes" class="text-sm text-brand-600 hover:text-brand-700 font-semibold">Voir tout</a>
     </div>
     {#if loading}
       <div class="p-5 space-y-2">{#each [1,2,3] as _}<div class="skeleton h-12 rounded-xl"></div>{/each}</div>
@@ -130,8 +131,8 @@
         <p class="text-slate-500 text-sm font-medium">Aucune demande</p>
       </div>
     {:else}
-      <!-- En-tête mini-tableau -->
-      <div class="grid grid-cols-12 gap-3 px-5 py-2.5 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wide">
+      <!-- En-tête mini-tableau (desktop only) -->
+      <div class="hidden lg:grid grid-cols-12 gap-3 px-5 py-2.5 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wide">
         <div class="col-span-4">Localisation</div>
         <div class="col-span-3">Client</div>
         <div class="col-span-2">Type</div>
@@ -140,20 +141,23 @@
       <div class="divide-y divide-slate-50">
         {#each demandes as d}
           <a href="/admin/demandes/{d.id}"
-            class="grid grid-cols-12 gap-3 px-5 py-3 hover:bg-slate-50 transition-all items-center group">
-            <div class="col-span-4 flex items-center gap-2 min-w-0">
-              <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 14px;">water_drop</span>
+            class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-3 lg:items-center px-5 py-3 hover:bg-slate-50 transition-all">
+            <div class="flex items-center gap-2 min-w-0 lg:col-span-4">
+              <div class="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-brand-600 icon-filled" style="font-size: 15px;">water_drop</span>
               </div>
-              <span class="text-sm font-medium text-slate-800 truncate">{d.localisationAdresse}</span>
+              <span class="text-sm font-medium text-slate-800 truncate flex-1">{d.localisationAdresse}</span>
+              <div class="lg:hidden shrink-0"><Badge status={d.statut} /></div>
             </div>
-            <div class="col-span-3 min-w-0">
-              <span class="text-sm text-slate-600 truncate block">{d.client?.fullName ?? d.client?.email ?? '—'}</span>
+            <div class="flex items-center gap-1 pl-10 lg:pl-0 lg:col-span-3 min-w-0">
+              <span class="text-xs lg:hidden text-slate-400">Client :</span>
+              <span class="text-sm text-slate-600 truncate">{d.client?.fullName ?? d.client?.email ?? '—'}</span>
             </div>
-            <div class="col-span-2">
+            <div class="flex items-center gap-1 pl-10 lg:pl-0 lg:col-span-2">
+              <span class="text-xs lg:hidden text-slate-400">Type :</span>
               <span class="text-xs text-slate-500 capitalize">{d.typeForage}</span>
             </div>
-            <div class="col-span-3">
+            <div class="hidden lg:block lg:col-span-3">
               <Badge status={d.statut} />
             </div>
           </a>
@@ -165,9 +169,9 @@
   <!-- Validation entreprises -->
   <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
     <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-      <h3 class="font-semibold text-slate-800">Validation entreprises</h3>
+      <h3 class="font-display font-bold text-slate-900">Validation entreprises</h3>
       {#if pendingEntreprises.length > 0}
-        <span class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium border border-orange-200">
+        <span class="text-xs px-2.5 py-1 rounded-full font-semibold border" style="background-color: #fbf3ec; color: #743820; border-color: #e9c2a3">
           {pendingEntreprises.length} en attente
         </span>
       {/if}
@@ -199,7 +203,7 @@
               </p>
             </div>
             <a href="/admin/utilisateurs/{e.id}"
-              class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-blue-700 transition-all shrink-0">
+              class="text-xs bg-brand-600 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-brand-700 transition-all shrink-0">
               Valider
             </a>
           </div>
@@ -207,7 +211,7 @@
       </div>
       {#if pendingEntreprises.length > 5}
         <div class="px-5 py-3 border-t border-slate-100">
-          <a href="/admin/utilisateurs/pending" class="text-sm text-blue-600 font-medium hover:text-blue-700">
+          <a href="/admin/utilisateurs/pending" class="text-sm text-brand-600 font-semibold hover:text-brand-700">
             Voir les {pendingEntreprises.length - 5} autres →
           </a>
         </div>
@@ -223,7 +227,7 @@
   <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-100 overflow-hidden">
     <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
       <div>
-        <h3 class="font-semibold text-slate-800">Répartition géographique</h3>
+        <h3 class="font-display font-bold text-slate-900">Répartition géographique</h3>
         <p class="text-xs text-slate-400 mt-0.5">
           {mapPoints.length} chantier{mapPoints.length > 1 ? 's' : ''} localisé{mapPoints.length > 1 ? 's' : ''}
         </p>
@@ -265,7 +269,7 @@
   <!-- Répartition type forage -->
   <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
     <div class="px-5 py-4 border-b border-slate-100">
-      <h3 class="font-semibold text-slate-800">Par type de forage</h3>
+      <h3 class="font-display font-bold text-slate-900">Par type de forage</h3>
       <p class="text-xs text-slate-400 mt-0.5">Répartition des demandes</p>
     </div>
     {#if loading}
@@ -290,7 +294,7 @@
               </div>
             </div>
             <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-              <div class="h-full bg-blue-500 rounded-full transition-all" style="width: {pct}%"></div>
+              <div class="h-full rounded-full transition-all" style="width: {pct}%; background: linear-gradient(90deg, #1e3fff 0%, #b35d2e 100%)"></div>
             </div>
           </div>
         {/each}

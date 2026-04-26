@@ -62,8 +62,8 @@
       <p class="text-slate-400 text-xs mt-1">Vous serez notifié dès qu'une invitation vous sera adressée</p>
     </div>
   {:else}
-    <div class="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-      <div class="col-span-1"></div>
+    <div class="hidden lg:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+      <div class="col-span-1">#</div>
       <div class="col-span-3">Localisation</div>
       <div class="col-span-2">Type</div>
       <div class="col-span-3">Délai restant</div>
@@ -74,46 +74,50 @@
       {#each appelsOffres as ao}
         {@const secondes = getSecondesRestantes(ao)}
         {@const expire = secondes <= 0}
-        <div class="grid grid-cols-12 gap-4 px-5 py-4 items-center">
-          <div class="col-span-1">
-            <span class="text-sm text-slate-500">{ao.id}</span>
+        <div class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4">
+          <!-- Ligne 1 mobile : ID + Localisation + Action -->
+          <div class="flex items-center gap-2 lg:col-span-1">
+            <span class="text-xs text-slate-400 lg:hidden">AO</span>
+            <span class="text-sm text-slate-500">#{ao.id}</span>
           </div>
-          <div class="col-span-3 min-w-0">
-            <p class="text-sm font-medium text-slate-800 truncate">
+          <div class="flex items-center gap-2 min-w-0 lg:col-span-3">
+            <span class="text-sm font-medium text-slate-800 truncate flex-1">
               {ao.demande?.localisationAdresse ?? ao.demande?.localisation_adresse ?? '—'}
-            </p>
+            </span>
           </div>
-          <div class="col-span-2">
+          <div class="flex items-center gap-1 lg:col-span-2">
+            <span class="text-xs lg:hidden text-slate-400">Type :</span>
             <span class="text-sm text-slate-600 capitalize">
               {ao.demande?.typeForage ?? ao.demande?.type_forage ?? '—'}
             </span>
           </div>
-          <div class="col-span-3">
+          <div class="flex items-center gap-1 lg:col-span-3">
             {#if expire}
               <span class="inline-flex items-center gap-1 text-xs font-semibold text-red-500">
                 <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">timer_off</span>
                 Délai expiré
               </span>
             {:else}
-              <span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-600">
+              <span class="inline-flex items-center gap-1 text-xs font-semibold" style="color: #b35d2e">
                 <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">timer</span>
                 {countdown(secondes)}
               </span>
             {/if}
           </div>
-          <div class="col-span-1">
+          <div class="flex items-center gap-1 lg:col-span-1">
+            <span class="text-xs lg:hidden text-slate-400">Réponse :</span>
             {#if ao.ma_reponse?.soumise}
               <Badge status={ao.ma_reponse.statut} />
             {:else}
               <span class="text-xs text-slate-400">—</span>
             {/if}
           </div>
-          <div class="col-span-2 text-right">
+          <div class="flex justify-stretch lg:justify-end lg:col-span-2">
             <a href="/entreprise/appels-offres/{ao.id}"
-              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all
+              class="w-full lg:w-auto inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all
                 {ao.ma_reponse?.soumise || expire
                   ? 'bg-slate-50 text-slate-500 border border-slate-200'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'}">
+                  : 'bg-brand-600 text-white hover:bg-brand-700'}">
               {ao.ma_reponse?.soumise ? 'Voir' : expire ? 'Expiré' : 'Répondre'}
             </a>
           </div>

@@ -20,6 +20,19 @@
   let locating = $state(false)
   let suggestions = $state<any[]>([])
   let showSuggestions = $state(false)
+  let showSearchModal = $state(false)
+  let searchInputEl: HTMLInputElement | undefined = $state()
+
+  function openSearchModal() {
+    showSearchModal = true
+    // Auto-focus sur le champ après ouverture
+    setTimeout(() => searchInputEl?.focus(), 80)
+  }
+
+  function closeSearchModal() {
+    showSearchModal = false
+    showSuggestions = false
+  }
 
   onMount(async () => {
     // Import dynamique Leaflet (SSR safe — browser only)
@@ -98,17 +111,47 @@
     } catch {}
   }
 
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null
+  let lastQueryId = 0
+
   async function searchAddress() {
-    if (!searchQuery.trim()) return
+    const q = searchQuery.trim()
+    if (!q) {
+      suggestions = []
+      showSuggestions = false
+      return
+    }
     searching = true
-    showSuggestions = false
+    // ID pour ignorer les réponses obsolètes (race conditions sur req parallèles)
+    const myId = ++lastQueryId
     try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=json&limit=5&accept-language=fr&countrycodes=ci`
-      )
-      suggestions = await res.json()
-      showSuggestions = suggestions.length > 0
-    } catch {} finally { searching = false }
+      // On boost les résultats CI mais sans les contraindre — countrycodes=ci
+      // peut filtrer trop strict si l'OSM tag est manquant.
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q + ', Côte d\'Ivoire')}&format=json&limit=6&accept-language=fr&addressdetails=1`
+      const res = await fetch(url, {
+        headers: { 'Accept': 'application/json' },
+      })
+      if (!res.ok) throw new Error(`Nominatim ${res.status}`)
+      const data = await res.json()
+      // Ignorer si une recherche plus récente a été lancée entretemps
+      if (myId !== lastQueryId) return
+      suggestions = Array.isArray(data) ? data : []
+      showSuggestions = true
+    } catch (err) {
+      console.error('[MapPicker] Erreur recherche Nominatim:', err)
+      suggestions = []
+      showSuggestions = true // afficher le "aucun résultat"
+    } finally {
+      if (myId === lastQueryId) searching = false
+    }
+  }
+
+  function debouncedSearch() {
+    if (debounceTimer) clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      if (searchQuery.trim().length >= 3) searchAddress()
+      else { suggestions = []; showSuggestions = false }
+    }, 350)
   }
 
   function selectSuggestion(s: any) {
@@ -118,6 +161,7 @@
     adresse = s.display_name
     searchQuery = s.display_name.split(',')[0]
     showSuggestions = false
+    showSearchModal = false  // ferme la popup et revient sur la carte
   }
 
   async function locateMe() {
@@ -141,67 +185,30 @@
 </script>
 
 <div class="space-y-3">
-  <!-- Barre de recherche -->
-  <div class="relative">
-    <div class="flex gap-2">
-      <div class="relative flex-1">
-        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">search</span>
-        <input
-          type="text"
-          bind:value={searchQuery}
-          onkeydown={handleSearchKey}
-          oninput={() => { if (searchQuery.length > 2) searchAddress() }}
-          placeholder="Rechercher une adresse en Côte d'Ivoire..."
-          class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm transition-all"
-        />
-      </div>
-      <button
-        type="button"
-        onclick={searchAddress}
-        disabled={searching}
-        class="px-4 py-3 rounded-xl gradient-blue text-white text-sm font-semibold shadow-md hover:scale-[1.02] transition-all disabled:opacity-60 flex items-center gap-1.5"
-      >
-        {#if searching}
-          <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-        {:else}
-          <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">search</span>
-        {/if}
-        Chercher
-      </button>
-      <button
-        type="button"
-        onclick={locateMe}
-        disabled={locating}
-        title="Ma position actuelle"
-        class="px-3 py-3 rounded-xl bg-emerald-500 text-white shadow-md hover:bg-emerald-600 transition-all disabled:opacity-60 flex items-center"
-      >
-        {#if locating}
-          <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-        {:else}
-          <span class="material-symbols-outlined icon-filled" style="font-size: 20px;">my_location</span>
-        {/if}
-      </button>
-    </div>
-
-    <!-- Suggestions -->
-    {#if showSuggestions}
-      <div class="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-fade-in-down">
-        {#each suggestions as s}
-          <button
-            type="button"
-            onclick={() => selectSuggestion(s)}
-            class="w-full text-left px-4 py-3 hover:bg-blue-50 transition-all border-b border-slate-50 last:border-0 flex items-start gap-2"
-          >
-            <span class="material-symbols-outlined text-blue-400 icon-filled flex-shrink-0 mt-0.5" style="font-size: 16px;">location_on</span>
-            <span class="text-sm text-slate-700 line-clamp-2">{s.display_name}</span>
-          </button>
-        {/each}
-        <button type="button" onclick={() => showSuggestions = false}
-          class="w-full text-center py-2 text-xs text-slate-400 hover:bg-slate-50 transition-all">
-          Fermer
-        </button>
-      </div>
-    {/if}
+  <!-- Boutons d'action -->
+  <div class="flex gap-2">
+    <button
+      type="button"
+      onclick={openSearchModal}
+      class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-brand-600 text-white text-sm font-semibold shadow-md hover:bg-brand-700 transition-all"
+    >
+      <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">search</span>
+      Rechercher une adresse
+    </button>
+    <button
+      type="button"
+      onclick={locateMe}
+      disabled={locating}
+      title="Ma position actuelle"
+      class="px-4 py-3 rounded-xl bg-emerald-500 text-white text-sm font-semibold shadow-md hover:bg-emerald-600 transition-all disabled:opacity-60 flex items-center gap-2"
+    >
+      {#if locating}
+        <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+      {:else}
+        <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">my_location</span>
+      {/if}
+      <span class="hidden sm:inline">Ma position</span>
+    </button>
   </div>
 
   <!-- Carte -->
@@ -224,11 +231,87 @@
     </div>
   </div>
 
-  <!-- Adresse détectée -->
-  {#if adresse}
-    <div class="flex items-start gap-2 p-3 bg-blue-50 rounded-xl border border-blue-100">
-      <span class="material-symbols-outlined text-blue-500 icon-filled flex-shrink-0 mt-0.5" style="font-size: 16px;">location_on</span>
-      <p class="text-sm text-blue-800 leading-snug">{adresse}</p>
-    </div>
-  {/if}
 </div>
+
+<!-- ============ Modale de recherche d'adresse ============ -->
+{#if showSearchModal}
+  <div class="fixed inset-0 z-2000 flex items-start justify-center p-4 sm:p-8" role="dialog" aria-modal="true" aria-label="Rechercher une adresse">
+    <!-- Backdrop -->
+    <button
+      type="button"
+      class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+      onclick={closeSearchModal}
+      aria-label="Fermer"
+    ></button>
+
+    <!-- Contenu -->
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl mt-12 sm:mt-20 overflow-hidden animate-fade-in-up">
+      <!-- Header -->
+      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined icon-filled text-brand-600" style="font-size: 20px;">search</span>
+          <h3 class="font-display font-bold text-slate-900">Rechercher une adresse</h3>
+        </div>
+        <button
+          type="button"
+          onclick={closeSearchModal}
+          class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-all"
+          aria-label="Fermer"
+        >
+          <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+        </button>
+      </div>
+
+      <!-- Champ de recherche -->
+      <div class="p-5 pb-3">
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">location_on</span>
+          <input
+            bind:this={searchInputEl}
+            type="text"
+            bind:value={searchQuery}
+            onkeydown={handleSearchKey}
+            oninput={debouncedSearch}
+            placeholder="Ex: Cocody Riviera 3, Abidjan…"
+            class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 bg-white text-sm transition-all"
+          />
+          {#if searching}
+            <span class="absolute right-3.5 top-1/2 -translate-y-1/2">
+              <span class="w-4 h-4 border-2 border-brand-200 border-t-brand-600 rounded-full animate-spin block"></span>
+            </span>
+          {/if}
+        </div>
+        <p class="text-xs text-slate-400 mt-2 px-1">Tapez au moins 3 caractères pour voir les suggestions.</p>
+      </div>
+
+      <!-- Suggestions -->
+      <div class="max-h-[60vh] overflow-y-auto border-t border-slate-100">
+        {#if !showSuggestions && !searching}
+          <div class="px-5 py-10 text-center">
+            <span class="material-symbols-outlined text-slate-300 icon-filled" style="font-size: 36px;">travel_explore</span>
+            <p class="text-sm text-slate-500 mt-2">Saisissez une adresse pour commencer</p>
+          </div>
+        {:else if suggestions.length === 0 && !searching}
+          <div class="px-5 py-10 text-center">
+            <span class="material-symbols-outlined text-slate-300 icon-filled" style="font-size: 36px;">search_off</span>
+            <p class="text-sm text-slate-500 mt-2">Aucun résultat trouvé</p>
+            <p class="text-xs text-slate-400 mt-1">Essayez avec une adresse plus précise.</p>
+          </div>
+        {:else}
+          <div class="divide-y divide-slate-50">
+            {#each suggestions as s}
+              <button
+                type="button"
+                onclick={() => selectSuggestion(s)}
+                class="w-full text-left px-5 py-3.5 hover:bg-brand-50 transition-all flex items-start gap-3"
+              >
+                <span class="material-symbols-outlined text-brand-500 icon-filled shrink-0 mt-0.5" style="font-size: 18px;">location_on</span>
+                <span class="text-sm text-slate-700 leading-snug">{s.display_name}</span>
+              </button>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    </div>
+  </div>
+{/if}

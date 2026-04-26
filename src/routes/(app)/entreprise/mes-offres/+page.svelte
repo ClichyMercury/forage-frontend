@@ -35,44 +35,58 @@
       <p class="text-slate-400 text-xs mt-1">Répondez à un appel d'offre pour voir vos soumissions ici</p>
     </div>
   {:else}
-    <div class="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-      <div class="col-span-1"></div>
+    <div class="hidden lg:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+      <div class="col-span-1">#</div>
       <div class="col-span-3">Demande</div>
       <div class="col-span-2 text-right">Prix HT</div>
       <div class="col-span-2 text-right">Prix TTC</div>
-      <div class="col-span-2 text-right">Délai</div>
+      <div class="col-span-1 text-right">Délai</div>
       <div class="col-span-1">Date</div>
-      <div class="col-span-1">Statut</div>
+      <div class="col-span-2">Statut</div>
     </div>
     <div class="divide-y divide-slate-50">
       {#each offres as o}
-        <div class="grid grid-cols-12 gap-4 px-5 py-3.5 items-center">
-          <div class="col-span-1">
-            <span class="text-sm text-slate-500">#{o.id}</span>
+        <div class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4">
+          <!-- Ligne 1 mobile : ID + Demande + Statut -->
+          <div class="flex items-center gap-3 min-w-0 lg:col-span-1">
+            <span class="text-sm font-semibold text-slate-500">#{o.id}</span>
           </div>
-          <div class="col-span-3 min-w-0">
-            <p class="text-sm font-medium text-slate-800 truncate">
+          <div class="flex items-center gap-2 min-w-0 lg:col-span-3">
+            <span class="text-sm font-medium text-slate-800 truncate flex-1">
               {o.appelOffre?.demande?.localisation_adresse ?? o.appelOffre?.demande?.localisationAdresse ?? `AO ${o.appelOffreId}`}
-            </p>
+            </span>
+            <div class="lg:hidden shrink-0"><Badge status={o.statut} /></div>
           </div>
-          <div class="col-span-2 text-right">
-            <span class="text-sm text-slate-600">{fmt(o.prixHt)}</span>
-            <span class="text-xs text-slate-400 ml-1">FCFA</span>
+          <!-- Prix HT/TTC : 2 colonnes mobile, alignés droite desktop -->
+          <div class="flex items-center justify-between lg:justify-end lg:col-span-2 pl-0">
+            <span class="text-xs lg:hidden text-slate-400">Prix HT :</span>
+            <div>
+              <span class="text-sm text-slate-600">{fmt(o.prixHt)}</span>
+              <span class="text-xs text-slate-400 ml-1">FCFA</span>
+            </div>
           </div>
-          <div class="col-span-2 text-right">
-            <span class="text-sm font-semibold text-slate-800">{fmt(o.prixTtc)}</span>
-            <span class="text-xs text-slate-400 ml-1">FCFA</span>
+          <div class="flex items-center justify-between lg:justify-end lg:col-span-2">
+            <span class="text-xs lg:hidden text-slate-400">Prix TTC :</span>
+            <div>
+              <span class="text-sm font-semibold text-slate-800">{fmt(o.prixTtc)}</span>
+              <span class="text-xs text-slate-400 ml-1">FCFA</span>
+            </div>
           </div>
-          <div class="col-span-2 text-right">
-            <span class="text-sm text-slate-600">{o.delaiExecution}</span>
-            <span class="text-xs text-slate-400 ml-1">jours</span>
+          <div class="flex items-center justify-between lg:justify-end lg:col-span-1">
+            <span class="text-xs lg:hidden text-slate-400">Délai :</span>
+            <div>
+              <span class="text-sm text-slate-600">{o.delaiExecution}</span>
+              <span class="text-xs text-slate-400 ml-1">j</span>
+            </div>
           </div>
-          <div class="col-span-1">
+          <div class="flex items-center justify-between lg:block lg:col-span-1">
+            <span class="text-xs lg:hidden text-slate-400">Date :</span>
             <span class="text-xs text-slate-400">
               {new Date(o.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short' })}
             </span>
           </div>
-          <div class="col-span-1">
+          <!-- Statut desktop only -->
+          <div class="hidden lg:block lg:col-span-2">
             <Badge status={o.statut} />
           </div>
         </div>

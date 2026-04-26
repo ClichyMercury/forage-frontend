@@ -1,8 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { notifStore } from '$lib/stores/notifications.svelte'
+  import { auth } from '$lib/stores/auth.svelte'
 
   onMount(() => notifStore.load())
+
+  const isAdmin = $derived(auth.user?.role === 'admin')
 
   const typeIcons: Record<string, string> = {
     nouvelle_demande: 'assignment',
@@ -32,24 +35,35 @@
 </script>
 
 <div class="max-w-2xl mx-auto">
-  <div class="flex items-center justify-between mb-6">
-    <div>
-      <h2 class="text-2xl font-bold text-slate-900">Notifications</h2>
-      <p class="text-slate-500 mt-1">
+  <div class="flex items-start justify-between mb-6 flex-wrap gap-3">
+    <div class="min-w-0 flex-1">
+      <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900">
+        <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">Notifications</span>.
+      </h2>
+      <p class="text-slate-500 mt-1 text-sm">
         {#if notifStore.count > 0}
-          <span class="text-blue-600 font-semibold">{notifStore.count}</span> non lue{notifStore.count > 1 ? 's' : ''}
+          <span class="text-brand-600 font-semibold">{notifStore.count}</span> non lue{notifStore.count > 1 ? 's' : ''}
         {:else}
           Toutes lues
         {/if}
       </p>
     </div>
-    {#if notifStore.count > 0}
-      <button onclick={() => notifStore.markAllRead()}
-        class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-blue-700 font-semibold text-sm hover:bg-blue-100 transition-all">
-        <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">done_all</span>
-        Tout marquer comme lu
-      </button>
-    {/if}
+    <div class="flex items-center gap-2 flex-wrap">
+      {#if isAdmin}
+        <a href="/admin/notifications/parametres"
+          class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-all">
+          <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">tune</span>
+          Paramètres
+        </a>
+      {/if}
+      {#if notifStore.count > 0}
+        <button onclick={() => notifStore.markAllRead()}
+          class="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-50 text-brand-700 font-semibold text-sm hover:bg-brand-100 transition-all">
+          <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">done_all</span>
+          Tout lire
+        </button>
+      {/if}
+    </div>
   </div>
 
   <div class="bg-white rounded-2xl card-shadow overflow-hidden">

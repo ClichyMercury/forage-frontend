@@ -84,7 +84,7 @@
     {#if demande}
       <div class="text-left">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Demande concernée</p>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div class="p-3 bg-slate-50 rounded-xl">
             <p class="text-xs text-slate-400">Type</p>
             <p class="text-sm font-semibold text-slate-700 capitalize">{demande.typeForage}</p>

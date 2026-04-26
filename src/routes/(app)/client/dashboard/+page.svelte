@@ -39,34 +39,36 @@
 <svelte:head><title>Tableau de bord — ForageCI</title></svelte:head>
 
 <!-- Bienvenue -->
-<div class="mb-6 flex items-center justify-between flex-wrap gap-3">
-  <div>
-    <h2 class="text-xl font-bold text-slate-900">
-      Bonjour, {auth.user?.fullName?.split(' ')[0] ?? 'bienvenue'}
+<div class="mb-6 flex items-start lg:items-center justify-between flex-wrap gap-3">
+  <div class="min-w-0 flex-1">
+    <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900 wrap-break-word">
+      Bonjour, <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">{auth.user?.fullName?.split(' ')[0] ?? 'bienvenue'}</span>.
     </h2>
-    <p class="text-sm text-slate-500 mt-0.5">Voici l'état de vos demandes de forage</p>
+    <p class="text-sm text-slate-500 mt-1">Voici l'état de vos demandes de forage.</p>
   </div>
   <button onclick={() => goto('/client/demandes/new')}
-    class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-all shadow-sm">
+    class="flex items-center gap-2 px-4 lg:px-5 py-2.5 lg:py-3 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition-all shadow-sm whitespace-nowrap">
     <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">add</span>
-    Nouvelle demande
+    <span class="hidden sm:inline">Nouvelle demande</span>
+    <span class="sm:hidden">Nouvelle</span>
   </button>
 </div>
 
 <!-- CDC §3.1 — Alerte actions requises (offres en attente de décision) -->
 {#if demandesUrgentes.length > 0}
-  <div class="mb-5 p-4 rounded-2xl bg-blue-50 border border-blue-200">
+  <div class="mb-5 p-5 rounded-2xl border" style="background-color: #fbf3ec; border-color: #e9c2a3">
     <div class="flex items-start gap-3">
-      <span class="material-symbols-outlined text-blue-600 icon-filled shrink-0 mt-0.5" style="font-size: 22px;">mark_email_read</span>
+      <span class="material-symbols-outlined icon-filled shrink-0 mt-0.5" style="font-size: 22px; color: #b35d2e">mark_email_read</span>
       <div class="flex-1">
-        <p class="font-semibold text-blue-800 text-sm">
+        <p class="font-display font-bold text-base" style="color: #743820">
           {demandesUrgentes.length === 1 ? 'Une offre attend votre décision' : `${demandesUrgentes.length} offres attendent votre décision`}
         </p>
-        <p class="text-xs text-blue-600 mt-0.5">Vous avez reçu une offre finale. Acceptez ou refusez depuis la page de la demande.</p>
+        <p class="text-xs mt-1" style="color: #944923">Vous avez reçu une offre finale. Acceptez ou refusez depuis la page de la demande.</p>
         <div class="flex flex-wrap gap-2 mt-3">
           {#each demandesUrgentes as d}
             <a href="/client/demandes/{d.id}"
-              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all">
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white text-xs font-semibold transition-all hover:opacity-90"
+              style="background-color: #b35d2e">
               <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">water_drop</span>
               {d.localisationAdresse?.split(',')[0] ?? `Demande #${d.id}`}
               <span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
@@ -100,8 +102,8 @@
 <!-- Historique des demandes -->
 <div class="bg-white rounded-2xl border border-slate-100">
   <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-    <h3 class="font-semibold text-slate-800">Historique des demandes</h3>
-    <a href="/client/demandes" class="text-sm text-blue-600 hover:text-blue-700 font-medium">Voir tout</a>
+    <h3 class="font-display font-bold text-slate-900">Historique des demandes</h3>
+    <a href="/client/demandes" class="text-sm text-brand-600 hover:text-brand-700 font-semibold">Voir tout</a>
   </div>
 
   {#if loading}
@@ -110,19 +112,19 @@
     </div>
   {:else if demandes.length === 0}
     <div class="py-14 text-center px-6">
-      <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mx-auto mb-3">
-        <span class="material-symbols-outlined text-blue-400" style="font-size: 24px;">assignment</span>
+      <div class="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mx-auto mb-3">
+        <span class="material-symbols-outlined text-brand-500 icon-filled" style="font-size: 24px;">assignment</span>
       </div>
-      <p class="text-slate-600 font-medium text-sm">Aucune demande pour le moment</p>
+      <p class="text-slate-700 font-semibold text-sm">Aucune demande pour le moment</p>
       <p class="text-slate-400 text-xs mt-1 mb-4">Soumettez votre première demande de forage</p>
       <button onclick={() => goto('/client/demandes/new')}
-        class="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all">
+        class="px-5 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700 transition-all">
         Créer une demande
       </button>
     </div>
   {:else}
-    <!-- En-tête tableau -->
-    <div class="grid grid-cols-12 gap-3 px-5 py-2.5 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wide">
+    <!-- En-tête tableau (desktop only) -->
+    <div class="hidden lg:grid grid-cols-12 gap-3 px-5 py-2.5 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wide">
       <div class="col-span-5">Localisation</div>
       <div class="col-span-2">Type</div>
       <div class="col-span-2">Date</div>
@@ -131,27 +133,32 @@
     <div class="divide-y divide-slate-50">
       {#each demandes.slice(0, 6) as d}
         <a href="/client/demandes/{d.id}"
-          class="grid grid-cols-12 gap-3 px-5 py-3.5 hover:bg-slate-50 transition-all items-center group
-            {d.statut === 'offre_envoyee' ? 'bg-blue-50/30' : ''}">
-          <div class="col-span-5 flex items-center gap-2 min-w-0">
-            <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 14px;">water_drop</span>
+          class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-3 lg:items-center px-5 py-3.5 hover:bg-slate-50 transition-all
+            {d.statut === 'offre_envoyee' ? 'bg-terre-50/40' : ''}">
+          <!-- Localisation -->
+          <div class="lg:col-span-5 flex items-center gap-2 min-w-0">
+            <div class="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-brand-600 icon-filled" style="font-size: 15px;">water_drop</span>
             </div>
             <span class="text-sm font-medium text-slate-800 truncate">{d.localisationAdresse}</span>
           </div>
-          <div class="col-span-2">
+          <!-- Métadonnées (mobile : ligne secondaire) -->
+          <div class="lg:col-span-2 flex items-center gap-2 lg:gap-0 pl-10 lg:pl-0">
             <span class="text-xs text-slate-500 capitalize">{d.typeForage}</span>
           </div>
-          <div class="col-span-2">
+          <div class="lg:col-span-2 hidden lg:block">
             <span class="text-xs text-slate-400">
               {new Date(d.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short' })}
             </span>
           </div>
-          <div class="col-span-3 flex items-center gap-1.5">
+          <div class="lg:col-span-3 flex items-center gap-1.5 pl-10 lg:pl-0">
             <Badge status={d.statut} />
             {#if d.statut === 'offre_envoyee'}
-              <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+              <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background-color: #b35d2e"></span>
             {/if}
+            <span class="text-xs text-slate-400 lg:hidden ml-auto">
+              {new Date(d.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short' })}
+            </span>
           </div>
         </a>
       {/each}
