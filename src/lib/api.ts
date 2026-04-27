@@ -3,7 +3,7 @@ import { auth } from '$lib/stores/auth.svelte'
 import { toast } from '$lib/stores/toast.svelte'
 import { goto } from '$app/navigation'
 
-export const BASE_URL = 'http://localhost:3333/api/v1'
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3333/api/v1'
 
 const api = axios.create({
   baseURL: BASE_URL,
