@@ -39,6 +39,12 @@
     return num.toLocaleString('fr-CI')
   }
 
+  function fmtMoney(n: any) {
+    const num = Number(n)
+    if (isNaN(num)) return '—'
+    return num.toLocaleString('fr-CI', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  }
+
   async function loadData() {
     loading = true
     try {
@@ -97,8 +103,8 @@
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
     <StatCard title="Demandes ({periode})" value={stats.demandes.total_periode} icon="assignment" color="blue" />
     <StatCard title="Taux de conversion" value={stats.demandes.taux_conversion} icon="trending_up" color="green" />
-    <StatCard title="Chiffre d'affaires" value="{fmt(stats.finances.chiffre_affaires)} FCFA" icon="payments" color="purple" subtitle="Période en cours" />
-    <StatCard title="Marges générées" value="{fmt(stats.finances.marges_cumulees)} FCFA" icon="account_balance" color="orange" />
+    <StatCard title="Chiffre d'affaires" value="{fmtMoney(stats.finances.chiffre_affaires)} FCFA" icon="payments" color="purple" subtitle="Période en cours" />
+    <StatCard title="Marges générées" value="{fmtMoney(stats.finances.marges_cumulees)} FCFA" icon="account_balance" color="orange" />
   </div>
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
     <StatCard title="Total demandes" value={stats.demandes.total_global} icon="folder_open" color="blue" />

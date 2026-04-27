@@ -14,9 +14,20 @@
   let sending = $state(false)
 
   // Formulaire offre finale
-  let prixFinalClient = $state('')
+  let margeAdmin = $state('')
   let delaiExecution = $state('')
   let resumePrestation = $state('')
+
+  // Prix final calculé automatiquement
+  const prixFinalCalcule = $derived(
+    offreRetenue && margeAdmin
+      ? offreRetenue.prix_ttc + Number(margeAdmin)
+      : offreRetenue?.prix_ttc ?? 0
+  )
+
+  const depasse = $derived(
+    demande && prixFinalCalcule > parseFloat(demande.budgetMax ?? '0')
+  )
 
   onMount(async () => {
     try {
@@ -38,8 +49,6 @@
         const comp = compRes.data.comparatif ?? []
         offreRetenue = comp.find((o: any) => o.statut === 'retenue') ?? null
         if (offreRetenue) {
-          // Pré-remplir le prix avec le prix TTC de l'offre retenue
-          prixFinalClient = String(offreRetenue.prix_ttc)
           delaiExecution = String(offreRetenue.delai_execution_jours)
           resumePrestation = offreRetenue.description_technique ?? ''
         }
@@ -54,14 +63,14 @@
 
   async function envoyer(e: Event) {
     e.preventDefault()
-    const prix = parseFloat(prixFinalClient)
+    const prix = prixFinalCalcule
     const delai = parseInt(delaiExecution)
     const budget = parseFloat(demande?.budgetMax)
 
     if (!prix || prix <= 0) { toast.error('Erreur', 'Prix final invalide'); return }
     if (!delai || delai <= 0) { toast.error('Erreur', 'Délai invalide'); return }
     if (!resumePrestation.trim()) { toast.error('Erreur', 'Le résumé de prestation est requis'); return }
-    if (prix > budget) {
+    if (depasse) {
       toast.error('Dépassement budget', `Le prix final (${fmt(prix)} FCFA) dépasse le budget client (${fmt(budget)} FCFA)`)
       return
     }
@@ -143,30 +152,45 @@
 
       <form onsubmit={envoyer} class="space-y-5">
 
-        <!-- Prix final client -->
+        <!-- Marge admin → prix final calculé automatiquement -->
         <div>
-          <label for="prix" class="block text-sm font-medium text-slate-700 mb-1.5">
-            Prix final proposé au client (FCFA)
-            {#if demande.budgetMax}
-              <span class="text-slate-400 font-normal ml-1">— max {fmt(demande.budgetMax)} FCFA</span>
-            {/if}
+          <label for="marge" class="block text-sm font-medium text-slate-700 mb-1.5">
+            Votre marge commerciale (FCFA)
           </label>
           <div class="relative">
-            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 icon-filled" style="font-size: 18px;">payments</span>
-            <input id="prix" type="number" bind:value={prixFinalClient} min="1" required
-              class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="Ex: 2500000" />
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 icon-filled" style="font-size: 18px;">add_circle</span>
+            <input id="marge" type="number" bind:value={margeAdmin} min="0" required
+              class="w-full pl-10 pr-4 py-3 rounded-xl border {depasse ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white'} text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="Ex: 150000" />
           </div>
-          {#if prixFinalClient && demande.budgetMax}
-            {@const marge = parseFloat(demande.budgetMax) - parseFloat(prixFinalClient)}
-            {#if marge < 0}
-              <p class="text-red-500 text-xs mt-1 flex items-center gap-1">
-                <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">warning</span>
-                Dépasse le budget de {fmt(Math.abs(marge))} FCFA
-              </p>
-            {:else}
-              <p class="text-emerald-600 text-xs mt-1">Marge restante : {fmt(marge)} FCFA</p>
-            {/if}
+
+          <!-- Récapitulatif calcul -->
+          {#if offreRetenue}
+            <div class="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-500">Prix prestataire TTC</span>
+                <span class="font-medium text-slate-700">{fmt(offreRetenue.prix_ttc)} FCFA</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-500">+ Votre marge</span>
+                <span class="font-medium text-slate-700">{fmt(Number(margeAdmin) || 0)} FCFA</span>
+              </div>
+              <div class="border-t border-slate-200 pt-1.5 flex justify-between">
+                <span class="text-sm font-bold text-slate-800">Prix final client</span>
+                <span class="text-sm font-bold {depasse ? 'text-red-600' : 'text-blue-700'}">{fmt(prixFinalCalcule)} FCFA</span>
+              </div>
+              {#if depasse}
+                <p class="text-xs text-red-500 flex items-center gap-1 pt-0.5">
+                  <span class="material-symbols-outlined icon-filled" style="font-size: 13px;">warning</span>
+                  Dépasse le budget client ({fmt(parseFloat(demande.budgetMax))} FCFA). Réduisez votre marge.
+                </p>
+              {:else}
+                <p class="text-xs text-emerald-600 flex items-center gap-1 pt-0.5">
+                  <span class="material-symbols-outlined icon-filled" style="font-size: 13px;">check_circle</span>
+                  Dans le budget — marge restante : {fmt(parseFloat(demande.budgetMax) - prixFinalCalcule)} FCFA
+                </p>
+              {/if}
+            </div>
           {/if}
         </div>
 
@@ -203,7 +227,7 @@
             class="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-all">
             Annuler
           </button>
-          <button type="submit" disabled={sending}
+          <button type="submit" disabled={sending || depasse || !margeAdmin || !resumePrestation.trim()}
             class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
             {#if sending}
               <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
