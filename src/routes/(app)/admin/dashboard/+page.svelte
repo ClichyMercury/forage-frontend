@@ -63,7 +63,10 @@
   }
 
   onMount(loadData)
-  $effect(() => { loadData() })
+  $effect(() => {
+    periode // réagir uniquement au changement de période
+    loadData()
+  })
 </script>
 
 <svelte:head><title>Tableau de bord — Admin ForageCI</title></svelte:head>
@@ -117,6 +120,50 @@
       color="red"
       subtitle={stats.alertes_sans_reponse.count > 0 ? 'Action requise' : 'Tout est à jour'}
     />
+  </div>
+{/if}
+
+<!-- Alertes demandes sans réponse -->
+{#if !loading && stats?.alertes_sans_reponse?.count > 0}
+  <div class="bg-red-50 border border-red-200 rounded-2xl overflow-hidden mb-5">
+    <div class="px-5 py-3.5 flex items-center justify-between border-b border-red-100">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-red-500 icon-filled" style="font-size: 18px;">warning</span>
+        <p class="text-sm font-bold text-red-700">
+          {stats.alertes_sans_reponse.count} demande{stats.alertes_sans_reponse.count > 1 ? 's' : ''} sans réponse depuis +7 jours
+        </p>
+      </div>
+      <span class="text-xs text-red-500 font-medium">Action requise</span>
+    </div>
+    <div class="divide-y divide-red-100">
+      {#each stats.alertes_sans_reponse.demandes.slice(0, 4) as d}
+        {@const jours = Math.floor((Date.now() - new Date(d.created_at).getTime()) / 86400000)}
+        <a href="/admin/demandes/{d.id}"
+          class="flex items-center gap-3 px-5 py-3 hover:bg-red-100/50 transition-all">
+          <div class="w-8 h-8 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-red-500 icon-filled" style="font-size: 15px;">schedule</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-slate-800 truncate">
+              {d.type_forage ? `Forage ${d.type_forage}` : `Demande #${d.id}`}{d.localisation_adresse ? ` — ${d.localisation_adresse.split(',')[0]}` : ''}
+            </p>
+            <p class="text-xs text-red-500 mt-0.5">En attente depuis {jours} jour{jours > 1 ? 's' : ''}</p>
+          </div>
+          <span class="text-xs px-2 py-1 rounded-lg font-medium shrink-0
+            {d.statut === 'en_attente' ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'}">
+            {d.statut === 'en_attente' ? 'À valider' : 'AO sans offre'}
+          </span>
+          <span class="material-symbols-outlined text-red-300 shrink-0" style="font-size: 16px;">chevron_right</span>
+        </a>
+      {/each}
+    </div>
+    {#if stats.alertes_sans_reponse.count > 4}
+      <div class="px-5 py-2.5 border-t border-red-100">
+        <a href="/admin/demandes" class="text-xs text-red-600 font-semibold hover:text-red-700">
+          Voir les {stats.alertes_sans_reponse.count - 4} autres →
+        </a>
+      </div>
+    {/if}
   </div>
 {/if}
 
