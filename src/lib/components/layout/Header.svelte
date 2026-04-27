@@ -106,8 +106,12 @@
     <!-- Avatar -->
     <a href="/{auth.user?.role}/profile"
       class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition-all ml-1">
-      <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold">
-        {auth.user?.initials ?? '?'}
+      <div class="w-8 h-8 rounded-full overflow-hidden bg-brand-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+        {#if auth.user?.avatarUrl}
+          <img src={auth.user.avatarUrl} alt={auth.user.fullName ?? 'Profil'} class="w-8 h-8 object-cover" />
+        {:else}
+          {auth.user?.initials ?? '?'}
+        {/if}
       </div>
       <div class="hidden sm:block">
         <p class="text-sm font-semibold text-slate-800 leading-none">{auth.user?.fullName?.split(' ')[0] ?? 'Profil'}</p>

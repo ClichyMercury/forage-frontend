@@ -9,6 +9,84 @@
   let user = $state<any>(null)
   let errors = $state<Record<string, string>>({})
 
+  // Avatar
+  let fileInput = $state<HTMLInputElement | null>(null)
+  let avatarPreview = $state<string | null>(null)
+  let uploadingAvatar = $state(false)
+
+  const ACCEPTED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+  const MAX_SIZE = 2 * 1024 * 1024 // 2 MB
+
+  function triggerFilePicker() { fileInput?.click() }
+
+  function onFileChange(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (!file) return
+    if (!ACCEPTED.includes(file.type)) {
+      toast.error('Format invalide', 'Formats acceptés : JPG, PNG, WEBP, GIF')
+      return
+    }
+    if (file.size > MAX_SIZE) {
+      toast.error('Fichier trop lourd', 'Taille maximale : 2 Mo')
+      return
+    }
+    // Preview local immédiat
+    const reader = new FileReader()
+    reader.onload = (ev) => { avatarPreview = ev.target?.result as string }
+    reader.readAsDataURL(file)
+    uploadAvatar(file)
+  }
+
+  async function uploadAvatar(file: File) {
+    uploadingAvatar = true
+    try {
+      const form = new FormData()
+      form.append('avatar', file)
+      const res = await api.post('/account/profile/avatar', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      const updated = res.data?.data ?? res.data
+      const newAvatarUrl = updated.avatarUrl ?? updated.avatar_url ?? null
+      user = { ...user, avatarUrl: newAvatarUrl }
+      avatarPreview = null
+      // Mettre à jour le store → sidebar + header se rafraîchissent
+      if (auth.user) {
+        auth.user = { ...auth.user, avatarUrl: newAvatarUrl }
+        if (typeof localStorage !== 'undefined' && auth.token) {
+          localStorage.setItem('auth', JSON.stringify({ user: auth.user, token: auth.token }))
+        }
+      }
+      toast.success('Photo mise à jour', 'Votre photo de profil a été enregistrée.')
+    } catch (err: any) {
+      avatarPreview = null
+      toast.error('Erreur upload', err.response?.data?.message ?? 'Impossible d\'uploader la photo')
+    } finally {
+      uploadingAvatar = false
+      if (fileInput) fileInput.value = ''
+    }
+  }
+
+  async function removeAvatar() {
+    if (!confirm('Supprimer votre photo de profil ?')) return
+    uploadingAvatar = true
+    try {
+      await api.delete('/account/profile/avatar')
+      user = { ...user, avatarUrl: null }
+      avatarPreview = null
+      if (auth.user) {
+        auth.user = { ...auth.user, avatarUrl: null }
+        if (typeof localStorage !== 'undefined' && auth.token) {
+          localStorage.setItem('auth', JSON.stringify({ user: auth.user, token: auth.token }))
+        }
+      }
+      toast.success('Photo supprimée', 'Votre photo de profil a été retirée.')
+    } catch (err: any) {
+      toast.error('Erreur', err.response?.data?.message ?? 'Impossible de supprimer la photo')
+    } finally { uploadingAvatar = false }
+  }
+
+  const currentAvatar = $derived(avatarPreview ?? user?.avatarUrl ?? user?.avatar_url ?? null)
+
   // Champs éditables
   let fullName = $state('')
   let telephone = $state('')
@@ -17,7 +95,7 @@
   onMount(async () => {
     try {
       const res = await api.get('/account/profile')
-      user = res.data
+      user = res.data?.data ?? res.data
       fullName = user.fullName ?? ''
       telephone = user.telephone ?? ''
       userType = user.userType ?? 'particulier'
@@ -33,9 +111,10 @@
       if (user?.role === 'client') payload.userType = userType
 
       const res = await api.patch('/account/profile', payload)
-      user = res.data
+      const updated = res.data?.data ?? res.data
+      // Conserver l'avatarUrl existant — le PATCH profil ne le retourne pas forcément
+      user = { ...user, ...updated, avatarUrl: updated.avatarUrl ?? updated.avatar_url ?? user.avatarUrl }
 
-      // Mettre à jour le store auth pour refléter le nouveau nom partout
       if (auth.user) {
         auth.user = { ...auth.user, fullName: user.fullName, telephone: user.telephone, userType: user.userType }
         if (typeof localStorage !== 'undefined' && auth.token) {
@@ -77,10 +156,50 @@
     <!-- Carte identité -->
     <div class="bg-white rounded-2xl border border-slate-100 p-6 mb-5">
       <div class="flex items-center gap-4 mb-6">
-        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-xl font-display font-black shrink-0"
-             style="background-color: {user.role === 'entreprise' ? '#b35d2e' : '#1e3fff'}">
-          {user.initials ?? '?'}
+        <!-- Avatar cliquable -->
+        <div class="relative shrink-0 group">
+          <button type="button" onclick={triggerFilePicker} disabled={uploadingAvatar}
+            class="w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all"
+            title="Changer la photo de profil">
+            {#if uploadingAvatar}
+              <!-- Spinner upload -->
+              <div class="w-16 h-16 rounded-2xl flex items-center justify-center"
+                   style="background-color: {user.role === 'entreprise' ? '#b35d2e' : '#1e3fff'}">
+                <span class="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              </div>
+            {:else if currentAvatar}
+              <!-- Photo de profil -->
+              <img src={currentAvatar} alt={user.fullName ?? 'Profil'}
+                class="w-16 h-16 rounded-2xl object-cover" />
+            {:else}
+              <!-- Fallback initiales -->
+              <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-xl font-display font-black"
+                   style="background-color: {user.role === 'entreprise' ? '#b35d2e' : '#1e3fff'}">
+                {user.initials ?? '?'}
+              </div>
+            {/if}
+            <!-- Overlay hover -->
+            {#if !uploadingAvatar}
+              <div class="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span class="material-symbols-outlined text-white icon-filled" style="font-size: 20px;">photo_camera</span>
+              </div>
+            {/if}
+          </button>
+
+          <!-- Bouton supprimer (si photo présente) -->
+          {#if currentAvatar && !uploadingAvatar}
+            <button type="button" onclick={removeAvatar}
+              class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-all shadow-sm"
+              title="Supprimer la photo">
+              <span class="material-symbols-outlined icon-filled" style="font-size: 12px;">close</span>
+            </button>
+          {/if}
         </div>
+
+        <!-- Input file caché -->
+        <input bind:this={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/gif"
+          class="hidden" onchange={onFileChange} />
+
         <div class="min-w-0 flex-1">
           <p class="font-display font-bold text-lg text-slate-900 truncate">{user.fullName ?? user.email}</p>
           <p class="text-sm text-slate-500 truncate">{user.email}</p>
