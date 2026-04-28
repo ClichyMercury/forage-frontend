@@ -33,7 +33,7 @@
   <div class="flex items-start justify-between">
     <div class="flex-1 min-w-0">
       <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">{title}</p>
-      <p class="font-display font-black text-3xl text-slate-900 mt-2 leading-none tracking-tight">{value}</p>
+      <p class="font-display font-black text-xl text-slate-900 mt-2 leading-none tracking-tight">{value}</p>
       {#if subtitle}
         <p class="text-xs text-slate-400 mt-1.5">{subtitle}</p>
       {/if}

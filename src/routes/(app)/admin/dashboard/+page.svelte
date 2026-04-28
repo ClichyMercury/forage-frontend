@@ -281,20 +281,19 @@
                 {e.full_name ?? e.fullName ?? '—'}
               </p>
               <div class="flex items-center gap-3 mt-1 flex-wrap">
-                <!-- Taux sélection -->
-                <div class="flex items-center gap-1">
-                  <span class="material-symbols-outlined text-emerald-500 icon-filled" style="font-size: 12px;">check_circle</span>
-                  <span class="text-xs font-semibold text-emerald-700">{taux.toFixed(0)}%</span>
-                </div>
                 <!-- Prix moyen -->
                 <div class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-slate-400 icon-filled" style="font-size: 12px;">payments</span>
-                  <span class="text-xs text-slate-500">{fmt(prixMoyen)} FCFA</span>
+                  <span class="text-xs text-slate-500">{fmtMoney(prixMoyen)}FCFA</span>
                 </div>
                 <!-- Délai moyen -->
                 <div class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-slate-400 icon-filled" style="font-size: 12px;">schedule</span>
                   <span class="text-xs text-slate-500">{delaiMoyen.toFixed(0)}j</span>
+                </div><!-- Taux sélection -->
+                <div class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-emerald-500 icon-filled" style="font-size: 12px;">check_circle</span>
+                  <span class="text-xs font-semibold text-emerald-700">{taux.toFixed(0)}%</span>
                 </div>
               </div>
               <!-- Barre taux -->

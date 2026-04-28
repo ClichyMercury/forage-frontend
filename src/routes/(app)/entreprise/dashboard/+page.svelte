@@ -56,6 +56,7 @@
   <StatCard title="En cours" value={stats().ouverts} icon="lock_open" color="purple" />
   <StatCard title="Offres soumises" value={stats().soumises} icon="send" color="orange" />
   <StatCard title="Offres retenues" value={stats().retenues} icon="star" color="green" />
+  <StatCard title="Offres non_retenues" value={stats().retenues} icon="cancel" color="red" />
 </div>
 
 <!-- Deux blocs côte à côte en dessous -->
