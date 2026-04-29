@@ -1,0 +1,8 @@
+# Code Owners du repo forage-frontend
+# https://docs.github.com/en/repositories/managing-your-repositories-settings-and-security/customizing-your-repository/about-code-owners
+#
+# Toute PR sur ce repo demandera automatiquement la review de @ClichyMercury.
+# Combiné avec la branch protection "Require review from Code Owners",
+# aucun merge ne peut se faire sur main sans son approbation.
+
+* @ClichyMercury

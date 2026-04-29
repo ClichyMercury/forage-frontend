@@ -21,3 +21,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Notes de session privées (récap d'incidents/sécurisation, jamais commitées)
+docs/RELEASE_NOTES_*.md
