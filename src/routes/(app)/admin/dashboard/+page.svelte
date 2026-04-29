@@ -10,6 +10,7 @@
   let demandes = $state<any[]>([])
   let pendingEntreprises = $state<any[]>([])
   let allDemandes = $state<any[]>([])
+  let classement = $state<any[]>([])
   let periode = $state('mois')
   let loading = $state(true)
 
@@ -38,6 +39,13 @@
     return num.toLocaleString('fr-CI')
   }
 
+  function fmtMoney(n: any) {
+    const num = Number(n)
+    if (isNaN(num)) return '—'
+    return num.toLocaleString('fr-CI', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  }
+
+
   async function loadData() {
     loading = true
     try {
@@ -51,11 +59,15 @@
       demandes = demandesRes.data.data ?? []
       pendingEntreprises = Array.isArray(pendingRes.data) ? pendingRes.data : []
       allDemandes = allDemandesRes.data.data ?? []
+      classement = stats?.classement_entreprises ?? []
     } catch {} finally { loading = false }
   }
 
   onMount(loadData)
-  $effect(() => { loadData() })
+  $effect(() => {
+    periode // réagir uniquement au changement de période
+    loadData()
+  })
 </script>
 
 <svelte:head><title>Tableau de bord — Admin ForageCI</title></svelte:head>
@@ -95,8 +107,8 @@
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
     <StatCard title="Demandes ({periode})" value={stats.demandes.total_periode} icon="assignment" color="blue" />
     <StatCard title="Taux de conversion" value={stats.demandes.taux_conversion} icon="trending_up" color="green" />
-    <StatCard title="Chiffre d'affaires" value="{fmt(stats.finances.chiffre_affaires)} FCFA" icon="payments" color="purple" subtitle="Période en cours" />
-    <StatCard title="Marges générées" value="{fmt(stats.finances.marges_cumulees)} FCFA" icon="account_balance" color="orange" />
+    <StatCard title="Chiffre d'affaires" value="{fmtMoney(stats.finances.chiffre_affaires)} FCFA" icon="payments" color="purple" subtitle="Période en cours" />
+    <StatCard title="Marges générées" value="{fmtMoney(stats.finances.marges_cumulees)} FCFA" icon="account_balance" color="orange" />
   </div>
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
     <StatCard title="Total demandes" value={stats.demandes.total_global} icon="folder_open" color="blue" />
@@ -112,10 +124,75 @@
   </div>
 {/if}
 
-<!-- Ligne 1 : Demandes récentes + Validation entreprises -->
+<!-- Alertes demandes sans réponse -->
+{#if !loading && stats?.alertes_sans_reponse?.count > 0}
+  <div class="bg-red-50 border border-red-200 rounded-2xl overflow-hidden mb-5">
+    <div class="px-5 py-3.5 flex items-center justify-between border-b border-red-100">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-red-500 icon-filled" style="font-size: 18px;">warning</span>
+        <p class="text-sm font-bold text-red-700">
+          {stats.alertes_sans_reponse.count} demande{stats.alertes_sans_reponse.count > 1 ? 's' : ''} sans réponse depuis +7 jours
+        </p>
+      </div>
+      <span class="text-xs text-red-500 font-medium">Action requise</span>
+    </div>
+    <div class="divide-y divide-red-100">
+      {#each stats.alertes_sans_reponse.demandes.slice(0, 4) as d}
+        {@const jours = Math.floor((Date.now() - new Date(d.created_at).getTime()) / 86400000)}
+        <a href="/admin/demandes/{d.id}"
+          class="flex items-center gap-3 px-5 py-3 hover:bg-red-100/50 transition-all">
+          <div class="w-8 h-8 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-red-500 icon-filled" style="font-size: 15px;">schedule</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-slate-800 truncate">
+              {d.type_forage ? `Forage ${d.type_forage}` : `Demande #${d.id}`}{d.localisation_adresse ? ` — ${d.localisation_adresse.split(',')[0]}` : ''}
+            </p>
+            <p class="text-xs text-red-500 mt-0.5">En attente depuis {jours} jour{jours > 1 ? 's' : ''}</p>
+          </div>
+          <span class="text-xs px-2 py-1 rounded-lg font-medium shrink-0
+            {d.statut === 'en_attente' ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'}">
+            {d.statut === 'en_attente' ? 'À valider' : 'AO sans offre'}
+          </span>
+          <span class="material-symbols-outlined text-red-300 shrink-0" style="font-size: 16px;">chevron_right</span>
+        </a>
+      {/each}
+    </div>
+    {#if stats.alertes_sans_reponse.count > 4}
+      <div class="px-5 py-2.5 border-t border-red-100">
+        <a href="/admin/demandes" class="text-xs text-red-600 font-semibold hover:text-red-700">
+          Voir les {stats.alertes_sans_reponse.count - 4} autres →
+        </a>
+      </div>
+    {/if}
+  </div>
+{/if}
+
+  <!-- Validation entreprises en attente (compact, si applicable) -->
+  {#if !loading && pendingEntreprises.length > 0}
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-3.5 mb-5 flex items-center justify-between gap-4 flex-wrap">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-amber-600 icon-filled" style="font-size: 20px;">business</span>
+        <div>
+          <p class="text-sm font-semibold text-amber-800">
+            {pendingEntreprises.length} entreprise{pendingEntreprises.length > 1 ? 's' : ''} en attente de validation
+          </p>
+          <p class="text-xs text-amber-600 mt-0.5">
+            {pendingEntreprises.slice(0, 3).map((e: any) => e.entrepriseProfile?.raisonSociale ?? e.email).join(', ')}{pendingEntreprises.length > 3 ? '…' : ''}
+          </p>
+        </div>
+      </div>
+      <a href="/admin/utilisateurs"
+        class="shrink-0 px-4 py-2 rounded-xl bg-amber-600 text-white text-sm font-semibold hover:bg-amber-700 transition-all">
+        Valider maintenant
+      </a>
+    </div>
+  {/if}
+
+<!-- Ligne 1 : Demandes récentes + Classement entreprises -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
 
-  <!-- Demandes récentes — même style que la liste demandes -->
+  <!-- Demandes récentes -->
   <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-100 overflow-hidden">
     <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
       <h3 class="font-display font-bold text-slate-900">Demandes récentes</h3>
@@ -166,53 +243,81 @@
     {/if}
   </div>
 
-  <!-- Validation entreprises -->
+  <!-- Classement entreprises -->
   <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-    <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-      <h3 class="font-display font-bold text-slate-900">Validation entreprises</h3>
-      {#if pendingEntreprises.length > 0}
-        <span class="text-xs px-2.5 py-1 rounded-full font-semibold border" style="background-color: #fbf3ec; color: #743820; border-color: #e9c2a3">
-          {pendingEntreprises.length} en attente
-        </span>
-      {/if}
+    <div class="px-5 py-4 border-b border-slate-100">
+      <h3 class="font-display font-bold text-slate-900">Top entreprises</h3>
+      <p class="text-xs text-slate-400 mt-0.5">Classées par taux de sélection</p>
     </div>
     {#if loading}
-      <div class="p-5 space-y-2">{#each [1,2,3] as _}<div class="skeleton h-14 rounded-xl"></div>{/each}</div>
-    {:else if pendingEntreprises.length === 0}
+      <div class="p-5 space-y-3">{#each [1,2,3,4] as _}<div class="skeleton h-14 rounded-xl"></div>{/each}</div>
+    {:else if classement.length === 0}
       <div class="py-12 text-center px-6">
-        <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mx-auto mb-3">
-          <span class="material-symbols-outlined text-emerald-500 icon-filled" style="font-size: 20px;">check_circle</span>
+        <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
+          <span class="material-symbols-outlined text-slate-400" style="font-size: 20px;">leaderboard</span>
         </div>
-        <p class="text-slate-500 text-sm font-medium">Tout est validé</p>
-        <p class="text-slate-400 text-xs mt-1">Aucune entreprise en attente</p>
+        <p class="text-slate-500 text-sm font-medium">Aucune donnée</p>
+        <p class="text-slate-400 text-xs mt-1">Les entreprises apparaîtront après soumission d'offres</p>
       </div>
     {:else}
       <div class="divide-y divide-slate-50">
-        {#each pendingEntreprises.slice(0, 5) as e}
-          <div class="flex items-center gap-3 px-5 py-3.5">
-            <div class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 text-sm font-bold shrink-0">
-              {(e.entrepriseProfile?.raisonSociale ?? e.email).charAt(0).toUpperCase()}
+        {#each classement.slice(0, 6) as e, i}
+          {@const taux = Number(e.taux_selection ?? 0)}
+          {@const prixMoyen = Number(e.prix_moyen ?? 0)}
+          {@const delaiMoyen = Number(e.delai_moyen ?? 0)}
+          {@const medals = ['🥇', '🥈', '🥉']}
+          <div class="px-5 py-3.5 flex items-start gap-3">
+            <!-- Rang -->
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5
+              {i === 0 ? 'bg-amber-100' : i === 1 ? 'bg-slate-100' : i === 2 ? 'bg-orange-100' : 'bg-slate-50'}">
+              {#if i < 3}
+                <span style="font-size: 14px;">{medals[i]}</span>
+              {:else}
+                <span class="text-xs font-bold text-slate-500">{i + 1}</span>
+              {/if}
             </div>
+
+            <!-- Infos -->
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-slate-800 truncate">
-                {e.entrepriseProfile?.raisonSociale ?? e.email}
+              <p class="text-sm font-semibold text-slate-800 truncate">
+                {e.full_name ?? e.fullName ?? '—'}
               </p>
-              <p class="text-xs text-slate-400 truncate">{e.email}</p>
-              <p class="text-xs text-slate-400 mt-0.5">
-                Inscrit le {new Date(e.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short' })}
-              </p>
+              <div class="flex items-center gap-3 mt-1 flex-wrap">
+                <!-- Prix moyen -->
+                <div class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-slate-400 icon-filled" style="font-size: 12px;">payments</span>
+                  <span class="text-xs text-slate-500">{fmtMoney(prixMoyen)}FCFA</span>
+                </div>
+                <!-- Délai moyen -->
+                <div class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-slate-400 icon-filled" style="font-size: 12px;">schedule</span>
+                  <span class="text-xs text-slate-500">{delaiMoyen.toFixed(0)}j</span>
+                </div><!-- Taux sélection -->
+                <div class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-emerald-500 icon-filled" style="font-size: 12px;">check_circle</span>
+                  <span class="text-xs font-semibold text-emerald-700">{taux.toFixed(0)}%</span>
+                </div>
+              </div>
+              <!-- Barre taux -->
+              <div class="mt-1.5 h-1 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all"
+                  style="width: {Math.min(taux, 100)}%; background: {i === 0 ? '#f59e0b' : i === 1 ? '#94a3b8' : i === 2 ? '#f97316' : '#1e3fff'}">
+                </div>
+              </div>
             </div>
-            <a href="/admin/utilisateurs/{e.id}"
-              class="text-xs bg-brand-600 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-brand-700 transition-all shrink-0">
-              Valider
-            </a>
+
+            <!-- Nb offres -->
+            <div class="text-right shrink-0">
+              <p class="text-xs font-bold text-slate-700">{e.total_offres}</p>
+              <p class="text-xs text-slate-400">offre{e.total_offres > 1 ? 's' : ''}</p>
+            </div>
           </div>
         {/each}
       </div>
-      {#if pendingEntreprises.length > 5}
+      {#if classement.length > 6}
         <div class="px-5 py-3 border-t border-slate-100">
-          <a href="/admin/utilisateurs/pending" class="text-sm text-brand-600 font-semibold hover:text-brand-700">
-            Voir les {pendingEntreprises.length - 5} autres →
+          <a href="/admin/utilisateurs" class="text-sm text-brand-600 font-semibold hover:text-brand-700">
+            Voir tous les prestataires →
           </a>
         </div>
       {/if}

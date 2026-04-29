@@ -15,6 +15,7 @@
     ouverts: appelsOffres.filter((a: any) => !a.compte_a_rebours?.expire).length,
     soumises: mesOffres.filter((o: any) => o.statut === 'soumise').length,
     retenues: mesOffres.filter((o: any) => o.statut === 'retenue').length,
+    nonRetenues: mesOffres.filter((o: any) => o.statut === 'non_retenue').length,
   }))
 
   function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
@@ -56,6 +57,7 @@
   <StatCard title="En cours" value={stats().ouverts} icon="lock_open" color="purple" />
   <StatCard title="Offres soumises" value={stats().soumises} icon="send" color="orange" />
   <StatCard title="Offres retenues" value={stats().retenues} icon="star" color="green" />
+  <StatCard title="Offres non retenues" value={stats().nonRetenues} icon="cancel" color="red" />
 </div>
 
 <!-- Deux blocs côte à côte en dessous -->
@@ -129,7 +131,7 @@
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-slate-800">Offre #{offre.id}</p>
               <p class="text-xs text-slate-400 mt-0.5">
-                {fmt(offre.prixTtc)} FCFA TTC · {offre.delaiExecution} jours
+                {fmt(offre.prixTtc ?? offre.prix_ttc)} FCFA TTC · {offre.delaiExecution ?? offre.delai_execution} jours
               </p>
             </div>
             <Badge status={offre.statut} />

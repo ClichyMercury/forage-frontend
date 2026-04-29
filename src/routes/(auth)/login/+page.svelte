@@ -72,6 +72,9 @@
   <div>
     <div class="flex items-center justify-between mb-1.5">
       <label class="block text-sm font-medium text-slate-700" for="password">Mot de passe</label>
+      <a href="/forgot-password" class="text-xs text-brand-600 hover:text-brand-700 font-medium transition-colors">
+        Mot de passe oublié ?
+      </a>
     </div>
     <div class="relative">
       <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">lock</span>

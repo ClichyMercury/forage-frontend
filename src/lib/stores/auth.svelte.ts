@@ -9,6 +9,7 @@ export interface AuthUser {
   userType: string | null
   isActive: boolean
   initials: string
+  avatarUrl?: string | null
 }
 
 // Utilisation d'un objet simple pour éviter les problèmes SSR avec $state au niveau module

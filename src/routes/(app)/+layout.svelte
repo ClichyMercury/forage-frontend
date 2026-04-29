@@ -25,6 +25,19 @@
     if (!auth.isAuthenticated()) goto('/login')
     checkViewport()
     window.addEventListener('resize', checkViewport)
+
+    // Rafraîchir le profil pour avoir avatarUrl à jour (ex: après reconnexion)
+    import('$lib/api').then(({ default: api }) => {
+      api.get('/account/profile').then((res) => {
+        const u = res.data?.data ?? res.data
+        if (auth.user && u?.avatarUrl !== undefined) {
+          auth.user = { ...auth.user, avatarUrl: u.avatarUrl ?? u.avatar_url ?? null }
+          if (typeof localStorage !== 'undefined' && auth.token) {
+            localStorage.setItem('auth', JSON.stringify({ user: auth.user, token: auth.token }))
+          }
+        }
+      }).catch(() => {})
+    })
   })
 
   onDestroy(() => {

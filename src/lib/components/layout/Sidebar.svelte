@@ -147,8 +147,12 @@
     <a href="/{role}/profile"
       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition-all"
       title={collapsed ? 'Profil' : ''}>
-      <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-white text-xs font-bold" style="background-color: #1e3fff">
-        {auth.user?.initials ?? '?'}
+      <div class="w-8 h-8 rounded-full shrink-0 overflow-hidden flex items-center justify-center text-white text-xs font-bold" style="background-color: #1e3fff">
+        {#if auth.user?.avatarUrl}
+          <img src={auth.user.avatarUrl} alt={auth.user.fullName ?? 'Profil'} class="w-8 h-8 object-cover" />
+        {:else}
+          {auth.user?.initials ?? '?'}
+        {/if}
       </div>
       {#if !collapsed}
         <div class="overflow-hidden flex-1 min-w-0">
