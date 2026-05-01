@@ -116,7 +116,7 @@
           <div class="flex items-center gap-1 pl-12 lg:pl-0 lg:col-span-2">
             <span class="text-xs lg:hidden text-slate-400">Budget :</span>
             {#if d.budgetMax}
-              <span class="text-sm font-semibold" style="color: #b35d2e">{fmt(d.budgetMax)} FCFA</span>
+              <span class="text-sm font-semibold text-brand-600">{fmt(d.budgetMax)} FCFA</span>
             {:else}
               <span class="text-slate-300">—</span>
             {/if}

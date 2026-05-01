@@ -43,7 +43,7 @@
   }
 </script>
 
-<svelte:head><title>Appels d'offres — ForageCI</title></svelte:head>
+<svelte:head><title>Appels d'offres — Forage</title></svelte:head>
 
 <div class="mb-5">
   <h2 class="text-xl font-bold text-slate-900">Appels d'offres reçus</h2>
@@ -98,7 +98,7 @@
                 Délai expiré
               </span>
             {:else}
-              <span class="inline-flex items-center gap-1 text-xs font-semibold" style="color: #b35d2e">
+              <span class="inline-flex items-center gap-1 text-xs font-semibold text-brand-600">
                 <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">timer</span>
                 {countdown(secondes)}
               </span>

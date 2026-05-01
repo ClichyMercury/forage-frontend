@@ -70,13 +70,13 @@
   })
 </script>
 
-<svelte:head><title>Tableau de bord — Admin ForageCI</title></svelte:head>
+<svelte:head><title>Tableau de bord — Admin Forage</title></svelte:head>
 
 <!-- Header -->
 <div class="mb-6 flex items-start lg:items-center justify-between flex-wrap gap-3">
   <div class="min-w-0 flex-1">
-    <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900 wrap-break-word">
-      Bonjour, <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">{auth.user?.fullName?.split(' ')[0] ?? 'Admin'}</span>.
+    <h2 class="font-display font-black text-2xl lg:text-3xl leading-tight wrap-break-word" style="color: #0f1f5c; letter-spacing: -0.02em">
+      Bonjour, <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #1e3fff">{auth.user?.fullName?.split(' ')[0] ?? 'Admin'}</span>.
     </h2>
     <p class="text-sm text-slate-500 mt-1">Vue d'ensemble de la plateforme.</p>
   </div>
@@ -90,7 +90,8 @@
       {/each}
     </div>
     <a href="/admin/demandes"
-      class="flex items-center gap-2 px-4 lg:px-5 py-2.5 lg:py-3 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition-all shadow-sm whitespace-nowrap">
+      class="flex items-center gap-2 px-4 lg:px-5 py-2.5 lg:py-3 rounded-xl text-white font-semibold text-sm transition-all whitespace-nowrap"
+      style="background-color: #1e3fff; box-shadow: 0 4px 14px rgba(30,63,255,0.3)">
       <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">assignment</span>
       <span class="hidden sm:inline">Gérer les demandes</span>
       <span class="sm:hidden">Gérer</span>
@@ -399,7 +400,7 @@
               </div>
             </div>
             <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-              <div class="h-full rounded-full transition-all" style="width: {pct}%; background: linear-gradient(90deg, #1e3fff 0%, #b35d2e 100%)"></div>
+              <div class="h-full rounded-full transition-all" style="width: {pct}%; background: linear-gradient(90deg, #1e3fff 0%, #475569 100%)"></div>
             </div>
           </div>
         {/each}

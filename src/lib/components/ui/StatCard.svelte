@@ -18,22 +18,22 @@
   }>()
 
   const colorMap = {
-    blue:   { bg: 'bg-brand-50',  icon: 'text-brand-600',  border: 'border-brand-100' },
-    green:  { bg: 'bg-emerald-50',icon: 'text-emerald-600',border: 'border-emerald-100' },
-    orange: { bg: 'bg-terre-50',  icon: 'text-terre-600',  border: 'border-terre-100' },
-    red:    { bg: 'bg-red-50',    icon: 'text-red-600',    border: 'border-red-100' },
-    purple: { bg: 'bg-brand-50',  icon: 'text-brand-700',  border: 'border-brand-100' },
-    cyan:   { bg: 'bg-terre-50',  icon: 'text-terre-500',  border: 'border-terre-100' },
+    blue:   { bg: 'bg-brand-50',   icon: 'text-brand-600',  border: 'border-brand-100' },
+    green:  { bg: 'bg-emerald-50', icon: 'text-emerald-600',border: 'border-emerald-100' },
+    orange: { bg: 'bg-slate-100',  icon: 'text-slate-600',  border: 'border-slate-200' },
+    red:    { bg: 'bg-red-50',     icon: 'text-red-600',    border: 'border-red-100' },
+    purple: { bg: 'bg-brand-50',   icon: 'text-brand-700',  border: 'border-brand-100' },
+    cyan:   { bg: 'bg-brand-100',  icon: 'text-brand-600',  border: 'border-brand-200' },
   }
 
   const c = $derived(colorMap[color as keyof typeof colorMap] ?? colorMap.blue)
 </script>
 
-<div class="bg-white rounded-2xl p-5 border border-slate-100 hover:border-slate-200 hover:shadow-md transition-all">
+<div class="bg-white rounded-xl p-5 border border-slate-100 hover:border-slate-200 transition-all card-shadow card-shadow-hover">
   <div class="flex items-start justify-between">
     <div class="flex-1 min-w-0">
-      <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">{title}</p>
-      <p class="font-display font-black text-3xl text-slate-900 mt-2 leading-none tracking-tight">{value}</p>
+      <p class="text-xs font-medium text-slate-500 uppercase tracking-widest">{title}</p>
+      <p class="font-display font-black text-3xl mt-2 leading-none tracking-tight" style="color: #0f1f5c">{value}</p>
       {#if subtitle}
         <p class="text-xs text-slate-400 mt-1.5">{subtitle}</p>
       {/if}

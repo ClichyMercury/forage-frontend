@@ -64,7 +64,7 @@
   )
 </script>
 
-<svelte:head><title>Appel d'offre #{id} — ForageCI</title></svelte:head>
+<svelte:head><title>Appel d'offre #{id} — Forage</title></svelte:head>
 
 <div class="max-w-3xl mx-auto">
   <!-- Header -->

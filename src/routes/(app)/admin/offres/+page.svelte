@@ -50,7 +50,7 @@
 
 <div class="mb-5">
   <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900">
-    Offres des <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">entreprises</span>.
+    Offres des <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #1e3fff">entreprises</span>.
   </h2>
   <p class="text-sm text-slate-500 mt-1">Toutes les offres soumises sur les appels d'offres.</p>
 </div>
@@ -101,7 +101,7 @@
             <span class="text-sm text-slate-500">#{o.offre_id}</span>
           </div>
           <div class="flex items-center gap-2 min-w-0 lg:col-span-3">
-            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0" style="background-color: #b35d2e">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0" style="background-color: #475569">
               {(o.entreprise?.fullName ?? o.entreprise?.email ?? '?').charAt(0).toUpperCase()}
             </div>
             <span class="text-sm font-semibold text-slate-800 truncate flex-1">

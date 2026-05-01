@@ -111,7 +111,7 @@
     <div class="bg-white rounded-2xl border border-slate-100 p-6 mb-5">
       <div class="flex items-center gap-4 mb-5 pb-5 border-b border-slate-100">
         <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-xl font-display font-black shrink-0"
-             style="background-color: {user.role === 'entreprise' ? '#b35d2e' : user.role === 'admin' ? '#0f172a' : '#1e3fff'}">
+             style="background-color: {user.role === 'entreprise' ? '#475569' : user.role === 'admin' ? '#0f172a' : '#1e3fff'}">
           {user.initials ?? (user.fullName ?? user.email).charAt(0).toUpperCase()}
         </div>
         <div class="min-w-0 flex-1">
@@ -119,7 +119,7 @@
           <p class="text-sm text-slate-500 truncate">{user.email}</p>
           <div class="flex items-center gap-2 mt-1.5 flex-wrap">
             <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold capitalize"
-                  style="background-color: {user.role === 'entreprise' ? '#fbf3ec' : user.role === 'admin' ? '#0f172a' : '#eef1ff'}; color: {user.role === 'entreprise' ? '#743820' : user.role === 'admin' ? '#ffffff' : '#1226a8'}">
+                  style="background-color: {user.role === 'entreprise' ? '#f1f5f9' : user.role === 'admin' ? '#0f172a' : '#eef1ff'}; color: {user.role === 'entreprise' ? '#334155' : user.role === 'admin' ? '#ffffff' : '#1226a8'}">
               {user.role}
             </span>
             {#if user.isActive}
@@ -128,8 +128,7 @@
                 Actif
               </span>
             {:else if user.role === 'entreprise'}
-              <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1"
-                    style="background-color: #fbf3ec; color: #743820">
+              <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1 bg-slate-100 text-slate-600">
                 <span class="material-symbols-outlined icon-filled" style="font-size: 11px;">schedule</span>
                 En attente de validation
               </span>
@@ -165,7 +164,7 @@
     {#if profile}
       <div class="bg-white rounded-2xl border border-slate-100 p-6 mb-5">
         <h3 class="font-display font-bold text-slate-900 mb-4 flex items-center gap-2">
-          <span class="material-symbols-outlined icon-filled" style="font-size: 18px; color: #b35d2e">business</span>
+          <span class="material-symbols-outlined icon-filled text-brand-600" style="font-size: 18px;">business</span>
           Profil entreprise
         </h3>
 
@@ -185,8 +184,7 @@
             <p class="text-xs text-slate-400 mb-2 px-1">Domaines d'intervention</p>
             <div class="flex flex-wrap gap-2">
               {#each profile.domaines as d}
-                <span class="px-3 py-1 rounded-lg text-xs font-semibold capitalize"
-                      style="background-color: #fbf3ec; color: #743820">{d}</span>
+                <span class="px-3 py-1 rounded-lg text-xs font-semibold capitalize bg-brand-50 text-brand-700">{d}</span>
               {/each}
             </div>
           </div>

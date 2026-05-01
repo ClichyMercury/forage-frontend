@@ -60,7 +60,7 @@
   function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
 </script>
 
-<svelte:head><title>Demande #{id} — ForageCI</title></svelte:head>
+<svelte:head><title>Demande #{id} — Forage</title></svelte:head>
 
 <FormPage maxWidth="max-w-3xl">
   <!-- Header -->

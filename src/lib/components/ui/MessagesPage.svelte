@@ -235,7 +235,7 @@
               <p class="text-xs text-slate-400">Mise à jour toutes les 15s</p>
             {:else}
               <p class="font-semibold text-slate-800 text-sm flex items-center gap-1.5 truncate">
-                Équipe ForageCI
+                Équipe Forage
                 <span class="material-symbols-outlined icon-filled text-slate-400 shrink-0" style="font-size: 13px;">verified</span>
               </p>
               <p class="text-xs text-slate-400 truncate">{selectedDemande.localisationAdresse ?? `Demande #${selectedDemande.id}`}</p>

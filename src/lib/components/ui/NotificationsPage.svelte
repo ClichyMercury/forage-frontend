@@ -38,7 +38,7 @@
   <div class="flex items-start justify-between mb-6 flex-wrap gap-3">
     <div class="min-w-0 flex-1">
       <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900">
-        <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">Notifications</span>.
+        <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #1e3fff">Notifications</span>.
       </h2>
       <p class="text-slate-500 mt-1 text-sm">
         {#if notifStore.count > 0}

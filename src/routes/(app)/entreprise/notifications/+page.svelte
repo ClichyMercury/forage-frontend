@@ -2,6 +2,6 @@
   import NotificationsPage from '$lib/components/ui/NotificationsPage.svelte'
 </script>
 
-<svelte:head><title>Notifications — ForageCI</title></svelte:head>
+<svelte:head><title>Notifications — Forage</title></svelte:head>
 
 <NotificationsPage />

@@ -51,7 +51,7 @@
   }
 </script>
 
-<svelte:head><title>Nouvelle demande — ForageCI</title></svelte:head>
+<svelte:head><title>Nouvelle demande — Forage</title></svelte:head>
 
 <FormPage maxWidth="max-w-2xl">
   <div class="flex items-center gap-3 mb-6">

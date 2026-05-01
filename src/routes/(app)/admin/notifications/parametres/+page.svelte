@@ -26,7 +26,7 @@
 
   const groupes = {
     demande: { label: 'Demandes', color: '#1e3fff' },
-    offre:   { label: 'Offres',   color: '#b35d2e' },
+    offre:   { label: 'Offres',   color: '#475569' },
     compte:  { label: 'Comptes',  color: '#0f172a' },
     message: { label: 'Messages', color: '#1e3fff' },
   }
@@ -80,7 +80,7 @@
     </button>
     <div class="flex-1 min-w-0">
       <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900 wrap-break-word">
-        Paramètres des <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">notifications</span>.
+        Paramètres des <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #1e3fff">notifications</span>.
       </h2>
       <p class="text-sm text-slate-500 mt-1">Activez ou désactivez chaque type de notification globalement.</p>
     </div>
@@ -99,7 +99,7 @@
       </div>
       <div class="bg-white rounded-2xl border border-slate-100 p-5">
         <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Désactivés</p>
-        <p class="font-display font-black text-2xl lg:text-3xl mt-2 leading-none tracking-tight" style="color: {stats().desactives > 0 ? '#b35d2e' : '#94a3b8'}">{stats().desactives}</p>
+        <p class="font-display font-black text-2xl lg:text-3xl mt-2 leading-none tracking-tight" style="color: {stats().desactives > 0 ? '#1e3fff' : '#94a3b8'}">{stats().desactives}</p>
       </div>
     </div>
   {/if}
@@ -166,12 +166,12 @@
     </div>
 
     <!-- Note explicative -->
-    <div class="mt-8 p-4 rounded-2xl border" style="background-color: #fbf3ec; border-color: #e9c2a3">
+    <div class="mt-8 p-4 rounded-2xl border border-brand-200" style="background-color: #eef1ff">
       <div class="flex items-start gap-3">
-        <span class="material-symbols-outlined icon-filled shrink-0 mt-0.5" style="font-size: 20px; color: #b35d2e">info</span>
+        <span class="material-symbols-outlined icon-filled shrink-0 mt-0.5" style="font-size: 20px; color: #1e3fff">info</span>
         <div class="flex-1">
-          <p class="text-sm font-semibold" style="color: #743820">À propos des paramètres</p>
-          <p class="text-xs mt-1 leading-relaxed" style="color: #944923">
+          <p class="text-sm font-semibold text-slate-800">À propos des paramètres</p>
+          <p class="text-xs mt-1 leading-relaxed text-slate-500">
             Désactiver un type empêche son envoi pour <strong>tous les utilisateurs</strong>, en email comme en interne.
             Les notifications déjà envoyées ne sont pas affectées. Conformément au CDC §5.1.
           </p>

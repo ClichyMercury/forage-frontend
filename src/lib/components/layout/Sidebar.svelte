@@ -85,20 +85,21 @@
 </script>
 
 <aside
-  class="fixed left-0 top-0 h-full z-40 flex flex-col transition-all duration-300 bg-white border-r border-slate-200"
+  class="fixed left-0 top-0 h-full z-40 flex flex-col transition-all duration-300 border-r border-slate-200"
   style="
+    background-color: #fafbff;
     width: {collapsed && !isMobile ? '64px' : '240px'};
     transform: translateX({isMobile && collapsed ? '-100%' : '0'});
   "
 >
   <!-- Logo + bouton fermer (mobile) -->
   <div class="flex items-center gap-2.5 px-4 py-5 border-b border-slate-100">
-    <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background-color: #1e3fff">
-      <span class="material-symbols-outlined text-white icon-filled" style="font-size: 18px;">water_drop</span>
+    <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 overflow-hidden" style="box-shadow: 0 4px 12px rgba(30,63,255,0.2)">
+      <img src="/images/logo.jpeg" alt="Forage" class="w-9 h-9 object-contain" />
     </div>
     {#if !collapsed}
       <div class="overflow-hidden flex-1">
-        <span class="font-display font-black text-lg tracking-tight text-slate-900 whitespace-nowrap">ForageCI</span>
+        <span class="font-display font-black text-lg tracking-tight text-slate-900 whitespace-nowrap">Forage</span>
       </div>
       {#if isMobile}
         <button
@@ -125,7 +126,7 @@
         <div class="relative shrink-0">
           <span class="material-symbols-outlined icon-filled" style="font-size: 20px;">{item.icon}</span>
           {#if item.badge > 0}
-            <span class="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 rounded-full text-white text-[9px] font-bold flex items-center justify-center px-1" style="background-color: #b35d2e">
+            <span class="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 rounded-full text-white text-[9px] font-bold flex items-center justify-center px-1" style="background-color: #1e3fff">
               {item.badge > 99 ? '99+' : item.badge}
             </span>
           {/if}
@@ -133,7 +134,7 @@
         {#if !collapsed}
           <span class="text-sm whitespace-nowrap flex-1">{item.label}</span>
           {#if item.badge > 0}
-            <span class="text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center" style="background-color: #b35d2e">
+            <span class="text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center" style="background-color: #1e3fff">
               {item.badge > 99 ? '99+' : item.badge}
             </span>
           {/if}
@@ -178,14 +179,16 @@
 <style>
   .sidebar-link {
     color: #64748b;
+    font-size: 0.875rem;
   }
   .sidebar-link:hover {
-    background-color: #f8fafc;
+    background-color: #eef1ff;
     color: #1e3fff;
   }
   .sidebar-link.is-active {
     background-color: #1e3fff;
     color: #ffffff;
+    box-shadow: 0 4px 12px rgba(30, 63, 255, 0.28);
   }
   .sidebar-link.is-active:hover {
     background-color: #1730d6;
