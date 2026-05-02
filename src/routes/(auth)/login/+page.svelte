@@ -38,21 +38,19 @@
   }
 </script>
 
-<svelte:head><title>Connexion — ForageCI</title></svelte:head>
+<svelte:head><title>Connexion — Forage</title></svelte:head>
 
 <!-- Logo mobile -->
 <div class="lg:hidden flex items-center gap-2.5 mb-10">
-  <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background-color: #1e3fff">
-    <span class="material-symbols-outlined text-white icon-filled" style="font-size: 20px;">water_drop</span>
-  </div>
-  <span class="font-display font-black text-xl tracking-tight text-slate-900">ForageCI</span>
+  <img src="/images/logo.jpeg" alt="Forage" class="w-10 h-10 object-contain" />
+  <span class="font-display font-black text-xl tracking-tight text-slate-900">Forage</span>
 </div>
 
 <div class="mb-8">
-  <h2 class="font-display font-black text-4xl tracking-tight leading-[1.05] text-slate-900">
+  <h2 class="font-display font-black text-4xl leading-[1.05]" style="color: #0f1f5c; letter-spacing: -0.03em">
     Bienvenue.
   </h2>
-  <p class="text-slate-500 mt-3 text-base">Connectez-vous à votre espace ForageCI.</p>
+  <p class="text-slate-500 mt-3 text-base">Connectez-vous à votre espace Forage.</p>
 </div>
 
 <form onsubmit={handleLogin} class="space-y-5">
@@ -62,7 +60,8 @@
     <div class="relative">
       <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">mail</span>
       <input id="email" type="email" bind:value={email} placeholder="Entrez votre adresse email" required
-        class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder-slate-400 text-sm transition-all"
+        class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 text-sm transition-all"
+        style="background-color: #fafbff"
         class:border-red-400={errors.email} />
     </div>
     {#if errors.email}<p class="text-red-500 text-xs mt-1">{errors.email}</p>{/if}
@@ -79,7 +78,8 @@
     <div class="relative">
       <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">lock</span>
       <input id="password" type={showPassword ? 'text' : 'password'} bind:value={password} placeholder="••••••••" required
-        class="w-full pl-10 pr-12 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder-slate-400 text-sm transition-all"
+        class="w-full pl-10 pr-12 py-3 rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 text-sm transition-all"
+        style="background-color: #fafbff"
         class:border-red-400={errors.password} />
       <button type="button" onclick={() => showPassword = !showPassword}
         class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -93,7 +93,8 @@
 
   <!-- Bouton -->
   <button type="submit" disabled={loading}
-    class="w-full py-4 rounded-2xl bg-brand-600 text-white font-semibold text-sm shadow-xl hover:bg-brand-700 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+    class="w-full py-4 rounded-2xl text-white font-semibold text-sm hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+    style="background-color: #1e3fff; box-shadow: 0 4px 14px rgba(30,63,255,0.35)">
     {#if loading}
       <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
       Connexion...
@@ -112,6 +113,6 @@
   </p>
   <p class="text-sm text-slate-500">
     Vous êtes une entreprise ?
-    <a href="/register-entreprise" class="font-semibold hover:underline" style="color: #b35d2e">Inscription entreprise</a>
+    <a href="/register-entreprise" class="font-semibold text-brand-600 hover:text-brand-700">Inscription entreprise</a>
   </p>
 </div>

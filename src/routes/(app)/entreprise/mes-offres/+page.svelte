@@ -16,7 +16,7 @@
   function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
 </script>
 
-<svelte:head><title>Mes offres — ForageCI</title></svelte:head>
+<svelte:head><title>Mes offres — Forage</title></svelte:head>
 
 <div class="mb-5">
   <h2 class="text-xl font-bold text-slate-900">Mes offres soumises</h2>

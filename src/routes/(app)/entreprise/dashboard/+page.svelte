@@ -32,19 +32,19 @@
   })
 </script>
 
-<svelte:head><title>Tableau de bord — ForageCI</title></svelte:head>
+<svelte:head><title>Tableau de bord — Forage</title></svelte:head>
 
 <!-- Bienvenue -->
 <div class="mb-6 flex items-start lg:items-center justify-between flex-wrap gap-3">
   <div class="min-w-0 flex-1">
-    <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900 wrap-break-word">
-      Bonjour, <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">{auth.user?.fullName?.split(' ')[0] ?? 'bienvenue'}</span>.
+    <h2 class="font-display font-black text-2xl lg:text-3xl leading-tight wrap-break-word" style="color: #0f1f5c; letter-spacing: -0.02em">
+      Bonjour, <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #1e3fff">{auth.user?.fullName?.split(' ')[0] ?? 'bienvenue'}</span>.
     </h2>
     <p class="text-sm text-slate-500 mt-1">Gérez vos appels d'offres et suivez vos soumissions.</p>
   </div>
   <a href="/entreprise/appels-offres"
-    class="flex items-center gap-2 px-4 lg:px-5 py-2.5 lg:py-3 rounded-xl text-white font-semibold text-sm transition-all shadow-sm hover:opacity-90 whitespace-nowrap"
-    style="background-color: #b35d2e">
+    class="flex items-center gap-2 px-4 lg:px-5 py-2.5 lg:py-3 rounded-xl text-white font-semibold text-sm transition-all whitespace-nowrap"
+    style="background-color: #1e3fff; box-shadow: 0 4px 14px rgba(30,63,255,0.3)">
     <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">campaign</span>
     <span class="hidden sm:inline">Voir les appels d'offres</span>
     <span class="sm:hidden">Appels d'offres</span>
@@ -66,7 +66,7 @@
   <div class="bg-white rounded-2xl border border-slate-100">
     <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
       <h3 class="font-display font-bold text-slate-900">Appels d'offres reçus</h3>
-      <a href="/entreprise/appels-offres" class="text-sm font-semibold transition-colors hover:opacity-80" style="color: #b35d2e">Voir tout</a>
+      <a href="/entreprise/appels-offres" class="text-sm font-semibold transition-colors hover:opacity-80 text-brand-600">Voir tout</a>
     </div>
     {#if loading}
       <div class="p-5 space-y-2">{#each [1,2,3] as _}<div class="skeleton h-12 rounded-xl"></div>{/each}</div>
@@ -83,8 +83,8 @@
         {#each appelsOffres.slice(0, 5) as ao}
           <a href="/entreprise/appels-offres/{ao.id}"
             class="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-all group">
-            <div class="w-9 h-9 rounded-xl {ao.compte_a_rebours?.expire ? 'bg-red-50' : 'bg-terre-50'} flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined icon-filled {ao.compte_a_rebours?.expire ? 'text-red-400' : 'text-terre-600'}" style="font-size: 16px;">campaign</span>
+            <div class="w-9 h-9 rounded-xl {ao.compte_a_rebours?.expire ? 'bg-red-50' : 'bg-brand-50'} flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined icon-filled {ao.compte_a_rebours?.expire ? 'text-red-400' : 'text-brand-600'}" style="font-size: 16px;">campaign</span>
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-slate-800 truncate">
@@ -97,7 +97,7 @@
             {#if ao.ma_reponse?.soumise}
               <Badge status={ao.ma_reponse.statut} />
             {:else if !ao.compte_a_rebours?.expire}
-              <span class="text-xs text-white px-2.5 py-1 rounded-full font-semibold shrink-0" style="background-color: #b35d2e">Répondre</span>
+              <span class="text-xs text-white px-2.5 py-1 rounded-full font-semibold shrink-0" style="background-color: #1e3fff">Répondre</span>
             {/if}
           </a>
         {/each}

@@ -52,7 +52,7 @@
 
 <Toast />
 
-<div class="flex h-screen overflow-hidden bg-slate-50">
+<div class="flex h-screen overflow-hidden" style="background-color: #f5f7fa">
   <Sidebar bind:collapsed />
 
   <!-- Backdrop mobile quand sidebar ouverte -->
@@ -79,8 +79,8 @@
     </main>
 
     <!-- Footer fixe en bas -->
-    <footer class="shrink-0 px-4 lg:px-6 py-3 text-center text-xs text-slate-400 border-t border-slate-100 bg-white">
-      © {year} ForageCI — Plateforme de mise en relation pour prestations de forage
+    <footer class="shrink-0 px-4 lg:px-6 py-3 text-center text-xs text-slate-400 border-t border-slate-100" style="background-color: #fafbff">
+      © {year} Forage — Plateforme de mise en relation pour prestations de forage
     </footer>
   </div>
 </div>

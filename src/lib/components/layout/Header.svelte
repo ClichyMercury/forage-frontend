@@ -21,17 +21,17 @@
     if (path.includes('notifications')) return 'Notifications'
     if (path.includes('comparatif')) return 'Comparatif des offres'
     if (path.includes('offre-finale')) return 'Offre finale'
-    return 'ForageCI'
+    return 'Forage'
   })
 </script>
 
-<header class="sticky top-0 z-30 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+<header class="sticky top-0 z-30 border-b border-slate-100 px-6 py-4 flex items-center justify-between" style="background-color: #fafbff">
   <div class="flex items-center gap-3">
     <button onclick={onToggleSidebar}
       class="w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-all text-slate-600">
       <span class="material-symbols-outlined" style="font-size: 20px;">menu</span>
     </button>
-    <h1 class="font-display font-bold text-lg tracking-tight text-slate-900">{pageTitle()}</h1>
+    <h1 class="font-display font-bold text-lg tracking-tight" style="color: #0f1f5c; letter-spacing: -0.02em">{pageTitle()}</h1>
   </div>
 
   <div class="flex items-center gap-1">
@@ -42,7 +42,7 @@
         class="relative w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-all text-slate-600">
         <span class="material-symbols-outlined icon-filled" style="font-size: 20px;">notifications</span>
         {#if notifStore.count > 0}
-          <span class="absolute top-1 right-1 w-4 h-4 rounded-full text-white text-[9px] font-bold flex items-center justify-center" style="background-color: #b35d2e">
+          <span class="absolute top-1 right-1 w-4 h-4 rounded-full text-white text-[9px] font-bold flex items-center justify-center" style="background-color: #1e3fff">
             {notifStore.count > 9 ? '9+' : notifStore.count}
           </span>
         {/if}
@@ -55,7 +55,7 @@
             <span class="font-display font-bold text-slate-900 text-sm">Notifications</span>
             <div class="flex items-center gap-2">
               {#if notifStore.count > 0}
-                <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background-color: #b35d2e">{notifStore.count} non lues</span>
+                <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background-color: #1e3fff">{notifStore.count} non lues</span>
                 <button onclick={() => notifStore.markAllRead()}
                   class="text-xs text-slate-400 hover:text-brand-600 transition-colors">
                   Tout lire

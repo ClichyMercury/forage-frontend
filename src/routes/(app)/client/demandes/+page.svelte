@@ -33,13 +33,13 @@
   function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
 </script>
 
-<svelte:head><title>Mes demandes — ForageCI</title></svelte:head>
+<svelte:head><title>Mes demandes — Forage</title></svelte:head>
 
 <!-- Header -->
 <div class="flex items-start lg:items-center justify-between mb-5 flex-wrap gap-3">
   <div class="min-w-0 flex-1">
     <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900">
-      Mes <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">demandes</span>.
+      Mes <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #1e3fff">demandes</span>.
     </h2>
     <p class="text-sm text-slate-500 mt-1">Historique de toutes vos demandes de forage.</p>
   </div>
@@ -134,7 +134,7 @@
           <div class="hidden lg:flex lg:col-span-2 items-center gap-2">
             <Badge status={d.statut} />
             {#if d.statut === 'offre_envoyee'}
-              <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: #b35d2e"></span>
+              <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: #1e3fff"></span>
             {/if}
           </div>
         </a>

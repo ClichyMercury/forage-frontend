@@ -143,7 +143,7 @@
   <!-- Titre -->
   <div class="mb-8">
     <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900">
-      Mon <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">profil</span>.
+      Mon <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #1e3fff">profil</span>.
     </h2>
     <p class="text-sm text-slate-500 mt-1">Gérez vos informations personnelles et vos préférences.</p>
   </div>
@@ -165,7 +165,7 @@
             {#if uploadingAvatar}
               <!-- Spinner upload -->
               <div class="w-16 h-16 rounded-2xl flex items-center justify-center"
-                   style="background-color: {user.role === 'entreprise' ? '#b35d2e' : '#1e3fff'}">
+                   style="background-color: #1e3fff">
                 <span class="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               </div>
             {:else if currentAvatar}
@@ -175,7 +175,7 @@
             {:else}
               <!-- Fallback initiales -->
               <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-xl font-display font-black"
-                   style="background-color: {user.role === 'entreprise' ? '#b35d2e' : '#1e3fff'}">
+                   style="background-color: #1e3fff">
                 {user.initials ?? '?'}
               </div>
             {/if}
@@ -206,7 +206,7 @@
           <p class="text-sm text-slate-500 truncate">{user.email}</p>
           <div class="flex items-center gap-2 mt-1.5">
             <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold capitalize"
-                  style="background-color: {user.role === 'entreprise' ? '#fbf3ec' : '#eef1ff'}; color: {user.role === 'entreprise' ? '#743820' : '#1226a8'}">
+                  style="background-color: {user.role === 'entreprise' ? '#f1f5f9' : '#eef1ff'}; color: {user.role === 'entreprise' ? '#334155' : '#1226a8'}">
               {user.role}
             </span>
             {#if user.isActive}

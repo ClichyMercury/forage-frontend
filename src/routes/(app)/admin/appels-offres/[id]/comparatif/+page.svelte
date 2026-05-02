@@ -145,7 +145,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
       <div class="bg-white rounded-2xl border border-slate-100 p-5">
         <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Budget client</p>
-        <p class="font-display font-black text-2xl lg:text-3xl tracking-tight" style="color: #b35d2e">{fmt(data.budget_client ?? 0)}</p>
+        <p class="font-display font-black text-2xl lg:text-3xl tracking-tight text-brand-600">{fmt(data.budget_client ?? 0)}</p>
         <p class="text-xs text-slate-400 mt-1">FCFA — confidentiel</p>
       </div>
       <div class="bg-white rounded-2xl border border-slate-100 p-5">

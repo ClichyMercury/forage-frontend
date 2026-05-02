@@ -36,18 +36,19 @@
   })
 </script>
 
-<svelte:head><title>Tableau de bord — ForageCI</title></svelte:head>
+<svelte:head><title>Tableau de bord — Forage</title></svelte:head>
 
 <!-- Bienvenue -->
 <div class="mb-6 flex items-start lg:items-center justify-between flex-wrap gap-3">
   <div class="min-w-0 flex-1">
-    <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900 wrap-break-word">
-      Bonjour, <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">{auth.user?.fullName?.split(' ')[0] ?? 'bienvenue'}</span>.
+    <h2 class="font-display font-black text-2xl lg:text-3xl leading-tight wrap-break-word" style="color: #0f1f5c; letter-spacing: -0.02em">
+      Bonjour, <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #1e3fff">{auth.user?.fullName?.split(' ')[0] ?? 'bienvenue'}</span>.
     </h2>
     <p class="text-sm text-slate-500 mt-1">Voici l'état de vos demandes de forage.</p>
   </div>
   <button onclick={() => goto('/client/demandes/new')}
-    class="flex items-center gap-2 px-4 lg:px-5 py-2.5 lg:py-3 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition-all shadow-sm whitespace-nowrap">
+    class="flex items-center gap-2 px-4 lg:px-5 py-2.5 lg:py-3 rounded-xl text-white font-semibold text-sm transition-all whitespace-nowrap"
+    style="background-color: #1e3fff; box-shadow: 0 4px 14px rgba(30,63,255,0.3)">
     <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">add</span>
     <span class="hidden sm:inline">Nouvelle demande</span>
     <span class="sm:hidden">Nouvelle</span>
@@ -56,19 +57,19 @@
 
 <!-- CDC §3.1 — Alerte actions requises (offres en attente de décision) -->
 {#if demandesUrgentes.length > 0}
-  <div class="mb-5 p-5 rounded-2xl border" style="background-color: #fbf3ec; border-color: #e9c2a3">
+  <div class="mb-5 p-5 rounded-2xl border border-brand-200" style="background-color: #eef1ff">
     <div class="flex items-start gap-3">
-      <span class="material-symbols-outlined icon-filled shrink-0 mt-0.5" style="font-size: 22px; color: #b35d2e">mark_email_read</span>
+      <span class="material-symbols-outlined icon-filled shrink-0 mt-0.5" style="font-size: 22px; color: #1e3fff">mark_email_read</span>
       <div class="flex-1">
-        <p class="font-display font-bold text-base" style="color: #743820">
+        <p class="font-display font-bold text-base" style="color: #0f1f5c">
           {demandesUrgentes.length === 1 ? 'Une offre attend votre décision' : `${demandesUrgentes.length} offres attendent votre décision`}
         </p>
-        <p class="text-xs mt-1" style="color: #944923">Vous avez reçu une offre finale. Acceptez ou refusez depuis la page de la demande.</p>
+        <p class="text-xs mt-1 text-slate-500">Vous avez reçu une offre finale. Acceptez ou refusez depuis la page de la demande.</p>
         <div class="flex flex-wrap gap-2 mt-3">
           {#each demandesUrgentes as d}
             <a href="/client/demandes/{d.id}"
               class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white text-xs font-semibold transition-all hover:opacity-90"
-              style="background-color: #b35d2e">
+              style="background-color: #1e3fff; box-shadow: 0 2px 8px rgba(30,63,255,0.3)">
               <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">water_drop</span>
               {d.localisationAdresse?.split(',')[0] ?? `Demande #${d.id}`}
               <span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
@@ -134,7 +135,7 @@
       {#each demandes.slice(0, 6) as d}
         <a href="/client/demandes/{d.id}"
           class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-3 lg:items-center px-5 py-3.5 hover:bg-slate-50 transition-all
-            {d.statut === 'offre_envoyee' ? 'bg-terre-50/40' : ''}">
+            {d.statut === 'offre_envoyee' ? 'bg-brand-50/60' : ''}">
           <!-- Localisation -->
           <div class="lg:col-span-5 flex items-center gap-2 min-w-0">
             <div class="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center shrink-0">
@@ -154,7 +155,7 @@
           <div class="lg:col-span-3 flex items-center gap-1.5 pl-10 lg:pl-0">
             <Badge status={d.statut} />
             {#if d.statut === 'offre_envoyee'}
-              <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background-color: #b35d2e"></span>
+              <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background-color: #1e3fff"></span>
             {/if}
             <span class="text-xs text-slate-400 lg:hidden ml-auto">
               {new Date(d.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short' })}

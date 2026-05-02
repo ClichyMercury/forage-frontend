@@ -68,7 +68,7 @@
 <div class="mb-5 flex items-center justify-between flex-wrap gap-3">
   <div>
     <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900">
-      Gestion des <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #b35d2e">utilisateurs</span>.
+      Gestion des <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #1e3fff">utilisateurs</span>.
     </h2>
     <p class="text-sm text-slate-500 mt-1">{users.length} utilisateur{users.length > 1 ? 's' : ''} au total.</p>
   </div>
@@ -109,7 +109,7 @@
           <!-- Utilisateur (cliquable vers détail) -->
           <a href="/admin/utilisateurs/{u.id}" class="flex items-center gap-3 min-w-0 group lg:col-span-4">
             <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0"
-                 style="background-color: {u.role === 'entreprise' ? '#b35d2e' : '#1e3fff'}">
+                 style="background-color: {u.role === 'entreprise' ? '#475569' : '#1e3fff'}">
               {(u.fullName ?? u.email).charAt(0).toUpperCase()}
             </div>
             <div class="min-w-0 flex-1">
@@ -120,7 +120,7 @@
           <!-- Badges (rôle + statut) — sur mobile, les 2 sur la même ligne -->
           <div class="flex items-center gap-2 flex-wrap pl-13 lg:pl-0 lg:col-span-2">
             <span class="text-xs px-2.5 py-1 rounded-full font-semibold capitalize"
-                  style="background-color: {u.role === 'entreprise' ? '#fbf3ec' : '#eef1ff'}; color: {u.role === 'entreprise' ? '#743820' : '#1226a8'}">
+                  style="background-color: {u.role === 'entreprise' ? '#f1f5f9' : '#eef1ff'}; color: {u.role === 'entreprise' ? '#334155' : '#1226a8'}">
               {u.role}
             </span>
           </div>

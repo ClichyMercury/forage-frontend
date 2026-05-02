@@ -60,7 +60,7 @@
   }
 </script>
 
-<svelte:head><title>Nouveau mot de passe — ForageCI</title></svelte:head>
+<svelte:head><title>Nouveau mot de passe — Forage</title></svelte:head>
 
 {#if verifying}
   <!-- Pendant la vérification du token -->
@@ -107,7 +107,7 @@
 {:else}
   <!-- Formulaire nouveau mot de passe -->
   <div class="mb-8">
-    <h2 class="font-display font-black text-4xl tracking-tight leading-[1.05] text-slate-900">
+  <h2 class="font-display font-black text-4xl leading-[1.05]" style="color: #0f1f5c; letter-spacing: -0.03em">
       Nouveau<br />mot de passe
     </h2>
     <p class="text-slate-500 mt-3 text-sm">Choisissez un mot de passe sécurisé d'au moins 6 caractères.</p>
@@ -148,7 +148,8 @@
     </div>
 
     <button type="submit" disabled={loading || (!!password && !!passwordConfirmation && password !== passwordConfirmation)}
-      class="w-full py-4 rounded-2xl bg-brand-600 text-white font-semibold text-sm shadow-xl hover:bg-brand-700 hover:scale-[1.01] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+      class="w-full py-4 rounded-2xl text-white font-semibold text-sm hover:scale-[1.01] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+      style="background-color: #1e3fff; box-shadow: 0 4px 14px rgba(30,63,255,0.35)">
       {#if loading}
         <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
         Mise à jour...

@@ -37,21 +37,19 @@
   }
 </script>
 
-<svelte:head><title>Inscription — ForageCI</title></svelte:head>
+<svelte:head><title>Inscription — Forage</title></svelte:head>
 
 <!-- Logo mobile -->
 <div class="lg:hidden flex items-center gap-2.5 mb-10">
-  <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background-color: #1e3fff">
-    <span class="material-symbols-outlined text-white icon-filled" style="font-size: 20px;">water_drop</span>
-  </div>
-  <span class="font-display font-black text-xl tracking-tight text-slate-900">ForageCI</span>
+  <img src="/images/logo.jpeg" alt="Forage" class="w-10 h-10 object-contain" />
+  <span class="font-display font-black text-xl tracking-tight text-slate-900">Forage</span>
 </div>
 
 <div class="mb-8">
-  <h2 class="font-display font-black text-4xl tracking-tight leading-[1.05] text-slate-900">
+  <h2 class="font-display font-black text-4xl leading-[1.05]" style="color: #0f1f5c; letter-spacing: -0.03em">
     Créer un compte.
   </h2>
-  <p class="text-slate-500 mt-3 text-base">Rejoignez la plateforme ForageCI.</p>
+  <p class="text-slate-500 mt-3 text-base">Rejoignez la plateforme Forage.</p>
 </div>
 
 <form onsubmit={handleRegister} class="space-y-4">
@@ -130,7 +128,8 @@
   </div>
 
   <button type="submit" disabled={loading}
-    class="w-full py-4 rounded-2xl bg-brand-600 text-white font-semibold text-sm shadow-xl hover:bg-brand-700 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+    class="w-full py-4 rounded-2xl text-white font-semibold text-sm hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+    style="background-color: #1e3fff; box-shadow: 0 4px 14px rgba(30,63,255,0.35)">
     {#if loading}
       <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
       Création...

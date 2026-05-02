@@ -47,7 +47,7 @@
 </script>
 
 <svelte:head>
-  <title>ForageCI — La plateforme de mise en relation pour le forage</title>
+  <title>Forage — La plateforme de mise en relation pour le forage</title>
   <meta name="description" content="Soumettez votre projet de forage, comparez les offres des prestataires, signez en confiance." />
 </svelte:head>
 
@@ -96,10 +96,8 @@
   <nav class="fixed top-0 inset-x-0 z-50 px-6 lg:px-12 py-5 flex items-center justify-between
               backdrop-blur-md bg-white/60 border-b border-slate-200/60">
     <a href="/" class="flex items-center gap-2.5 group">
-      <div class="w-9 h-9 rounded-xl bg-brand flex items-center justify-center transition-transform group-hover:rotate-12">
-        <span class="material-symbols-outlined text-white icon-filled" style="font-size: 18px;">water_drop</span>
-      </div>
-      <span class="font-display font-black text-xl tracking-tight text-slate-900">ForageCI</span>
+      <img src="/images/logo.jpeg" alt="Forage" class="w-9 h-9 object-contain" />
+      <span class="font-display font-black text-xl tracking-tight text-slate-900">Forage</span>
     </a>
 
     <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-700">
@@ -145,11 +143,11 @@
       </div>
       <div class="absolute top-[60%] left-[6%] animate-float-slower"
            style="transform: {px(25)} translateY({scrollY * 0.35}px)">
-        {@render layers(80, '#d99c6f', 0.5)}
+        {@render layers(80, '#94a3b8', 0.5)}
       </div>
       <div class="absolute top-[20%] left-[12%] animate-float-slow"
            style="transform: {px(15)} translateY({scrollY * 0.4}px); animation-delay: -5s">
-        {@render drop(50, '#d99c6f', 0.55)}
+        {@render drop(50, '#94a3b8', 0.55)}
       </div>
 
       <!-- Halo radial bleu vers haut, accent terre vers bas -->
@@ -162,9 +160,9 @@
       <h1 class="font-display font-black text-white leading-[0.95] tracking-tight mb-8 animate-reveal-up"
           style="font-size: clamp(3rem, 9vw, 8rem); animation-delay: 0.1s">
         Le forage,<br/>
-        <span class="italic font-light relative inline-block" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #e9c2a3">
+        <span class="italic font-light relative inline-block" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: rgba(255,255,255,0.75)">
           simplifié.
-          <span class="absolute -bottom-2 left-0 right-0 h-1 rounded-full" style="background-color: #b35d2e"></span>
+          <span class="absolute -bottom-2 left-0 right-0 h-0.5 rounded-full bg-white/40"></span>
         </span>
       </h1>
 
@@ -199,9 +197,9 @@
           { value: '3', label: 'Acteurs cloisonnés', accent: false },
           { value: '8', label: 'Étapes contrôlées', accent: false },
         ] as stat}
-          <div class="pl-4 border-l-2" style="border-color: {stat.accent ? '#b35d2e' : 'rgba(255,255,255,0.3)'}">
-            <p class="font-display text-3xl lg:text-4xl font-black tracking-tight" style="color: {stat.accent ? '#e9c2a3' : '#ffffff'}">{stat.value}</p>
-            <p class="text-xs lg:text-sm mt-1" style="color: {stat.accent ? 'rgba(233,194,163,0.85)' : 'rgba(255,255,255,0.7)'}">{stat.label}</p>
+          <div class="pl-4 border-l-2" style="border-color: {stat.accent ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.3)'}">
+            <p class="font-display text-3xl lg:text-4xl font-black tracking-tight text-white">{stat.value}</p>
+            <p class="text-xs lg:text-sm mt-1 text-white/70">{stat.label}</p>
           </div>
         {/each}
       </div>
@@ -233,7 +231,7 @@
       {@render drill(300, '#1e3fff', 1)}
     </div>
     <div class="absolute bottom-10 left-10 opacity-10" style="transform: translateY({(scrollY - 1100) * 0.1}px)">
-      {@render layers(220, '#b35d2e', 1)}
+      {@render layers(220, '#1e3fff', 1)}
     </div>
 
     <div class="max-w-7xl mx-auto relative">
@@ -285,7 +283,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {#each [
           { label: 'Client', title: 'Particulier ou entreprise', bg: 'bg-brand', txt: 'text-white', features: ['Soumission rapide', 'Budget confidentiel', 'Suivi temps réel', 'Acceptation en 1 clic'], cta: 'Devenir client', href: '/register', ctaCls: 'bg-white text-[#1e3fff] hover:bg-slate-100' },
-          { label: 'Prestataire', title: 'Entreprise de forage', bg: 'bg-[#b35d2e]', txt: 'text-white', features: ['Appels d\'offres ciblés', 'Soumission structurée', 'Pas de mise en concurrence visible', 'Notifications prioritaires'], cta: "S'inscrire en tant qu'entreprise", href: '/register-entreprise', ctaCls: 'bg-white text-[#b35d2e] hover:bg-slate-100' },
+          { label: 'Prestataire', title: 'Entreprise de forage', bg: 'bg-slate-800', txt: 'text-white', features: ['Appels d\'offres ciblés', 'Soumission structurée', 'Pas de mise en concurrence visible', 'Notifications prioritaires'], cta: "S'inscrire en tant qu'entreprise", href: '/register-entreprise', ctaCls: 'bg-white text-slate-800 hover:bg-slate-100' },
         ] as acteur, i}
           <div data-reveal class="rounded-3xl p-8 lg:p-10 {acteur.bg} {acteur.txt} transition-all duration-500 hover:scale-[1.02]"
                style="transition-delay: {i * 100}ms">
@@ -322,7 +320,7 @@
       {@render target(500, '#1e3fff', 1)}
     </div>
     <div class="absolute top-10 -left-10 opacity-15" style="transform: translateY({(scrollY - 1800) * 0.1}px)">
-      {@render drop(180, '#b35d2e', 1)}
+      {@render drop(180, '#1e3fff', 1)}
     </div>
 
     <div class="max-w-7xl mx-auto relative">
@@ -340,9 +338,9 @@
 
         <div data-reveal class="space-y-4">
           {#each [
-            { icon: 'lock', title: 'Budget confidentiel', text: "Jamais communiqué aux prestataires.", color: '#b35d2e' },
-            { icon: 'shield', title: "Pas d'enchères visibles", text: 'Les offres entreprises sont cloisonnées.', color: '#1e3fff' },
-            { icon: 'forum', title: 'Messagerie centralisée', text: "Toutes les communications transitent par la plateforme.", color: '#b35d2e' },
+            { icon: 'lock', title: 'Budget confidentiel', text: "Jamais communiqué aux prestataires.", color: '#1e3fff' },
+            { icon: 'shield', title: "Pas d'enchères visibles", text: 'Les offres entreprises sont cloisonnées.', color: '#475569' },
+            { icon: 'forum', title: 'Messagerie centralisée', text: "Toutes les communications transitent par la plateforme.", color: '#1e3fff' },
             { icon: 'task_alt', title: 'Workflow contrôlé', text: 'Aucune transition de statut hors séquence.', color: '#1e3fff' },
           ] as item}
             <div class="flex items-start gap-4 p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors">
@@ -369,7 +367,7 @@
       {@render drill(100, '#ffffff', 0.3)}
     </div>
     <div class="absolute top-1/2 right-1/4 animate-float-slow" style="animation-delay: -4s">
-      {@render layers(70, '#fbf3ec', 0.35)}
+      {@render layers(70, '#eef1ff', 0.35)}
     </div>
 
     <div class="max-w-4xl mx-auto text-center text-white relative" data-reveal>
@@ -407,12 +405,10 @@
   <footer class="bg-slate-950 text-slate-400 py-12 px-6 lg:px-12">
     <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center">
-          <span class="material-symbols-outlined text-white icon-filled" style="font-size: 16px;">water_drop</span>
-        </div>
-        <span class="font-display font-black text-lg text-white tracking-tight">ForageCI</span>
+        <img src="/images/logo.jpeg" alt="Forage" class="w-8 h-8 object-contain" />
+        <span class="font-display font-black text-lg text-white tracking-tight">Forage</span>
       </div>
-      <p class="text-xs">© 2025 ForageCI · Plateforme de mise en relation pour prestations de forage</p>
+      <p class="text-xs">© 2026 Forage · Plateforme de mise en relation pour prestations de forage</p>
     </div>
   </footer>
 
@@ -440,10 +436,10 @@
 
   /* === Cartes process — hover bleu OU terre selon accent === */
   .step-card[data-accent="brand"]:hover { background-color: #1e3fff; }
-  .step-card[data-accent="terre"]:hover { background-color: #b35d2e; }
+  .step-card[data-accent="terre"]:hover { background-color: #475569; }
 
   .step-card[data-accent="brand"] .step-icon { color: #1e3fff; }
-  .step-card[data-accent="terre"] .step-icon { color: #b35d2e; }
+  .step-card[data-accent="terre"] .step-icon { color: #475569; }
 
   .step-card:hover .step-num   { color: rgba(255,255,255,0.2); }
   .step-card:hover .step-icon-bg { background-color: rgba(255,255,255,0.2); }

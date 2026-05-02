@@ -38,7 +38,7 @@
   function getStatut(o: any) { return o.demande?.statut ?? o.statut ?? 'envoyee' }
 </script>
 
-<svelte:head><title>Mes offres — ForageCI</title></svelte:head>
+<svelte:head><title>Mes offres — Forage</title></svelte:head>
 
 <div class="mb-5 flex items-center justify-between">
   <div>
