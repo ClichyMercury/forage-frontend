@@ -36,13 +36,13 @@
     if (isNaN(num)) return '—'
     if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + ' M'
     if (num >= 1_000) return (num / 1_000).toFixed(0) + ' K'
-    return num.toLocaleString('fr-CI')
+    return num.toLocaleString('fr-CM')
   }
 
   function fmtMoney(n: any) {
     const num = Number(n)
     if (isNaN(num)) return '—'
-    return num.toLocaleString('fr-CI', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+    return num.toLocaleString('fr-CM', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
   }
 
 
@@ -154,7 +154,7 @@
           </div>
           <span class="text-xs px-2 py-1 rounded-lg font-medium shrink-0
             {d.statut === 'en_attente' ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'}">
-            {d.statut === 'en_attente' ? 'À valider' : 'AO sans offre'}
+            {d.statut === 'en_attente' ? 'À valider' : 'Appel d\'offre sans offre'}
           </span>
           <span class="material-symbols-outlined text-red-300 shrink-0" style="font-size: 16px;">chevron_right</span>
         </a>
@@ -344,7 +344,7 @@
         {#each [
           { color: '#f59e0b', label: 'En attente' },
           { color: '#3b82f6', label: 'Validée' },
-          { color: '#6366f1', label: 'AO lancé' },
+          { color: '#6366f1', label: "Appel d'offre lancé" },
           { color: '#06b6d4', label: 'Offre envoyée' },
           { color: '#10b981', label: 'Acceptée' },
           { color: '#ef4444', label: 'Refusée' },

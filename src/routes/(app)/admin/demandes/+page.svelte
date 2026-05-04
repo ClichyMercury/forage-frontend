@@ -24,7 +24,7 @@
   onMount(load)
   $effect(() => { load() })
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
+  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
 </script>
 
 <svelte:head><title>Gestion des demandes — Admin</title></svelte:head>
@@ -44,11 +44,11 @@
         <option value="">Tous les statuts</option>
         <option value="en_attente">En attente</option>
         <option value="validee">Validée</option>
-        <option value="appel_offre_lance">AO lancé</option>
+        <option value="appel_offre_lance">Appel d'offre lancé</option>
         <option value="offres_recues">Offres reçues</option>
         <option value="offre_envoyee">Offre envoyée</option>
         <option value="acceptee">Acceptée</option>
-        <option value="refusee">Refusée</option>
+        <option value="cloturee">Clôturée</option>
       </select>
     </div>
     <div>
@@ -66,7 +66,7 @@
       <label class="block text-xs font-medium text-slate-500 mb-1.5" for="filtreRegion">Région</label>
       <div class="relative">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 16px;">search</span>
-        <input id="filtreRegion" type="text" bind:value={filtreRegion} placeholder="Ex: Abidjan"
+        <input id="filtreRegion" type="text" bind:value={filtreRegion} placeholder="Ex: Douala"
           class="w-full pl-8 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-sm" />
       </div>
     </div>
@@ -124,7 +124,7 @@
           <div class="flex items-center gap-1 pl-12 lg:pl-0 lg:col-span-1">
             <span class="text-xs lg:hidden text-slate-400">Date :</span>
             <span class="text-xs text-slate-400">
-              {new Date(d.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short' })}
+              {new Date(d.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'short' })}
             </span>
           </div>
           <div class="hidden lg:block lg:col-span-2">

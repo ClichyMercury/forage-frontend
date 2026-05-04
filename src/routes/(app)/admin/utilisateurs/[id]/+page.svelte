@@ -72,7 +72,7 @@
 
   function fmtDate(d: string | null | undefined) {
     if (!d) return '—'
-    return new Date(d).toLocaleDateString('fr-CI', { day: 'numeric', month: 'long', year: 'numeric' })
+    return new Date(d).toLocaleDateString('fr-CM', { day: 'numeric', month: 'long', year: 'numeric' })
   }
 
   const profile = $derived(user?.entreprise_profile ?? null)

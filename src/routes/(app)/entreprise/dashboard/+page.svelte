@@ -18,7 +18,7 @@
     nonRetenues: mesOffres.filter((o: any) => o.statut === 'non_retenue').length,
   }))
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
+  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
 
   onMount(async () => {
     try {

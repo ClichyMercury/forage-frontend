@@ -12,10 +12,10 @@
     { value: '', label: 'Toutes' },
     { value: 'en_attente', label: 'En attente' },
     { value: 'validee', label: 'Validée' },
-    { value: 'appel_offre_lance', label: 'AO lancé' },
+    { value: 'appel_offre_lance', label: "Appel d'offre lancé" },
     { value: 'offre_envoyee', label: 'Offre reçue' },
     { value: 'acceptee', label: 'Acceptée' },
-    { value: 'refusee', label: 'Refusée' },
+    { value: 'cloturee', label: 'Clôturée' },
   ]
 
   async function load() {
@@ -30,7 +30,7 @@
   onMount(load)
   $effect(() => { load() })
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
+  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
 </script>
 
 <svelte:head><title>Mes demandes — Forage</title></svelte:head>
@@ -127,7 +127,7 @@
           <div class="flex items-center gap-1 pl-12 lg:pl-0 lg:col-span-2">
             <span class="text-xs lg:hidden text-slate-400">Date :</span>
             <span class="text-sm text-slate-500">
-              {new Date(d.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short', year: 'numeric' })}
+              {new Date(d.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'short', year: 'numeric' })}
             </span>
           </div>
           <!-- Statut desktop only (déjà affiché en mobile dans la 1re ligne) -->

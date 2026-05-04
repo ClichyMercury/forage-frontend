@@ -3,18 +3,23 @@
   import api from '$lib/api'
   import Badge from '$lib/components/ui/Badge.svelte'
 
-  let offres = $state<any[]>([])
+  let toutesOffres = $state<any[]>([])
   let loading = $state(true)
   let filtreStatut = $state('')
+
+  // Filtrage local — pas de rechargement API à chaque clic
+  const offres = $derived(
+    filtreStatut
+      ? toutesOffres.filter(o => o.statut === filtreStatut)
+      : toutesOffres
+  )
 
   async function load() {
     loading = true
     try {
-      // Charger tous les appels d'offres avec leurs offres
       const res = await api.get('/admin/appels-offres')
       const appelsOffres = res.data.data ?? []
 
-      // Pour chaque AO, charger le comparatif
       const allOffres: any[] = []
       await Promise.all(
         appelsOffres.map(async (ao: any) => {
@@ -34,16 +39,13 @@
         })
       )
 
-      offres = filtreStatut
-        ? allOffres.filter(o => o.statut === filtreStatut)
-        : allOffres
+      toutesOffres = allOffres
     } catch {} finally { loading = false }
   }
 
   onMount(load)
-  $effect(() => { load() })
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
+  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
 </script>
 
 <svelte:head><title>Gestion des offres — Admin</title></svelte:head>

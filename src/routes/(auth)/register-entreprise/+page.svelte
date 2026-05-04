@@ -16,7 +16,7 @@
   let errors = $state<Record<string, string>>({})
 
   const domainesOptions = [
-    { value: 'eau', label: 'Forage eau', icon: 'water_drop' },
+    { value: 'eau', label: 'eau', icon: 'water_drop' },
     { value: 'geotechnique', label: 'Géotechnique', icon: 'terrain' },
     { value: 'petrolier', label: 'Pétrolier', icon: 'oil_barrel' },
     { value: 'autre', label: 'Autre', icon: 'more_horiz' },
@@ -69,8 +69,7 @@
 
 <!-- Logo mobile -->
 <div class="lg:hidden flex items-center gap-2.5 mb-10">
-  <img src="/images/logo.jpeg" alt="Forage" class="w-10 h-10 object-contain" />
-  <span class="font-display font-black text-xl tracking-tight text-slate-900">Forage</span>
+  <img src="/images/logo.jpeg" alt="Forage" class="h-10 w-auto object-contain" />
 </div>
 
 <div class="mb-8">
@@ -109,7 +108,7 @@
       <label class="block text-sm font-medium text-slate-700 mb-1.5">Téléphone *</label>
       <div class="relative">
         <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">phone</span>
-        <input type="tel" bind:value={telephone} placeholder="0700000000" required
+        <input type="tel" bind:value={telephone} placeholder="+237 6XX XXX XXX" required
           class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm transition-all"
           class:border-red-400={errors.telephone} />
       </div>
@@ -150,7 +149,7 @@
     <label class="block text-sm font-medium text-slate-700 mb-1.5">Zones géographiques * <span class="text-slate-400 font-normal">(séparées par virgule)</span></label>
     <div class="relative">
       <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">location_on</span>
-      <input type="text" bind:value={zonesGeographiques} placeholder="Abidjan, Bouaké, Yamoussoukro"
+      <input type="text" bind:value={zonesGeographiques} placeholder="Douala, Yaoundé, Bafoussam"
         class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm transition-all"
         class:border-red-400={errors.zonesGeographiques} />
     </div>

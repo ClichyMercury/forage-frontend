@@ -60,18 +60,21 @@
     finally { acting = false }
   }
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
+  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
 
   // Étapes du workflow pour guider l'admin
   const workflowSteps = [
     { statut: 'en_attente',        label: 'Reçue',           icon: 'inbox' },
     { statut: 'validee',           label: 'Validée',          icon: 'verified' },
-    { statut: 'appel_offre_lance', label: 'AO lancé',         icon: 'campaign' },
+    { statut: 'appel_offre_lance', label: "Appel d'offre lancé", icon: 'campaign' },
     { statut: 'offres_recues',     label: 'Offres reçues',    icon: 'inbox' },
     { statut: 'offre_envoyee',     label: 'Offre envoyée',    icon: 'send' },
     { statut: 'acceptee',          label: 'Acceptée',         icon: 'check_circle' },
     { statut: 'cloturee',          label: 'Clôturée',         icon: 'lock' },
   ]
+  // refusee n'existe plus comme statut final — le backend passe directement à cloturee
+  // On garde isRefusee pour compatibilité avec d'anciens enregistrements en base
+  const isRefusee = $derived(demande?.statut === 'refusee')
   const statutOrder = workflowSteps.map(s => s.statut)
   const currentIdx = $derived(demande ? statutOrder.indexOf(demande.statut) : 0)
 </script>
@@ -127,24 +130,43 @@
     <!-- Timeline workflow -->
     <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-5">
       <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">Progression du dossier</p>
-      <div class="flex items-start overflow-x-auto pb-2">
-        {#each workflowSteps as step, i}
-          <div class="flex-1 flex flex-col items-center min-w-[80px]">
-            <div class="flex items-center w-full">
-              <div class="flex-1 {i === 0 ? 'invisible' : ''} h-0.5 {currentIdx >= i ? 'bg-blue-500' : 'bg-slate-200'}"></div>
-              <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all
-                {currentIdx >= i ? 'bg-blue-600' : 'bg-slate-100'}
-                {currentIdx === i ? 'ring-4 ring-blue-100' : ''}">
-                <span class="material-symbols-outlined icon-filled {currentIdx >= i ? 'text-white' : 'text-slate-400'}" style="font-size: 14px;">{step.icon}</span>
-              </div>
-              <div class="flex-1 {i === workflowSteps.length - 1 ? 'invisible' : ''} h-0.5 {currentIdx > i ? 'bg-blue-500' : 'bg-slate-200'}"></div>
-            </div>
-            <p class="text-xs text-center mt-2 leading-tight {currentIdx >= i ? 'text-blue-600 font-semibold' : 'text-slate-400'}">
-              {step.label}
-            </p>
+
+      {#if isRefusee}
+        <!-- Cas refus : affichage spécial -->
+        <div class="flex items-center gap-3 p-3 bg-red-50 rounded-xl border border-red-100">
+          <div class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined icon-filled text-white" style="font-size: 14px;">cancel</span>
           </div>
-        {/each}
-      </div>
+          <div>
+            <p class="text-sm font-semibold text-red-700">Offre refusée par le client</p>
+            <p class="text-xs text-red-500 mt-0.5">Le client a refusé l'offre finale.</p>
+          </div>
+        </div>
+      {:else}
+        <div class="flex items-start overflow-x-auto pb-2">
+          {#each workflowSteps as step, i}
+            {@const isActive = currentIdx === i}
+            {@const isDone = currentIdx > i}
+            {@const isFuture = currentIdx < i}
+            <div class="flex-1 flex flex-col items-center min-w-[80px]">
+              <div class="flex items-center w-full">
+                <div class="flex-1 {i === 0 ? 'invisible' : ''} h-0.5 {isDone ? 'bg-brand-500' : 'bg-slate-200'}"></div>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all
+                  {isDone ? 'bg-brand-600' : isActive ? 'bg-brand-600 ring-4 ring-brand-100' : 'bg-slate-100'}">
+                  <span class="material-symbols-outlined icon-filled {isDone || isActive ? 'text-white' : 'text-slate-400'}" style="font-size: 14px;">{step.icon}</span>
+                </div>
+                <div class="flex-1 {i === workflowSteps.length - 1 ? 'invisible' : ''} h-0.5 {isDone ? 'bg-brand-500' : 'bg-slate-200'}"></div>
+              </div>
+              <p class="text-xs text-center mt-2 leading-tight {isDone ? 'text-brand-600 font-semibold' : isActive ? 'text-brand-700 font-bold' : 'text-slate-400'}">
+                {step.label}
+              </p>
+              {#if isActive}
+                <span class="text-[9px] text-brand-500 font-bold uppercase tracking-wide mt-0.5">En cours</span>
+              {/if}
+            </div>
+          {/each}
+        </div>
+      {/if}
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -177,7 +199,7 @@
               { label: 'Type de forage', value: demande.typeForage, icon: 'water_drop' },
               { label: 'Localisation', value: demande.localisationAdresse, icon: 'location_on' },
               { label: 'Profondeur estimée', value: demande.profondeurEstimee ? `${demande.profondeurEstimee} m` : '—', icon: 'straighten' },
-              { label: 'Délai souhaité', value: demande.delaiSouhaite ? new Date(demande.delaiSouhaite).toLocaleDateString('fr-CI') : '—', icon: 'calendar_today' },
+              { label: 'Délai souhaité', value: demande.delaiSouhaite ? new Date(demande.delaiSouhaite).toLocaleDateString('fr-CM') : '—', icon: 'calendar_today' },
             ] as info}
               <div class="flex items-start gap-2 p-3 bg-slate-50 rounded-xl">
                 <span class="material-symbols-outlined text-slate-400 icon-filled mt-0.5" style="font-size: 15px;">{info.icon}</span>
@@ -285,27 +307,22 @@
             </button>
           </div>
 
-        {:else if demande.statut === 'cloturee'}
+        {:else if demande.statut === 'refusee' || demande.statut === 'cloturee'}
           <div class="bg-slate-50 rounded-2xl border border-slate-200 p-5 text-center">
             <span class="material-symbols-outlined text-slate-400 icon-filled" style="font-size: 32px;">lock</span>
             <p class="text-sm font-semibold text-slate-600 mt-2">Dossier clôturé</p>
             <p class="text-xs text-slate-400 mt-1">Ce dossier est archivé.</p>
           </div>
 
-        {:else if demande.statut === 'en_attente'}
-          <!-- <div class="bg-white rounded-2xl border border-amber-200 p-5">
-            <p class="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-2">Action requise</p>
-            <p class="text-sm text-slate-600">Validez ou rejetez cette demande en utilisant les boutons en haut.</p>
-          </div> -->
         {/if}
 
-        <!-- Lien vers l'AO si existe -->
-        {#if appelOffre && !['en_attente','validee','refusee'].includes(demande.statut)}
+        <!-- Lien vers l'appel d'offre si existe -->
+        {#if appelOffre && !['en_attente','validee','refusee','cloturee'].includes(demande.statut)}
           <div class="bg-white rounded-2xl border border-slate-100 p-4">
             <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Appel d'offre lié</p>
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-sm font-medium text-slate-800">AO #{appelOffre.id}</p>
+                <p class="text-sm font-medium text-slate-800">Appel d'offre #{appelOffre.id}</p>
                 <p class="text-xs text-slate-400">{appelOffre.entreprises?.length ?? 0} entreprise(s) invitée(s)</p>
               </div>
               <a href="/admin/appels-offres/{appelOffre.id}/comparatif"

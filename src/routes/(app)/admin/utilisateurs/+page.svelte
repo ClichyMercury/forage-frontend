@@ -133,7 +133,7 @@
           <div class="flex items-center gap-1 pl-13 lg:pl-0 lg:col-span-2">
             <span class="text-xs lg:hidden text-slate-400">Inscrit :</span>
             <span class="text-xs text-slate-400">
-              {new Date(u.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short', year: 'numeric' })}
+              {new Date(u.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'short', year: 'numeric' })}
             </span>
           </div>
           <!-- Actions -->

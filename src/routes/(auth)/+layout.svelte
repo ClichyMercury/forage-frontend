@@ -41,10 +41,7 @@
 
     <!-- Logo -->
     <div class="relative z-10 flex items-center gap-2.5">
-      <div class="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center bg-white/20 backdrop-blur-sm">
-        <img src="/images/logo.jpeg" alt="Forage" class="w-10 h-10 object-contain" />
-      </div>
-      <span class="text-white font-display font-black text-xl tracking-tight">Forage</span>
+      <img src="/images/logo.jpeg" alt="Forage" class="h-12 w-auto object-contain" />
     </div>
 
     <!-- Contenu central -->

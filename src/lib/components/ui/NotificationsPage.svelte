@@ -93,7 +93,7 @@
               <p class="text-sm text-slate-800 leading-snug {!notif.lu ? 'font-semibold' : ''}">{notif.contenu}</p>
               <div class="flex items-center gap-2 mt-1.5">
                 <span class="text-xs text-slate-400">
-                  {new Date(notif.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  {new Date(notif.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </span>
                 <span class="text-xs px-2 py-0.5 rounded-full {notif.canal === 'email' ? 'bg-blue-100 text-blue-600' : notif.canal === 'sms' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}">
                   {notif.canal}

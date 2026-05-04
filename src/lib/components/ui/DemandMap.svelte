@@ -76,7 +76,7 @@
       markers.push(marker)
     })
 
-    // Ajuster la vue si des points existent, sinon centrer sur la Côte d'Ivoire
+    // Ajuster la vue si des points existent, sinon centrer sur le Cameroun
     if (markers.length > 0) {
       const group = L.featureGroup(markers)
       const bounds = group.getBounds()
@@ -85,12 +85,12 @@
       if (center.lat > 4 && center.lat < 11 && center.lng > -9 && center.lng < -2) {
         map.fitBounds(bounds.pad(0.3))
       } else {
-        // Coordonnées hors Côte d'Ivoire — centrer sur CI quand même
-        map.setView([7.5399, -5.5471], 7)
+        // Coordonnées hors Cameroun — centrer sur CM quand même
+        map.setView([4.0511, 9.7679], 6)
         markers.forEach((m: any) => m.addTo(map))
       }
     } else {
-      map.setView([7.5399, -5.5471], 7)
+      map.setView([4.0511, 9.7679], 6)
     }
   }
 
@@ -108,7 +108,7 @@
       await new Promise(resolve => setTimeout(resolve, 100))
     }
 
-    map = L.map(mapEl, { zoomControl: true }).setView([7.5399, -5.5471], 7)
+    map = L.map(mapEl, { zoomControl: true }).setView([4.0511, 9.7679], 6)
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a> © <a href="https://carto.com">CARTO</a>',

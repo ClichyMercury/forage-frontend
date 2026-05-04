@@ -78,10 +78,10 @@
         <div class="relative">
           <select id="typeForage" bind:value={typeForage}
             class="w-full appearance-none pl-4 pr-10 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-800 cursor-pointer">
-            <option value="eau">💧 Forage eau</option>
-            <option value="geotechnique">🏔️ Géotechnique</option>
-            <option value="petrolier">🛢️ Pétrolier</option>
-            <option value="autre">⚙️ Autre</option>
+            <option value="eau">eau</option>
+            <option value="geotechnique">Géotechnique</option>
+            <option value="petrolier">Pétrolier</option>
+            <option value="autre">Autre</option>
           </select>
           <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" style="font-size: 20px;">expand_more</span>
         </div>
@@ -116,7 +116,7 @@
         <div class="relative mb-3">
           <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">edit_location</span>
           <input type="text" bind:value={localisationAdresse}
-            placeholder="Ex: Cocody Riviera 3, Abidjan" required
+            placeholder="Ex: Bastos, Yaoundé" required
             class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm transition-all"
             class:border-red-400={errors.localisationAdresse} />
         </div>

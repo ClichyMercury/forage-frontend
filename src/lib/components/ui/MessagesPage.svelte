@@ -314,7 +314,7 @@
                       <span class="truncate">Canal {canalRole === 'entreprise' ? `Entreprise · ${otherParty?.fullName ?? otherParty?.email ?? ''}` : 'Client'}</span>
                     </span>
                   {/if}
-                  <span>{new Date(msg.createdAt).toLocaleTimeString('fr-CI', { hour: '2-digit', minute: '2-digit' })}</span>
+                  <span>{new Date(msg.createdAt).toLocaleTimeString('fr-CM', { hour: '2-digit', minute: '2-digit' })}</span>
                   {#if isMine}
                     <span class="text-slate-300">✓</span>
                   {/if}

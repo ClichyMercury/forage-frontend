@@ -77,7 +77,7 @@
         <div class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4">
           <!-- Ligne 1 mobile : ID + Localisation + Action -->
           <div class="flex items-center gap-2 lg:col-span-1">
-            <span class="text-xs text-slate-400 lg:hidden">AO</span>
+            <span class="text-xs text-slate-400 lg:hidden">Appel d'offre</span>
             <span class="text-sm text-slate-500">#{ao.id}</span>
           </div>
           <div class="flex items-center gap-2 min-w-0 lg:col-span-3">

@@ -64,7 +64,7 @@
     } catch (err: any) {
       const d = err.response?.data
       if (d?.calcul) {
-        toast.error('Budget dépassé', `Marge max autorisée : ${Number(d.calcul.marge_maximum_autorisee).toLocaleString('fr-CI')} FCFA`)
+        toast.error('Budget dépassé', `Marge max autorisée : ${Number(d.calcul.marge_maximum_autorisee).toLocaleString('fr-CM')} FCFA`)
       } else {
         toast.error('Erreur', d?.message)
       }
@@ -103,7 +103,7 @@
     }
   })
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
+  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
 </script>
 
 <svelte:head><title>Comparatif des offres — Admin</title></svelte:head>

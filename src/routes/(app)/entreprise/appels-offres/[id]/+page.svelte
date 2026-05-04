@@ -60,7 +60,7 @@
 
   // Nom de la demande pour le titre
   const titreDemande = $derived(
-    ao?.demande?.localisationAdresse ?? ao?.demande?.localisation_adresse ?? `AO #${id}`
+    ao?.demande?.localisationAdresse ?? ao?.demande?.localisation_adresse ?? `Appel d'offre #${id}`
   )
 </script>
 
@@ -126,7 +126,7 @@
           <p class="text-xs text-slate-400 mb-1">Délai souhaité</p>
           <p class="text-sm font-semibold text-slate-700">
             {(ao.demande?.delaiSouhaite ?? ao.demande?.delai_souhaite)
-              ? new Date(ao.demande?.delaiSouhaite ?? ao.demande?.delai_souhaite).toLocaleDateString('fr-CI')
+              ? new Date(ao.demande?.delaiSouhaite ?? ao.demande?.delai_souhaite).toLocaleDateString('fr-CM')
               : '—'}
           </p>
         </div>
@@ -161,7 +161,7 @@
             </p>
             {#if !ao.compte_a_rebours.expire}
               <p class="text-xs text-amber-600">
-                {new Date(ao.compte_a_rebours.delai_reponse ?? ao.delaiReponse).toLocaleString('fr-CI')}
+                {new Date(ao.compte_a_rebours.delai_reponse ?? ao.delaiReponse).toLocaleString('fr-CM')}
               </p>
             {/if}
           </div>
