@@ -115,6 +115,7 @@
     <StatCard title="Total demandes" value={stats.demandes.total_global} icon="folder_open" color="blue" />
     <StatCard title="En attente" value={stats.demandes.en_attente} icon="hourglass_empty" color="orange" />
     <StatCard title="Acceptées" value={stats.demandes.acceptees} icon="check_circle" color="green" />
+    <StatCard title="refusées" value={stats.demandes.refusees} icon="cancel" color="red" />
     <StatCard
       title="Sans réponse +7j"
       value={stats.alertes_sans_reponse.count}

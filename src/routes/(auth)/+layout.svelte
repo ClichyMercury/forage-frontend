@@ -74,7 +74,7 @@
       </div>
     </div>
 
-    <div class="relative z-10 text-white/40 text-xs">© 2026 Forage — Côte d'Ivoire</div>
+    <div class="relative z-10 text-white/40 text-xs">© 2026 Forage — Cameroun</div>
   </div>
 
   <!-- Panneau droit — formulaire -->
