@@ -12,6 +12,7 @@
   let appelOffre = $state<any>(null)
   let loading = $state(true)
   let acting = $state(false)
+  let showCloturerModal = $state(false)
   const id = $derived($page.params.id)
 
   onMount(async () => {
@@ -19,7 +20,6 @@
       const res = await api.get(`/admin/demandes/${id}`)
       demande = res.data
       documents = res.data.documents ?? []
-      // Charger l'AO lié si existe
       try {
         const aoRes = await api.get('/admin/appels-offres')
         const aos = aoRes.data.data ?? []
@@ -50,7 +50,7 @@
   }
 
   async function cloturer() {
-    if (!confirm('Clôturer définitivement ce dossier ? Le chantier est terminé.')) return
+    showCloturerModal = false
     acting = true
     try {
       await api.patch(`/admin/demandes/${id}/cloturer`)
@@ -62,24 +62,50 @@
 
   function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
 
-  // Étapes du workflow pour guider l'admin
   const workflowSteps = [
-    { statut: 'en_attente',        label: 'Reçue',           icon: 'inbox' },
-    { statut: 'validee',           label: 'Validée',          icon: 'verified' },
+    { statut: 'en_attente',        label: 'Reçue',              icon: 'inbox' },
+    { statut: 'validee',           label: 'Validée',             icon: 'verified' },
     { statut: 'appel_offre_lance', label: "Appel d'offre lancé", icon: 'campaign' },
-    { statut: 'offres_recues',     label: 'Offres reçues',    icon: 'inbox' },
-    { statut: 'offre_envoyee',     label: 'Offre envoyée',    icon: 'send' },
-    { statut: 'acceptee',          label: 'Acceptée',         icon: 'check_circle' },
-    { statut: 'cloturee',          label: 'Clôturée',         icon: 'lock' },
+    { statut: 'offres_recues',     label: 'Offres reçues',       icon: 'inbox' },
+    { statut: 'offre_envoyee',     label: 'Offre envoyée',       icon: 'send' },
+    { statut: 'acceptee',          label: 'Acceptée',            icon: 'check_circle' },
+    { statut: 'cloturee',          label: 'Clôturée',            icon: 'lock' },
   ]
-  // refusee n'existe plus comme statut final — le backend passe directement à cloturee
-  // On garde isRefusee pour compatibilité avec d'anciens enregistrements en base
   const isRefusee = $derived(demande?.statut === 'refusee')
   const statutOrder = workflowSteps.map(s => s.statut)
   const currentIdx = $derived(demande ? statutOrder.indexOf(demande.statut) : 0)
 </script>
 
 <svelte:head><title>Demande #{id} — Admin</title></svelte:head>
+
+<!-- Bannière de confirmation clôture -->
+{#if showCloturerModal}
+  <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-4 flex items-center gap-4">
+      <span class="material-symbols-outlined icon-filled text-slate-600 shrink-0" style="font-size: 22px;">lock</span>
+      <div class="flex-1 min-w-0">
+        <p class="font-semibold text-slate-900 text-sm">Clôturer ce dossier ?</p>
+        <p class="text-xs text-slate-500 mt-0.5">Cette action est irréversible. Le dossier sera archivé.</p>
+      </div>
+      <div class="flex gap-2 shrink-0">
+        <button
+          onclick={() => showCloturerModal = false}
+          class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 font-semibold text-xs hover:bg-slate-50 transition-all">
+          Annuler
+        </button>
+        <button
+          onclick={cloturer}
+          disabled={acting}
+          class="px-3 py-1.5 rounded-lg bg-slate-800 text-white font-semibold text-xs hover:bg-slate-900 transition-all disabled:opacity-60 flex items-center gap-1.5">
+          {#if acting}
+            <span class="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+          {/if}
+          Confirmer
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <div class="max-w-4xl mx-auto">
 
@@ -114,9 +140,8 @@
         </button>
       </div>
     {:else if demande?.statut === 'acceptee'}
-      <button onclick={cloturer} disabled={acting}
+      <button onclick={() => showCloturerModal = true} disabled={acting}
         class="px-4 py-2 rounded-xl bg-slate-700 text-white font-semibold text-sm hover:bg-slate-800 transition-all disabled:opacity-60 flex items-center gap-2 shrink-0">
-        {#if acting}<span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>{/if}
         <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">lock</span>
         Clôturer le dossier
       </button>
@@ -132,7 +157,6 @@
       <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">Progression du dossier</p>
 
       {#if isRefusee}
-        <!-- Cas refus : affichage spécial -->
         <div class="flex items-center gap-3 p-3 bg-red-50 rounded-xl border border-red-100">
           <div class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined icon-filled text-white" style="font-size: 14px;">cancel</span>
@@ -147,7 +171,6 @@
           {#each workflowSteps as step, i}
             {@const isActive = currentIdx === i}
             {@const isDone = currentIdx > i}
-            {@const isFuture = currentIdx < i}
             <div class="flex-1 flex flex-col items-center min-w-[80px]">
               <div class="flex items-center w-full">
                 <div class="flex-1 {i === 0 ? 'invisible' : ''} h-0.5 {isDone ? 'bg-brand-500' : 'bg-slate-200'}"></div>
@@ -255,19 +278,6 @@
             </a>
           </div>
 
-        {:else if demande.statut === 'appel_offre_lance'}
-          <div class="bg-white rounded-2xl border border-indigo-200 p-5">
-            <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-2">En attente</p>
-            <p class="text-sm text-slate-600 mb-3">Les entreprises soumettent leurs offres. Revenez une fois le délai écoulé.</p>
-            {#if appelOffre}
-              <a href="/admin/appels-offres/{appelOffre.id}/comparatif"
-                class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-indigo-200 text-indigo-700 font-semibold text-sm hover:bg-indigo-50 transition-all">
-                <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">compare_arrows</span>
-                Voir le comparatif
-              </a>
-            {/if}
-          </div>
-
         {:else if demande.statut === 'offres_recues'}
           <div class="bg-white rounded-2xl border border-emerald-200 p-5">
             <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-2">Prochaine étape</p>
@@ -300,7 +310,7 @@
           <div class="bg-white rounded-2xl border border-emerald-200 p-5">
             <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-2">Offre acceptée ✓</p>
             <p class="text-sm text-slate-600 mb-3">Le client a accepté l'offre. Une fois le chantier terminé, clôturez le dossier.</p>
-            <button onclick={cloturer} disabled={acting}
+            <button onclick={() => showCloturerModal = true} disabled={acting}
               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-slate-700 text-white font-semibold text-sm hover:bg-slate-800 transition-all disabled:opacity-60">
               <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">lock</span>
               Clôturer le dossier
@@ -312,24 +322,6 @@
             <span class="material-symbols-outlined text-slate-400 icon-filled" style="font-size: 32px;">lock</span>
             <p class="text-sm font-semibold text-slate-600 mt-2">Dossier clôturé</p>
             <p class="text-xs text-slate-400 mt-1">Ce dossier est archivé.</p>
-          </div>
-
-        {/if}
-
-        <!-- Lien vers l'appel d'offre si existe -->
-        {#if appelOffre && !['en_attente','validee','refusee','cloturee'].includes(demande.statut)}
-          <div class="bg-white rounded-2xl border border-slate-100 p-4">
-            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Appel d'offre lié</p>
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-medium text-slate-800">Appel d'offre #{appelOffre.id}</p>
-                <p class="text-xs text-slate-400">{appelOffre.entreprises?.length ?? 0} entreprise(s) invitée(s)</p>
-              </div>
-              <a href="/admin/appels-offres/{appelOffre.id}/comparatif"
-                class="text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg font-medium hover:bg-blue-100 transition-all border border-blue-200">
-                Comparatif
-              </a>
-            </div>
           </div>
         {/if}
 
