@@ -162,7 +162,7 @@
       <label class="block text-sm font-medium text-slate-700 mb-1.5">Mot de passe *</label>
       <div class="relative">
         <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">lock</span>
-        <input type={showPassword ? 'text' : 'password'} bind:value={password} placeholder="Min. 8 car." required
+        <input type={showPassword ? 'text' : 'password'} bind:value={password} placeholder="Min. 8 caractère." required
           class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 bg-white text-sm transition-all"
           class:border-red-400={errors.password} />
         <button type="button" onclick={() => showPassword = !showPassword}
