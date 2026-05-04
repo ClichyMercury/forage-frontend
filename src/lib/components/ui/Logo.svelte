@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { height = 'h-15', class: cls = '' } = $props<{
+  let { height = 'h-16', class: cls = '' } = $props<{
     height?: string
     class?: string
   }>()
