@@ -94,21 +94,21 @@
 >
   <!-- Logo + bouton fermer (mobile) -->
   <div class="flex items-center justify-center px-4 py-4 border-b border-slate-100">
-  <img src="/images/logo.jpeg" alt="Forage" class="h-28 w-auto object-contain shrink-0" />
-  
-  {#if !collapsed}
-    {#if isMobile}
-      <button
-        type="button"
-        onclick={() => collapsed = true}
-        class="absolute right-4 w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-all text-slate-500 shrink-0"
-        aria-label="Fermer le menu"
-      >
-        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
-      </button>
+    <img src="/images/logo.jpeg" alt="Forage" class="h-28 w-auto object-contain shrink-0" />
+    
+    {#if !collapsed}
+      {#if isMobile}
+        <button
+          type="button"
+          onclick={() => collapsed = true}
+          class="absolute right-4 w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-all text-slate-500 shrink-0"
+          aria-label="Fermer le menu"
+        >
+          <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+        </button>
+      {/if}
     {/if}
-  {/if}
-</div>
+  </div>
 
   <!-- Navigation -->
   <nav class="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
