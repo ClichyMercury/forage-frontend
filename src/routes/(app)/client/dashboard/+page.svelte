@@ -16,7 +16,7 @@
     offresRecues: demandes.filter(d => ['offre_envoyee','acceptee','cloturee'].includes(d.statut)).length,
     aTraiter: demandes.filter(d => d.statut === 'offre_envoyee').length,
     acceptees: demandes.filter(d => d.statut === 'acceptee').length,
-    refusees: demandes.filter(d => d.statut === 'cloturee').length,
+    refusees: demandes.filter(d => d.statut === 'cloturee' && d.offre_finale?.statut === 'refusee').length,
     cloturees: demandes.filter(d => d.statut === 'cloturee').length,
   }))
 
