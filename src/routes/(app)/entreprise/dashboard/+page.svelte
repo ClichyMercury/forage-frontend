@@ -61,7 +61,7 @@
 </div>
 
 <!-- Deux blocs côte à côte en dessous -->
-<div class="grid grid-cols-1 l gap-5">
+<div class="grid grid-cols-1  gap-5">
   <!-- Appels d'offres récents -->
   <div class="bg-white rounded-2xl border border-slate-100">
     <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
