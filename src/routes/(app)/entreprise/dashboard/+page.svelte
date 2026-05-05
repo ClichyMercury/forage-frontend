@@ -12,8 +12,8 @@
 
   const stats = $derived(() => ({
     total: appelsOffres.length,
-    ouverts: appelsOffres.filter((a: any) => !a.compte_a_rebours?.expire).length,
-    soumises: mesOffres.filter((o: any) => o.statut === 'soumise').length,
+    ouverts: appelsOffres.filter((a: any) => !a.compte_a_rebours?.expire && !a.ma_reponse?.soumise).length,
+    soumises: mesOffres.length,
     retenues: mesOffres.filter((o: any) => o.statut === 'retenue').length,
     nonRetenues: mesOffres.filter((o: any) => o.statut === 'non_retenue').length,
   }))
