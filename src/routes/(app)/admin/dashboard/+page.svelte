@@ -4,6 +4,7 @@
   import { auth } from '$lib/stores/auth.svelte'
   import StatCard from '$lib/components/ui/StatCard.svelte'
   import Badge from '$lib/components/ui/Badge.svelte'
+  import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
   import DemandMap from '$lib/components/ui/DemandMap.svelte'
 
   let stats = $state<any>(null)
@@ -45,7 +46,6 @@
     return num.toLocaleString('fr-CM', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
   }
 
-
   async function loadData() {
     loading = true
     try {
@@ -70,7 +70,9 @@
   })
 </script>
 
-<svelte:head><title>Tableau de bord — Admin Forage</title></svelte:head>
+<svelte:head>
+  <title>Tableau de bord — Admin Forage</title>
+</svelte:head>
 
 <!-- Header -->
 <div class="mb-6 flex items-start lg:items-center justify-between flex-wrap gap-3">
@@ -83,15 +85,19 @@
   <div class="flex items-center gap-2 flex-wrap">
     <div class="flex gap-1 bg-slate-100 rounded-xl p-1">
       {#each [['semaine','Sem.'], ['mois','Mois'], ['annee','An.']] as [val, label]}
-        <button onclick={() => periode = val}
-          class="px-3 py-1.5 rounded-lg text-sm font-semibold transition-all {periode === val ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}">
+        <button 
+          onclick={() => periode = val}
+          class="px-3 py-1.5 rounded-lg text-sm font-semibold transition-all {periode === val ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}"
+        >
           {label}
         </button>
       {/each}
     </div>
-    <a href="/admin/demandes"
+    <a 
+      href="/admin/demandes"
       class="flex items-center gap-2 px-4 lg:px-5 py-2.5 lg:py-3 rounded-xl text-white font-semibold text-sm transition-all whitespace-nowrap"
-      style="background-color: #1e3fff; box-shadow: 0 4px 14px rgba(30,63,255,0.3)">
+      style="background-color: #1e3fff; box-shadow: 0 4px 14px rgba(30,63,255,0.3)"
+    >
       <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">assignment</span>
       <span class="hidden sm:inline">Gérer les demandes</span>
       <span class="sm:hidden">Gérer</span>
@@ -102,7 +108,9 @@
 <!-- Stats -->
 {#if loading}
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-    {#each [1,2,3,4,5,6,7,8] as _}<div class="skeleton h-24 rounded-2xl"></div>{/each}
+    {#each [1,2,3,4,5,6,7,8] as _}
+      <div class="skeleton h-24 rounded-2xl"></div>
+    {/each}
   </div>
 {:else if stats}
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
@@ -141,8 +149,10 @@
     <div class="divide-y divide-red-100">
       {#each stats.alertes_sans_reponse.demandes.slice(0, 4) as d}
         {@const jours = Math.floor((Date.now() - new Date(d.created_at).getTime()) / 86400000)}
-        <a href="/admin/demandes/{d.id}"
-          class="flex items-center gap-3 px-5 py-3 hover:bg-red-100/50 transition-all">
+        <a 
+          href="/admin/demandes/{d.id}"
+          class="flex items-center gap-3 px-5 py-3 hover:bg-red-100/50 transition-all"
+        >
           <div class="w-8 h-8 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined text-red-500 icon-filled" style="font-size: 15px;">schedule</span>
           </div>
@@ -170,26 +180,28 @@
   </div>
 {/if}
 
-  <!-- Validation entreprises en attente (compact, si applicable) -->
-  {#if !loading && pendingEntreprises.length > 0}
-    <div class="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-3.5 mb-5 flex items-center justify-between gap-4 flex-wrap">
-      <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-amber-600 icon-filled" style="font-size: 20px;">business</span>
-        <div>
-          <p class="text-sm font-semibold text-amber-800">
-            {pendingEntreprises.length} entreprise{pendingEntreprises.length > 1 ? 's' : ''} en attente de validation
-          </p>
-          <p class="text-xs text-amber-600 mt-0.5">
-            {pendingEntreprises.slice(0, 3).map((e: any) => e.entrepriseProfile?.raisonSociale ?? e.email).join(', ')}{pendingEntreprises.length > 3 ? '…' : ''}
-          </p>
-        </div>
+<!-- Validation entreprises en attente (compact, si applicable) -->
+{#if !loading && pendingEntreprises.length > 0}
+  <div class="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-3.5 mb-5 flex items-center justify-between gap-4 flex-wrap">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-amber-600 icon-filled" style="font-size: 20px;">business</span>
+      <div>
+        <p class="text-sm font-semibold text-amber-800">
+          {pendingEntreprises.length} entreprise{pendingEntreprises.length > 1 ? 's' : ''} en attente de validation
+        </p>
+        <p class="text-xs text-amber-600 mt-0.5">
+          {pendingEntreprises.slice(0, 3).map((e: any) => e.entrepriseProfile?.raisonSociale ?? e.email).join(', ')}{pendingEntreprises.length > 3 ? '…' : ''}
+        </p>
       </div>
-      <a href="/admin/utilisateurs"
-        class="shrink-0 px-4 py-2 rounded-xl bg-amber-600 text-white text-sm font-semibold hover:bg-amber-700 transition-all">
-        Valider maintenant
-      </a>
     </div>
-  {/if}
+    <a 
+      href="/admin/utilisateurs"
+      class="shrink-0 px-4 py-2 rounded-xl bg-amber-600 text-white text-sm font-semibold hover:bg-amber-700 transition-all"
+    >
+      Valider maintenant
+    </a>
+  </div>
+{/if}
 
 <!-- Ligne 1 : Demandes récentes + Classement entreprises -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
@@ -201,7 +213,11 @@
       <a href="/admin/demandes" class="text-sm text-brand-600 hover:text-brand-700 font-semibold">Voir tout</a>
     </div>
     {#if loading}
-      <div class="p-5 space-y-2">{#each [1,2,3] as _}<div class="skeleton h-12 rounded-xl"></div>{/each}</div>
+      <div class="p-5 space-y-2">
+        {#each [1,2,3] as _}
+          <div class="skeleton h-12 rounded-xl"></div>
+        {/each}
+      </div>
     {:else if demandes.length === 0}
       <div class="py-12 text-center px-6">
         <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
@@ -212,15 +228,22 @@
     {:else}
       <!-- En-tête mini-tableau (desktop only) -->
       <div class="hidden lg:grid grid-cols-12 gap-3 px-5 py-2.5 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wide">
-        <div class="col-span-4">Localisation</div>
         <div class="col-span-3">Client</div>
+        <div class="col-span-4">Localisation</div>
         <div class="col-span-2">Type</div>
         <div class="col-span-3">Statut</div>
       </div>
       <div class="divide-y divide-slate-50">
         {#each demandes as d}
-          <a href="/admin/demandes/{d.id}"
-            class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-3 lg:items-center px-5 py-3 hover:bg-slate-50 transition-all">
+          <a 
+            href="/admin/demandes/{d.id}"
+            class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-3 lg:items-center px-5 py-3 hover:bg-slate-50 transition-all"
+          >
+            <div class="flex items-center gap-1 pl-10 lg:pl-0 lg:col-span-3 min-w-0">
+              <UserAvatar user={d.client} size="sm" />
+              <span class="text-xs lg:hidden text-slate-400">Client :</span>
+              <span class="text-sm text-slate-600 truncate">{d.client?.fullName ?? d.client?.email ?? '—'}</span>
+            </div>
             <div class="flex items-center gap-2 min-w-0 lg:col-span-4">
               <div class="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-brand-600 icon-filled" style="font-size: 15px;">water_drop</span>
@@ -228,10 +251,7 @@
               <span class="text-sm font-medium text-slate-800 truncate flex-1">{d.localisationAdresse}</span>
               <div class="lg:hidden shrink-0"><Badge status={d.statut} /></div>
             </div>
-            <div class="flex items-center gap-1 pl-10 lg:pl-0 lg:col-span-3 min-w-0">
-              <span class="text-xs lg:hidden text-slate-400">Client :</span>
-              <span class="text-sm text-slate-600 truncate">{d.client?.fullName ?? d.client?.email ?? '—'}</span>
-            </div>
+          
             <div class="flex items-center gap-1 pl-10 lg:pl-0 lg:col-span-2">
               <span class="text-xs lg:hidden text-slate-400">Type :</span>
               <span class="text-xs text-slate-500 capitalize">{d.typeForage}</span>
@@ -252,7 +272,11 @@
       <p class="text-xs text-slate-400 mt-0.5">Classées par taux de sélection</p>
     </div>
     {#if loading}
-      <div class="p-5 space-y-3">{#each [1,2,3,4] as _}<div class="skeleton h-14 rounded-xl"></div>{/each}</div>
+      <div class="p-5 space-y-3">
+        {#each [1,2,3,4] as _}
+          <div class="skeleton h-14 rounded-xl"></div>
+        {/each}
+      </div>
     {:else if classement.length === 0}
       <div class="py-12 text-center px-6">
         <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
@@ -294,7 +318,8 @@
                 <div class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-slate-400 icon-filled" style="font-size: 12px;">schedule</span>
                   <span class="text-xs text-slate-500">{delaiMoyen.toFixed(0)}j</span>
-                </div><!-- Taux sélection -->
+                </div>
+                <!-- Taux sélection -->
                 <div class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-emerald-500 icon-filled" style="font-size: 12px;">check_circle</span>
                   <span class="text-xs font-semibold text-emerald-700">{taux.toFixed(0)}%</span>
@@ -380,7 +405,11 @@
       <p class="text-xs text-slate-400 mt-0.5">Répartition des demandes</p>
     </div>
     {#if loading}
-      <div class="p-5 space-y-3">{#each [1,2,3,4] as _}<div class="skeleton h-10 rounded-xl"></div>{/each}</div>
+      <div class="p-5 space-y-3">
+        {#each [1,2,3,4] as _}
+          <div class="skeleton h-10 rounded-xl"></div>
+        {/each}
+      </div>
     {:else if stats?.repartition_type_forage?.length > 0}
       {@const total = stats.repartition_type_forage.reduce((s: number, i: any) => s + Number(i.count), 0)}
       <div class="p-5 space-y-4">

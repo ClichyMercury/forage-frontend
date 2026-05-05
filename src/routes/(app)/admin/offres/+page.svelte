@@ -122,23 +122,31 @@
               <p class="text-xs text-slate-400 capitalize mt-0.5">{o.demande_type}</p>
             </div>
             
-            <!-- Ligne 3 : Prix + Délai + Budget -->
-            <div class="flex items-center justify-between flex-wrap gap-2">
-              <div>
-                <span class="text-xs text-slate-400">Prix TTC :</span>
-                <div>
-                  <span class="text-sm font-semibold text-slate-900">{fmt(o.prix_ttc)}</span>
-                  <span class="text-xs text-slate-400 ml-1">FCFA</span>
+            <!-- Ligne 3 : Prix + Délai + Budget (tous alignés verticalement et centrés) -->
+            <div class="flex items-center justify-between flex-wrap gap-4">
+              <!-- Prix TTC -->
+              <div class="flex flex-col items-center text-center min-w-[100px]">
+                <span class="text-xs text-slate-400">Prix TTC</span>
+                <div class="flex items-baseline justify-center gap-0.5 mt-0.5">
+                  <span class="text-sm font-bold text-slate-900">{fmt(o.prix_ttc)}</span>
+                  <span class="text-xs text-slate-400">FCFA</span>
                 </div>
               </div>
-              <div>
-                <span class="text-xs text-slate-400">Délai :</span>
-                <div class="text-sm text-slate-600">{o.delai_execution_jours}j</div>
+              
+              <!-- Délai -->
+              <div class="flex flex-col items-center text-center min-w-[70px]">
+                <span class="text-xs text-slate-400">Délai</span>
+                <div class="flex items-baseline justify-center gap-0.5 mt-0.5">
+                  <span class="text-sm font-bold text-slate-900">{o.delai_execution_jours}</span>
+                  <span class="text-xs text-slate-400">j</span>
+                </div>
               </div>
-              <div>
-                <span class="text-xs text-slate-400">Dans budget :</span>
-                <div>
-                  <span class="text-xs font-semibold {o.dans_budget ? 'text-emerald-600' : 'text-red-500'}">
+              
+              <!-- Budget -->
+              <div class="flex flex-col items-center text-center min-w-[80px]">
+                <span class="text-xs text-slate-400">Budget</span>
+                <div class="mt-0.5">
+                  <span class="text-sm font-semibold {o.dans_budget ? 'text-emerald-600' : 'text-red-500'}">
                     {o.dans_budget ? '✓ Oui' : '✗ Non'}
                   </span>
                 </div>
@@ -177,7 +185,7 @@
             
             <!-- Colonne 5 : Budget -->
             <div class="col-span-1">
-              <span class="text-xs font-semibold {o.dans_budget ? 'text-emerald-600' : 'text-red-500'}">
+              <span class="text-sm font-semibold {o.dans_budget ? 'text-emerald-600' : 'text-red-500'}">
                 {o.dans_budget ? '✓ Oui' : '✗ Non'}
               </span>
             </div>
