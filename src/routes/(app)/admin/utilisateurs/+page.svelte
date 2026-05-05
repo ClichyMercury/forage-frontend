@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
+  import { fileUrl } from '$lib/utils/file-url'
 
   let users = $state<any[]>([])
   let loading = $state(true)
@@ -187,9 +188,13 @@
       {#each users as u}
         <div class="flex flex-col gap-3 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4  ">
           <a href="/admin/utilisateurs/{u.id}" class="flex items-center gap-3 min-w-0 group lg:col-span-4">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0"
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden"
                  style="background-color: {u.role === 'entreprise' ? '#475569' : '#1e3fff'}">
-              {(u.fullName ?? u.email).charAt(0).toUpperCase()}
+              {#if u.avatarUrl}
+                <img src="{fileUrl(u.avatarUrl)}" alt={u.fullName ?? u.email} class="w-full h-full object-cover" />
+              {:else}
+                {(u.fullName ?? u.email).charAt(0).toUpperCase()}
+              {/if}
             </div>
             <div class="min-w-0 flex-1">
               <p class="text-sm font-semibold text-slate-800 truncate group-hover:text-brand-700 transition-colors">{u.fullName ?? u.email}</p>

@@ -7,6 +7,7 @@
   import { goto } from '$app/navigation'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
+  import { fileUrl } from '$lib/utils/file-url'
 
   let { collapsed = $bindable(false) } = $props()
   const role = $derived(auth.user?.role)
@@ -146,7 +147,7 @@
       title={collapsed ? 'Profil' : ''}>
       <div class="w-8 h-8 rounded-full shrink-0 overflow-hidden flex items-center justify-center text-white text-xs font-bold" style="background-color: #1e3fff">
         {#if auth.user?.avatarUrl}
-          <img src={auth.user.avatarUrl} alt={auth.user.fullName ?? 'Profil'} class="w-8 h-8 object-cover" />
+          <img src={fileUrl(auth.user.avatarUrl)} alt={auth.user.fullName ?? 'Profil'} class="w-8 h-8 object-cover" />
         {:else}
           {auth.user?.initials ?? '?'}
         {/if}

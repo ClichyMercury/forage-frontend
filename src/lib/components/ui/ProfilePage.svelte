@@ -3,6 +3,7 @@
   import api from '$lib/api'
   import { auth } from '$lib/stores/auth.svelte'
   import { toast } from '$lib/stores/toast.svelte'
+  import { fileUrl } from '$lib/utils/file-url'
 
   let loading = $state(true)
   let saving = $state(false)
@@ -85,7 +86,11 @@
     } finally { uploadingAvatar = false }
   }
 
-  const currentAvatar = $derived(avatarPreview ?? user?.avatarUrl ?? user?.avatar_url ?? null)
+  const currentAvatar = $derived(
+    avatarPreview ?? (user?.avatarUrl ?? user?.avatar_url
+      ? fileUrl(user?.avatarUrl ?? user?.avatar_url)
+      : null)
+  )
 
   // Champs éditables
   let fullName = $state('')
