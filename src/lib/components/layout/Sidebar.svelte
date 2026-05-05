@@ -7,6 +7,8 @@
   import { goto } from '$app/navigation'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
+  import { fileUrl } from '$lib/utils/file-url'
+  import Logo from '$lib/components/ui/Logo.svelte'
 
   let { collapsed = $bindable(false) } = $props()
   const role = $derived(auth.user?.role)
@@ -93,19 +95,15 @@
   "
 >
   <!-- Logo + bouton fermer (mobile) -->
-  <div class="flex items-center gap-2.5 px-4 py-5 border-b border-slate-100">
-    <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 overflow-hidden" style="box-shadow: 0 4px 12px rgba(30,63,255,0.2)">
-      <img src="/images/logo.jpeg" alt="Forage" class="w-9 h-9 object-contain" />
-    </div>
+  <div class="flex items-center justify-center px-4 py-4 border-b border-slate-100">
+    <Logo height="h-28" class="shrink-0" />
+    
     {#if !collapsed}
-      <div class="overflow-hidden flex-1">
-        <span class="font-display font-black text-lg tracking-tight text-slate-900 whitespace-nowrap">Forage</span>
-      </div>
       {#if isMobile}
         <button
           type="button"
           onclick={() => collapsed = true}
-          class="w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-all text-slate-500 shrink-0"
+          class="absolute right-4 w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-all text-slate-500 shrink-0"
           aria-label="Fermer le menu"
         >
           <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
@@ -150,7 +148,7 @@
       title={collapsed ? 'Profil' : ''}>
       <div class="w-8 h-8 rounded-full shrink-0 overflow-hidden flex items-center justify-center text-white text-xs font-bold" style="background-color: #1e3fff">
         {#if auth.user?.avatarUrl}
-          <img src={auth.user.avatarUrl} alt={auth.user.fullName ?? 'Profil'} class="w-8 h-8 object-cover" />
+          <img src={fileUrl(auth.user.avatarUrl)} alt={auth.user.fullName ?? 'Profil'} class="w-8 h-8 object-cover" />
         {:else}
           {auth.user?.initials ?? '?'}
         {/if}

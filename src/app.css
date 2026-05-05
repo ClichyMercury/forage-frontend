@@ -338,3 +338,63 @@ a, button { transition: all 0.2s ease; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================================
+   DARK MODE — classe .dark sur <html>
+   Tons gris foncés confortables pour les yeux.
+   Les règles sont placées dans @layer utilities pour s'appliquer
+   APRÈS les utilitaires Tailwind v4 dans la cascade — pas besoin
+   de !important pour override les classes (bg-white, text-slate-*, etc.)
+   ============================================================ */
+:root.dark {
+  color-scheme: dark;
+}
+
+:root.dark body {
+  background-color: #1a1d23;
+  color: #e2e8f0;
+}
+
+@layer utilities {
+  :root.dark .bg-white { background-color: #242830; }
+  :root.dark .bg-slate-50 { background-color: #1e2128; }
+  :root.dark .bg-slate-100 { background-color: #2a2f3a; }
+
+  :root.dark .border-slate-100 { border-color: #2e3340; }
+  :root.dark .border-slate-200 { border-color: #363c4a; }
+
+  :root.dark .text-slate-900 { color: #f1f5f9; }
+  :root.dark .text-slate-800 { color: #e2e8f0; }
+  :root.dark .text-slate-700 { color: #cbd5e1; }
+  :root.dark .text-slate-600 { color: #94a3b8; }
+  :root.dark .text-slate-500 { color: #64748b; }
+  :root.dark .text-slate-400 { color: #475569; }
+
+  :root.dark .hover\:bg-slate-50:hover { background-color: #2a2f3a; }
+  :root.dark .hover\:bg-slate-100:hover { background-color: #2e3340; }
+}
+
+:root.dark header,
+:root.dark aside,
+:root.dark footer {
+  background-color: #1e2128;
+  border-color: #2e3340;
+}
+
+:root.dark input,
+:root.dark select,
+:root.dark textarea {
+  background-color: #2a2f3a;
+  border-color: #363c4a;
+  color: #e2e8f0;
+}
+
+:root.dark .skeleton {
+  background: linear-gradient(90deg, #2a2f3a 25%, #363c4a 50%, #2a2f3a 75%);
+}
+
+:root.dark ::-webkit-scrollbar-track { background: #1e2128; }
+:root.dark ::-webkit-scrollbar-thumb { background: #363c4a; }
+:root.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+:root.dark #app-layout { background-color: #1a1d23; }

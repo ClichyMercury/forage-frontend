@@ -12,13 +12,13 @@
 
   const stats = $derived(() => ({
     total: appelsOffres.length,
-    ouverts: appelsOffres.filter((a: any) => !a.compte_a_rebours?.expire).length,
-    soumises: mesOffres.filter((o: any) => o.statut === 'soumise').length,
+    ouverts: appelsOffres.filter((a: any) => !a.compte_a_rebours?.expire && !a.ma_reponse?.soumise).length,
+    soumises: mesOffres.length,
     retenues: mesOffres.filter((o: any) => o.statut === 'retenue').length,
     nonRetenues: mesOffres.filter((o: any) => o.statut === 'non_retenue').length,
   }))
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
+  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
 
   onMount(async () => {
     try {
@@ -61,7 +61,7 @@
 </div>
 
 <!-- Deux blocs côte à côte en dessous -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+<div class="grid grid-cols-1  gap-5">
   <!-- Appels d'offres récents -->
   <div class="bg-white rounded-2xl border border-slate-100">
     <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
@@ -129,7 +129,9 @@
               <span class="material-symbols-outlined text-slate-400 icon-filled" style="font-size: 16px;">description</span>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-slate-800">Offre #{offre.id}</p>
+              <p class="text-sm font-medium text-slate-800 truncate">
+                {offre.appelOffre?.demande?.typeForage ?? offre.appel_offre?.demande?.type_forage ?? 'Forage'} — {offre.appelOffre?.demande?.localisationAdresse ?? offre.appel_offre?.demande?.localisation_adresse ?? `Offre #${offre.id}`}
+              </p>
               <p class="text-xs text-slate-400 mt-0.5">
                 {fmt(offre.prixTtc ?? offre.prix_ttc)} FCFA TTC · {offre.delaiExecution ?? offre.delai_execution} jours
               </p>

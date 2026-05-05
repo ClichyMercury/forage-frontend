@@ -13,7 +13,7 @@
     } catch {} finally { loading = false }
   })
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
+  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
 </script>
 
 <svelte:head><title>Mes offres — Forage</title></svelte:head>
@@ -53,7 +53,7 @@
           </div>
           <div class="flex items-center gap-2 min-w-0 lg:col-span-3">
             <span class="text-sm font-medium text-slate-800 truncate flex-1">
-              {o.appelOffre?.demande?.localisation_adresse ?? o.appelOffre?.demande?.localisationAdresse ?? `AO ${o.appelOffreId}`}
+              {o.appelOffre?.demande?.localisation_adresse ?? o.appelOffre?.demande?.localisationAdresse ?? `Appel d'offre ${o.appelOffreId}`}
             </span>
             <div class="lg:hidden shrink-0"><Badge status={o.statut} /></div>
           </div>
@@ -82,7 +82,7 @@
           <div class="flex items-center justify-between lg:block lg:col-span-1">
             <span class="text-xs lg:hidden text-slate-400">Date :</span>
             <span class="text-xs text-slate-400">
-              {new Date(o.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short' })}
+              {new Date(o.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'short' })}
             </span>
           </div>
           <!-- Statut desktop only -->

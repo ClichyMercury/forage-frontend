@@ -52,7 +52,7 @@
 
 <Toast />
 
-<div class="flex h-screen overflow-hidden" style="background-color: #f5f7fa">
+<div class="flex h-screen overflow-hidden" style="background-color: #f5f7fa" id="app-layout">
   <Sidebar bind:collapsed />
 
   <!-- Backdrop mobile quand sidebar ouverte -->
@@ -80,7 +80,7 @@
 
     <!-- Footer fixe en bas -->
     <footer class="shrink-0 px-4 lg:px-6 py-3 text-center text-xs text-slate-400 border-t border-slate-100" style="background-color: #fafbff">
-      © {year} Forage — Plateforme de mise en relation pour prestations de forage
+      © {year} Forage — Plateforme de mise en relation pour prestations de forage au Cameroun
     </footer>
   </div>
 </div>

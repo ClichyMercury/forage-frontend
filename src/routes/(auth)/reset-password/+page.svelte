@@ -121,7 +121,7 @@
       <div class="relative">
         <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">lock</span>
         <input id="password" type={showPassword ? 'text' : 'password'} bind:value={password}
-          placeholder="Min. 6 caractères" required minlength="6"
+          placeholder="Min. 8 caractères" required minlength="6"
           class="w-full pl-10 pr-12 py-3 rounded-xl border border-slate-200 bg-white text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent" />
         <button type="button" onclick={() => showPassword = !showPassword}
           class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">

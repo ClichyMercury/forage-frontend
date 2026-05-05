@@ -1,5 +1,6 @@
 <script lang="ts">
   import Toast from '$lib/components/ui/Toast.svelte'
+  import Logo from '$lib/components/ui/Logo.svelte'
   import '../../app.css'
   let { children } = $props()
 </script>
@@ -41,10 +42,7 @@
 
     <!-- Logo -->
     <div class="relative z-10 flex items-center gap-2.5">
-      <div class="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center bg-white/20 backdrop-blur-sm">
-        <img src="/images/logo.jpeg" alt="Forage" class="w-10 h-10 object-contain" />
-      </div>
-      <span class="text-white font-display font-black text-xl tracking-tight">Forage</span>
+      <Logo height="h-12" />
     </div>
 
     <!-- Contenu central -->
@@ -74,7 +72,7 @@
       </div>
     </div>
 
-    <div class="relative z-10 text-white/40 text-xs">© 2026 Forage — Côte d'Ivoire</div>
+    <div class="relative z-10 text-white/40 text-xs">© 2026 Forage — Cameroun</div>
   </div>
 
   <!-- Panneau droit — formulaire -->

@@ -60,7 +60,7 @@
 
   // Nom de la demande pour le titre
   const titreDemande = $derived(
-    ao?.demande?.localisationAdresse ?? ao?.demande?.localisation_adresse ?? `AO #${id}`
+    ao?.demande?.localisationAdresse ?? ao?.demande?.localisation_adresse ?? `Appel d'offre #${id}`
   )
 </script>
 
@@ -126,7 +126,7 @@
           <p class="text-xs text-slate-400 mb-1">Délai souhaité</p>
           <p class="text-sm font-semibold text-slate-700">
             {(ao.demande?.delaiSouhaite ?? ao.demande?.delai_souhaite)
-              ? new Date(ao.demande?.delaiSouhaite ?? ao.demande?.delai_souhaite).toLocaleDateString('fr-CI')
+              ? new Date(ao.demande?.delaiSouhaite ?? ao.demande?.delai_souhaite).toLocaleDateString('fr-CM')
               : '—'}
           </p>
         </div>
@@ -150,7 +150,7 @@
         </div>
       {/if}
 
-      {#if ao.compte_a_rebours}
+      {#if ao.compte_a_rebours && !ao.ma_reponse?.soumise}
         <div class="p-3 rounded-xl flex items-center gap-2 {ao.compte_a_rebours.expire ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-200'}">
           <span class="material-symbols-outlined icon-filled {ao.compte_a_rebours.expire ? 'text-red-500' : 'text-amber-600'}" style="font-size: 18px;">
             {ao.compte_a_rebours.expire ? 'timer_off' : 'timer'}
@@ -161,7 +161,7 @@
             </p>
             {#if !ao.compte_a_rebours.expire}
               <p class="text-xs text-amber-600">
-                {new Date(ao.compte_a_rebours.delai_reponse ?? ao.delaiReponse).toLocaleString('fr-CI')}
+                {new Date(ao.compte_a_rebours.delai_reponse ?? ao.delaiReponse).toLocaleString('fr-CM')}
               </p>
             {/if}
           </div>

@@ -13,12 +13,10 @@
     total: demandes.length,
     enAttente: demandes.filter(d => d.statut === 'en_attente').length,
     enCours: demandes.filter(d => ['validee','appel_offre_lance','offres_recues','offre_envoyee'].includes(d.statut)).length,
-    // Offres reçues = toutes les demandes qui ont eu une offre (envoyée + acceptée + refusée)
-    offresRecues: demandes.filter(d => ['offre_envoyee','acceptee','refusee'].includes(d.statut)).length,
-    // En attente de décision = seulement offre_envoyee
+    offresRecues: demandes.filter(d => ['offre_envoyee','acceptee','cloturee'].includes(d.statut)).length,
     aTraiter: demandes.filter(d => d.statut === 'offre_envoyee').length,
     acceptees: demandes.filter(d => d.statut === 'acceptee').length,
-    refusees: demandes.filter(d => d.statut === 'refusee').length,
+    refusees: demandes.filter(d => d.statut === 'cloturee' && d.offre_finale?.statut === 'refusee').length,
     cloturees: demandes.filter(d => d.statut === 'cloturee').length,
   }))
 
@@ -26,7 +24,7 @@
   const demandesUrgentes = $derived(
     demandes.filter(d => d.statut === 'offre_envoyee')
   )
-  function fmt(n: number) { return n.toLocaleString('fr-CI') }
+  function fmt(n: number) { return n.toLocaleString('fr-CM') }
 
   onMount(async () => {
     try {

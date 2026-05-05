@@ -6,11 +6,11 @@
     class: string;
     icon: string 
   }> = {
-    en_attente:       { label: 'En attente',       class: 'bg-terre-50 text-terre-700 border-terre-200',     icon: 'schedule' },
+    en_attente:       { label: 'En attente',       class: 'bg-slate-100 text-slate-600 border-slate-200',     icon: 'schedule' },
     validee:          { label: 'Validée',           class: 'bg-brand-100 text-brand-700 border-brand-200',    icon: 'verified' },
-    appel_offre_lance:{ label: 'AO lancé',          class: 'bg-brand-100 text-brand-700 border-brand-200',    icon: 'campaign' },
+    appel_offre_lance:{ label: "Appel d'offre lancé", class: 'bg-brand-100 text-brand-700 border-brand-200', icon: 'campaign' },
     offres_recues:    { label: 'Offres reçues',     class: 'bg-brand-100 text-brand-700 border-brand-200',    icon: 'inbox' },
-    offre_envoyee:    { label: 'Offre reçue',       class: 'bg-terre-100 text-terre-700 border-terre-200',    icon: 'mark_email_read' },
+    offre_envoyee:    { label: 'Offre reçue',       class: 'bg-slate-100 text-slate-700 border-slate-200',    icon: 'mark_email_read' },
     acceptee:         { label: 'Acceptée',          class: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: 'check_circle' },
     refusee:          { label: 'Refusée',           class: 'bg-red-100 text-red-700 border-red-200',         icon: 'cancel' },
     cloturee:         { label: 'Clôturée',          class: 'bg-slate-100 text-slate-600 border-slate-200',   icon: 'lock' },
@@ -19,7 +19,7 @@
     non_retenue:      { label: 'Non retenue',       class: 'bg-red-100 text-red-700 border-red-200',         icon: 'close' },
     ouvert:           { label: 'Ouvert',            class: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: 'lock_open' },
     clos:             { label: 'Clôturé',           class: 'bg-slate-100 text-slate-600 border-slate-200',   icon: 'lock' },
-    envoyee:          { label: 'Envoyée',           class: 'bg-terre-100 text-terre-700 border-terre-200',    icon: 'send' },
+    envoyee:          { label: 'Envoyée',           class: 'bg-slate-100 text-slate-700 border-slate-200',    icon: 'send' },
   }
 
   const cfg = $derived(config[status] ?? { label: status, class: 'bg-slate-100 text-slate-600 border-slate-200', icon: 'circle' })

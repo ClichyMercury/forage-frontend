@@ -21,7 +21,9 @@
   onDestroy(() => clearInterval(timer))
 
   function getSecondesRestantes(ao: any): number {
-    // Utiliser la date limite directement si disponible
+    // Si l'entreprise a déjà répondu, le décompte s'arrête
+    if (ao.ma_reponse?.soumise) return -1
+
     const delai = ao.delaiReponse ?? ao.delai_reponse ?? ao.compte_a_rebours?.delai_reponse
     if (delai) {
       const diff = new Date(delai).getTime() - now
@@ -31,6 +33,7 @@
   }
 
   function countdown(secondes: number): string {
+    if (secondes === -1) return 'Offre soumise'
     if (secondes <= 0) return 'Expiré'
     const j = Math.floor(secondes / 86400)
     const h = Math.floor((secondes % 86400) / 3600)
@@ -77,7 +80,7 @@
         <div class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4">
           <!-- Ligne 1 mobile : ID + Localisation + Action -->
           <div class="flex items-center gap-2 lg:col-span-1">
-            <span class="text-xs text-slate-400 lg:hidden">AO</span>
+            <span class="text-xs text-slate-400 lg:hidden">Appel d'offre</span>
             <span class="text-sm text-slate-500">#{ao.id}</span>
           </div>
           <div class="flex items-center gap-2 min-w-0 lg:col-span-3">
@@ -92,7 +95,12 @@
             </span>
           </div>
           <div class="flex items-center gap-1 lg:col-span-3">
-            {#if expire}
+            {#if secondes === -1}
+              <span class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">check_circle</span>
+                Offre soumise
+              </span>
+            {:else if expire}
               <span class="inline-flex items-center gap-1 text-xs font-semibold text-red-500">
                 <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">timer_off</span>
                 Délai expiré

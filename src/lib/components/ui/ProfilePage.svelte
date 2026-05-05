@@ -3,6 +3,7 @@
   import api from '$lib/api'
   import { auth } from '$lib/stores/auth.svelte'
   import { toast } from '$lib/stores/toast.svelte'
+  import { fileUrl } from '$lib/utils/file-url'
 
   let loading = $state(true)
   let saving = $state(false)
@@ -85,7 +86,11 @@
     } finally { uploadingAvatar = false }
   }
 
-  const currentAvatar = $derived(avatarPreview ?? user?.avatarUrl ?? user?.avatar_url ?? null)
+  const currentAvatar = $derived(
+    avatarPreview ?? (user?.avatarUrl ?? user?.avatar_url
+      ? fileUrl(user?.avatarUrl ?? user?.avatar_url)
+      : null)
+  )
 
   // Champs éditables
   let fullName = $state('')
@@ -135,7 +140,7 @@
   }
 
   function fmtDate(d: string) {
-    return new Date(d).toLocaleDateString('fr-CI', { day: 'numeric', month: 'long', year: 'numeric' })
+    return new Date(d).toLocaleDateString('fr-CM', { day: 'numeric', month: 'long', year: 'numeric' })
   }
 </script>
 
@@ -272,7 +277,7 @@
         <label class="block text-sm font-medium text-slate-700 mb-1.5" for="profile-tel">Téléphone</label>
         <div class="relative">
           <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">phone</span>
-          <input id="profile-tel" type="tel" bind:value={telephone} placeholder="0700000000"
+          <input id="profile-tel" type="tel" bind:value={telephone} placeholder="+237 6XX XXX XXX"
             class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm transition-all"
             class:border-red-400={errors.telephone} />
         </div>

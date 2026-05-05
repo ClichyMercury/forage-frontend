@@ -93,10 +93,10 @@
     }
   }
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
+  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
 </script>
 
-<svelte:head><title>Offre finale — Demande #{id}</title></svelte:head>
+<svelte:head><title>Offre finale — Demande {id}</title></svelte:head>
 
 <div class="max-w-2xl mx-auto">
 

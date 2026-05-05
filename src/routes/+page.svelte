@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { goto } from '$app/navigation'
   import { auth } from '$lib/stores/auth.svelte'
+  import Logo from '$lib/components/ui/Logo.svelte'
 
   let mouseX = $state(0)
   let mouseY = $state(0)
@@ -96,8 +97,7 @@
   <nav class="fixed top-0 inset-x-0 z-50 px-6 lg:px-12 py-5 flex items-center justify-between
               backdrop-blur-md bg-white/60 border-b border-slate-200/60">
     <a href="/" class="flex items-center gap-2.5 group">
-      <img src="/images/logo.jpeg" alt="Forage" class="w-9 h-9 object-contain" />
-      <span class="font-display font-black text-xl tracking-tight text-slate-900">Forage</span>
+      <Logo height="h-16" />
     </a>
 
     <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-700">
@@ -405,10 +405,9 @@
   <footer class="bg-slate-950 text-slate-400 py-12 px-6 lg:px-12">
     <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
       <div class="flex items-center gap-2.5">
-        <img src="/images/logo.jpeg" alt="Forage" class="w-8 h-8 object-contain" />
-        <span class="font-display font-black text-lg text-white tracking-tight">Forage</span>
+        <Logo height="h-16" />
       </div>
-      <p class="text-xs">© 2026 Forage · Plateforme de mise en relation pour prestations de forage</p>
+      <p class="text-xs">© 2026 Forage · Plateforme de mise en relation pour prestations de forage au Cameroun</p>
     </div>
   </footer>
 

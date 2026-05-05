@@ -3,6 +3,7 @@
   import api from '$lib/api'
   import { auth } from '$lib/stores/auth.svelte'
   import { toast } from '$lib/stores/toast.svelte'
+  import Logo from '$lib/components/ui/Logo.svelte'
 
   let email = $state('')
   let password = $state('')
@@ -42,8 +43,7 @@
 
 <!-- Logo mobile -->
 <div class="lg:hidden flex items-center gap-2.5 mb-10">
-  <img src="/images/logo.jpeg" alt="Forage" class="w-10 h-10 object-contain" />
-  <span class="font-display font-black text-xl tracking-tight text-slate-900">Forage</span>
+  <Logo height="h-10" />
 </div>
 
 <div class="mb-8">

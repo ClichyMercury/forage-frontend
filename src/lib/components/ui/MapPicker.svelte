@@ -47,9 +47,9 @@
       shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
     })
 
-    // Centrer sur Abidjan par défaut
-    const initLat = lat ?? 5.3599517
-    const initLng = lng ?? -4.0082563
+    // Centrer sur Douala par défaut (Cameroun)
+    const initLat = lat ?? 4.0511
+    const initLng = lng ?? 9.7679
 
     map = L.map(mapEl, { zoomControl: true }).setView([initLat, initLng], lat ? 14 : 10)
 
@@ -127,7 +127,7 @@
     try {
       // On boost les résultats CI mais sans les contraindre — countrycodes=ci
       // peut filtrer trop strict si l'OSM tag est manquant.
-      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q + ', Côte d\'Ivoire')}&format=json&limit=6&accept-language=fr&addressdetails=1`
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q + ', Cameroun')}&format=json&limit=6&accept-language=fr&addressdetails=1`
       const res = await fetch(url, {
         headers: { 'Accept': 'application/json' },
       })
@@ -272,7 +272,7 @@
             bind:value={searchQuery}
             onkeydown={handleSearchKey}
             oninput={debouncedSearch}
-            placeholder="Ex: Cocody Riviera 3, Abidjan…"
+            placeholder="Ex: Bastos, Yaoundé…"
             class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 bg-white text-sm transition-all"
           />
           {#if searching}

@@ -34,7 +34,7 @@
     } finally { deciding = null }
   }
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CI') }
+  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
   function getStatut(o: any) { return o.demande?.statut ?? o.statut ?? 'envoyee' }
 </script>
 
@@ -92,7 +92,7 @@
                 <span class="text-xs text-slate-400">·</span>
                 <span class="text-xs text-slate-500">{delai} jours</span>
                 <span class="text-xs text-slate-400">·</span>
-                <span class="text-xs text-slate-400">{new Date(o.created_at ?? o.createdAt).toLocaleDateString('fr-CI', { day: 'numeric', month: 'short' })}</span>
+                <span class="text-xs text-slate-400">{new Date(o.created_at ?? o.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'short' })}</span>
               </div>
             </div>
           </div>

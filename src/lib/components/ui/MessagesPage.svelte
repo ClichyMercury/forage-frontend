@@ -15,7 +15,7 @@
   let adminReceiverId = $state<number | null>(null)
   let entreprisesAO = $state<any[]>([])
   let pollInterval: ReturnType<typeof setInterval> | null = null
-  let chatEl: HTMLDivElement
+  let chatEl = $state<HTMLDivElement | undefined>(undefined)
 
   onMount(async () => {
     try {
@@ -28,8 +28,9 @@
         demandes = (res.data.data ?? [])
           .map((ao: any) => ({
             id: ao.demande?.id ?? ao.demandeId,
-            localisationAdresse: ao.demande?.localisation_adresse ?? `AO #${ao.id}`,
-            typeForage: ao.demande?.type_forage ?? '',
+            localisationAdresse: ao.demande?.localisation_adresse ?? ao.demande?.localisationAdresse ?? '',
+            typeForage: ao.demande?.type_forage ?? ao.demande?.typeForage ?? '',
+            _label: [ao.demande?.type_forage ?? ao.demande?.typeForage, ao.demande?.localisation_adresse ?? ao.demande?.localisationAdresse].filter(Boolean).join(' — ') || `Appel d'offre #${ao.id}`,
           }))
           .filter((d: any) => d.id)
       } else {
@@ -65,7 +66,6 @@
 
     await loadMessages(true)
 
-    // Polling toutes les 15s — sans toast, juste mise à jour silencieuse
     if (pollInterval) clearInterval(pollInterval)
     pollInterval = setInterval(() => loadMessages(false), 15000)
   }
@@ -76,22 +76,18 @@
       const res = await api.get(`/demandes/${selectedDemande.id}/messages`)
       const fetched: any[] = res.data ?? []
 
-      // Détecter nouveaux messages reçus (pas les miens)
       if (!initial && fetched.length > messages.length) {
         const userId = auth.user?.id
         const nouveaux = fetched.slice(messages.length).filter(
           (m) => m.senderId !== userId && m.sender_id !== userId
         )
         if (nouveaux.length > 0) {
-          // Mettre à jour le store seulement pour les messages non lus reçus
-          // Le badge reste jusqu'à ce que l'utilisateur lise (scroll en bas)
           msgStore.loadUnread()
         }
       }
 
       messages = fetched
 
-      // Marquer comme lus uniquement si la conversation est visible et scrollée en bas
       if (chatEl) {
         const isAtBottom = chatEl.scrollHeight - chatEl.scrollTop - chatEl.clientHeight < 100
         if (isAtBottom) {
@@ -106,7 +102,7 @@
     if (!newMessage.trim() || !selectedDemande) return
     sending = true
     const content = newMessage
-    newMessage = '' // Vider immédiatement pour UX fluide
+    newMessage = ''
 
     try {
       const body: any = { contenu: content }
@@ -125,7 +121,7 @@
       messages = [...messages, res.data]
       toast.success('Message envoyé')
     } catch (err: any) {
-      newMessage = content // Remettre le message en cas d'erreur
+      newMessage = content
       toast.error('Erreur', err.response?.data?.message)
     } finally { sending = false }
   }
@@ -137,12 +133,10 @@
     }
   }
 
-  // Scroll automatique vers le bas + marquer comme lu quand on arrive en bas
   $effect(() => {
     if (messages.length > 0 && chatEl) {
       setTimeout(() => {
-        chatEl.scrollTop = chatEl.scrollHeight
-        // Marquer comme lu quand on voit les messages
+        chatEl?.scrollTo({ top: chatEl.scrollHeight, behavior: 'instant' })
         if (selectedDemande) msgStore.markDemandeRead(selectedDemande.id)
       }, 50)
     }
@@ -150,7 +144,7 @@
 </script>
 
 <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 h-[calc(100vh-180px)]">
-  <!-- Liste des demandes : pleine largeur mobile (cachée si conversation ouverte), 288px desktop -->
+  <!-- Liste des demandes -->
   <div class="w-full lg:w-72 lg:shrink-0 bg-white rounded-2xl card-shadow overflow-hidden flex-col
               {selectedDemande ? 'hidden lg:flex' : 'flex'}">
     <div class="px-4 py-3.5 border-b border-slate-100">
@@ -186,7 +180,7 @@
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-sm truncate {unread > 0 ? 'font-bold text-slate-900' : 'font-semibold text-slate-700'}">
-                {d.localisationAdresse ?? `Demande #${d.id}`}
+                {d._label ?? d.localisationAdresse ?? `Demande #${d.id}`}
               </p>
               <p class="text-xs truncate {unread > 0 ? 'text-red-500 font-medium' : 'text-slate-400 capitalize'}">
                 {unread > 0 ? `${unread} message${unread > 1 ? 's' : ''} non lu${unread > 1 ? 's' : ''}` : (d.typeForage ?? '')}
@@ -199,7 +193,7 @@
     </div>
   </div>
 
-  <!-- Zone de chat : pleine largeur mobile (cachée si pas de conversation), flex-1 desktop -->
+  <!-- Zone de chat -->
   <div class="flex-1 bg-white rounded-2xl card-shadow overflow-hidden flex-col
               {selectedDemande ? 'flex' : 'hidden lg:flex'}">
     {#if !selectedDemande}
@@ -231,27 +225,31 @@
           </div>
           <div class="min-w-0 flex-1">
             {#if auth.user?.role === 'admin'}
-              <p class="font-semibold text-slate-800 text-sm truncate">{selectedDemande.localisationAdresse ?? `Demande #${selectedDemande.id}`}</p>
+              <p class="font-semibold text-slate-800 text-sm truncate">{selectedDemande._label ?? selectedDemande.localisationAdresse ?? `Demande #${selectedDemande.id}`}</p>
               <p class="text-xs text-slate-400">Mise à jour toutes les 15s</p>
             {:else}
               <p class="font-semibold text-slate-800 text-sm flex items-center gap-1.5 truncate">
                 Équipe Forage
                 <span class="material-symbols-outlined icon-filled text-slate-400 shrink-0" style="font-size: 13px;">verified</span>
               </p>
-              <p class="text-xs text-slate-400 truncate">{selectedDemande.localisationAdresse ?? `Demande #${selectedDemande.id}`}</p>
+              <p class="text-xs text-slate-400 truncate">{selectedDemande._label ?? selectedDemande.localisationAdresse ?? `Demande #${selectedDemande.id}`}</p>
             {/if}
           </div>
         </div>
 
-        <!-- Sélecteur destinataire (admin) ou badge privé -->
+        <!-- Sélecteur destinataire pour admin -->
         {#if auth.user?.role === 'admin'}
           <select bind:value={adminReceiverId}
             class="text-xs px-2 sm:px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 font-medium shrink-0 max-w-[140px] sm:max-w-none truncate">
             {#if selectedDemande.clientId}
-              <option value={selectedDemande.clientId}>👤 {selectedDemande.clientNom ?? 'Client'}</option>
+              <option value={selectedDemande.clientId}>
+                👤 {selectedDemande.clientNom ?? 'Client'}
+              </option>
             {/if}
-            {#each entreprisesAO as e}
-              <option value={e.id}>🏢 {e.fullName ?? e.email}</option>
+            {#each entreprisesAO as entreprise}
+              <option value={entreprise.id}>
+                🏢 {entreprise.fullName ?? entreprise.email}
+              </option>
             {/each}
           </select>
         {:else}
@@ -314,7 +312,7 @@
                       <span class="truncate">Canal {canalRole === 'entreprise' ? `Entreprise · ${otherParty?.fullName ?? otherParty?.email ?? ''}` : 'Client'}</span>
                     </span>
                   {/if}
-                  <span>{new Date(msg.createdAt).toLocaleTimeString('fr-CI', { hour: '2-digit', minute: '2-digit' })}</span>
+                  <span>{new Date(msg.createdAt).toLocaleTimeString('fr-CM', { hour: '2-digit', minute: '2-digit' })}</span>
                   {#if isMine}
                     <span class="text-slate-300">✓</span>
                   {/if}
