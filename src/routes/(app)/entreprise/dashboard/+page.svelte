@@ -129,7 +129,9 @@
               <span class="material-symbols-outlined text-slate-400 icon-filled" style="font-size: 16px;">description</span>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-slate-800">Offre #{offre.id}</p>
+              <p class="text-sm font-medium text-slate-800 truncate">
+                {offre.appelOffre?.demande?.typeForage ?? offre.appel_offre?.demande?.type_forage ?? 'Forage'} — {offre.appelOffre?.demande?.localisationAdresse ?? offre.appel_offre?.demande?.localisation_adresse ?? `Offre #${offre.id}`}
+              </p>
               <p class="text-xs text-slate-400 mt-0.5">
                 {fmt(offre.prixTtc ?? offre.prix_ttc)} FCFA TTC · {offre.delaiExecution ?? offre.delai_execution} jours
               </p>
