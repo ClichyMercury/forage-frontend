@@ -20,7 +20,7 @@
   const statutConfig: Record<string, { color: string; label: string }> = {
     en_attente:        { color: '#f59e0b', label: 'En attente' },
     validee:           { color: '#3b82f6', label: 'Validée' },
-    appel_offre_lance: { color: '#6366f1', label: 'AO lancé' },
+    appel_offre_lance: { color: '#6366f1', label: "Appel d'offre lancé" },
     offres_recues:     { color: '#8b5cf6', label: 'Offres reçues' },
     offre_envoyee:     { color: '#06b6d4', label: 'Offre envoyée' },
     acceptee:          { color: '#10b981', label: 'Acceptée' },

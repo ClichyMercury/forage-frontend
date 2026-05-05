@@ -78,7 +78,7 @@
         <div class="relative">
           <select id="typeForage" bind:value={typeForage}
             class="w-full appearance-none pl-4 pr-10 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-800 cursor-pointer">
-            <option value="eau">eau</option>
+            <option value="eau">Eau</option>
             <option value="geotechnique">Géotechnique</option>
             <option value="petrolier">Pétrolier</option>
             <option value="autre">Autre</option>

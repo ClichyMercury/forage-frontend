@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores'
-  import { onMount } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
   import { goto } from '$app/navigation'
   import { auth } from '$lib/stores/auth.svelte'
   import { notifStore } from '$lib/stores/notifications.svelte'
@@ -16,7 +16,8 @@
   let searchResults = $state<any[]>([])
   let searchLoading = $state(false)
   let showSearch = $state(false)
-  let searchTimeout: ReturnType<typeof setTimeout>
+  let searchTimeout: ReturnType<typeof setTimeout> | null = null
+  let searchAbort: AbortController | null = null
 
   const pageTitle = $derived(() => {
     const path = $page.url.pathname
@@ -35,11 +36,14 @@
 
   onMount(() => {
     notifStore.load()
-    const saved = localStorage.getItem('theme')
-    if (saved === 'dark') {
-      darkMode = true
-      document.documentElement.classList.add('dark')
-    }
+    // La classe .dark est déjà appliquée par le script anti-FOUC dans app.html ;
+    // on synchronise juste l'état local avec le DOM pour piloter l'icône du toggle.
+    darkMode = document.documentElement.classList.contains('dark')
+  })
+
+  onDestroy(() => {
+    if (searchTimeout) clearTimeout(searchTimeout)
+    searchAbort?.abort()
   })
 
   function toggleDark() {
@@ -54,8 +58,14 @@
       showSearch = false
       return
     }
-    clearTimeout(searchTimeout)
+    if (searchTimeout) clearTimeout(searchTimeout)
     searchTimeout = setTimeout(async () => {
+      // Annule la requête précédente encore en vol — évite les race conditions
+      // où un résultat plus ancien écrase un résultat plus récent.
+      searchAbort?.abort()
+      searchAbort = new AbortController()
+      const signal = searchAbort.signal
+
       searchLoading = true
       showSearch = true
       try {
@@ -64,8 +74,8 @@
 
         if (role === 'admin') {
           const [demandesRes, usersRes] = await Promise.all([
-            api.get(`/admin/demandes?region=${encodeURIComponent(q)}&limit=5`),
-            api.get(`/admin/users?search=${encodeURIComponent(q)}&limit=5`).catch(() => ({ data: { data: [] } })),
+            api.get(`/admin/demandes?region=${encodeURIComponent(q)}&limit=5`, { signal }),
+            api.get(`/admin/users?search=${encodeURIComponent(q)}&limit=5`, { signal }).catch(() => ({ data: { data: [] } })),
           ])
           const demandes = demandesRes.data.data ?? []
           const users = usersRes.data.data ?? []
@@ -82,7 +92,7 @@
             icon: 'person',
           }))
         } else if (role === 'client') {
-          const res = await api.get('/demandes')
+          const res = await api.get('/demandes', { signal })
           const demandes = (res.data ?? []).filter((d: any) =>
             d.localisationAdresse?.toLowerCase().includes(q.toLowerCase()) ||
             d.typeForage?.toLowerCase().includes(q.toLowerCase())
@@ -94,7 +104,7 @@
             icon: 'water_drop',
           }))
         } else if (role === 'entreprise') {
-          const res = await api.get('/appels-offres')
+          const res = await api.get('/appels-offres', { signal })
           const aos = (res.data.data ?? []).filter((a: any) =>
             (a.demande?.localisationAdresse ?? a.demande?.localisation_adresse ?? '')
               .toLowerCase().includes(q.toLowerCase())
@@ -107,11 +117,13 @@
           }))
         }
 
+        if (signal.aborted) return
         searchResults = results
-      } catch {
+      } catch (err: any) {
+        if (err?.name === 'CanceledError' || err?.name === 'AbortError' || signal.aborted) return
         searchResults = []
       } finally {
-        searchLoading = false
+        if (!signal.aborted) searchLoading = false
       }
     }, 300)
   }

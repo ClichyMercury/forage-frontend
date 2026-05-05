@@ -31,11 +31,11 @@
 
   // Pour refusee, on affiche la timeline jusqu'à offre_envoyee (idx 4)
   const timelineOrder = timelineSteps.map(s => s.key)
-  const currentIdx = $derived(() => {
-    if (!demande) return 0
-    if (demande.statut === 'refusee') return 4 // s'arrête à "Offre reçue"
-    return timelineOrder.indexOf(demande.statut)
-  })
+  const currentIdx = $derived(
+    !demande ? 0
+    : demande.statut === 'refusee' ? 4
+    : timelineOrder.indexOf(demande.statut)
+  )
 
   onMount(async () => {
     try {
@@ -117,8 +117,8 @@
       <div class="flex items-start overflow-x-auto pb-1">
         {#each timelineSteps as step, i}
           {@const stepIdx = timelineOrder.indexOf(step.key)}
-          {@const done = currentIdx() > stepIdx}
-          {@const active = currentIdx() === stepIdx}
+          {@const done = currentIdx > stepIdx}
+          {@const active = currentIdx === stepIdx}
           {@const isTerminalRefus = isRefusee && step.key === 'offre_envoyee'}
           <div class="flex-1 flex flex-col items-center min-w-[72px]">
             <div class="flex items-center w-full">
