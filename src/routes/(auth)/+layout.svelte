@@ -78,8 +78,8 @@
 
       <div class="mt-10 grid grid-cols-3 gap-4 max-w-md">
         {#each [
-          { value: fmt(statsData.utilisateurs), label: 'Utilisateurs inscrits', accent: true },
-          { value: fmt(statsData.demandes), label: 'Demandes soumises', accent: false },
+          { value: '100%', label: 'Budget protégé', accent: true },
+          { value: fmt(statsData.utilisateurs), label: 'Utilisateurs inscrits', accent: false },
           { value: fmt(statsData.entreprises), label: 'Entreprises actives', accent: false },
         ] as stat}
           <div class="pl-3 border-l-2" style="border-color: {stat.accent ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.3)'}">
