@@ -8,6 +8,7 @@
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
   import { fileUrl } from '$lib/utils/file-url'
+  import Logo from '$lib/components/ui/Logo.svelte'
 
   let { collapsed = $bindable(false) } = $props()
   const role = $derived(auth.user?.role)
@@ -95,7 +96,7 @@
 >
   <!-- Logo + bouton fermer (mobile) -->
   <div class="flex items-center justify-center px-4 py-4 border-b border-slate-100">
-    <img src="/images/logo.jpeg" alt="Forage" class="h-28 w-auto object-contain shrink-0" />
+    <Logo height="h-28" class="shrink-0" />
     
     {#if !collapsed}
       {#if isMobile}

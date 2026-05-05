@@ -1,5 +1,6 @@
 <script lang="ts">
   import Toast from '$lib/components/ui/Toast.svelte'
+  import Logo from '$lib/components/ui/Logo.svelte'
   import '../../app.css'
   let { children } = $props()
 </script>
@@ -41,7 +42,7 @@
 
     <!-- Logo -->
     <div class="relative z-10 flex items-center gap-2.5">
-      <img src="/images/logo.jpeg" alt="Forage" class="h-12 w-auto object-contain" />
+      <Logo height="h-12" />
     </div>
 
     <!-- Contenu central -->

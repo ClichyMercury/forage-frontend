@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
+  import Logo from '$lib/components/ui/Logo.svelte'
 
   let email = $state('')
   let telephone = $state('')
@@ -16,7 +17,7 @@
   let errors = $state<Record<string, string>>({})
 
   const domainesOptions = [
-    { value: 'eau', label: 'eau', icon: 'water_drop' },
+    { value: 'eau', label: 'Eau', icon: 'water_drop' },
     { value: 'geotechnique', label: 'Géotechnique', icon: 'terrain' },
     { value: 'petrolier', label: 'Pétrolier', icon: 'oil_barrel' },
     { value: 'autre', label: 'Autre', icon: 'more_horiz' },
@@ -69,7 +70,7 @@
 
 <!-- Logo mobile -->
 <div class="lg:hidden flex items-center gap-2.5 mb-10">
-  <img src="/images/logo.jpeg" alt="Forage" class="h-10 w-auto object-contain" />
+  <Logo height="h-10" />
 </div>
 
 <div class="mb-8">
