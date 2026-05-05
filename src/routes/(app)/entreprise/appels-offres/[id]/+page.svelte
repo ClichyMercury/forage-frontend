@@ -150,7 +150,7 @@
         </div>
       {/if}
 
-      {#if ao.compte_a_rebours}
+      {#if ao.compte_a_rebours && !ao.ma_reponse?.soumise}
         <div class="p-3 rounded-xl flex items-center gap-2 {ao.compte_a_rebours.expire ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-200'}">
           <span class="material-symbols-outlined icon-filled {ao.compte_a_rebours.expire ? 'text-red-500' : 'text-amber-600'}" style="font-size: 18px;">
             {ao.compte_a_rebours.expire ? 'timer_off' : 'timer'}

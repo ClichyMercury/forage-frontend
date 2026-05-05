@@ -21,7 +21,9 @@
   onDestroy(() => clearInterval(timer))
 
   function getSecondesRestantes(ao: any): number {
-    // Utiliser la date limite directement si disponible
+    // Si l'entreprise a déjà répondu, le décompte s'arrête
+    if (ao.ma_reponse?.soumise) return -1
+
     const delai = ao.delaiReponse ?? ao.delai_reponse ?? ao.compte_a_rebours?.delai_reponse
     if (delai) {
       const diff = new Date(delai).getTime() - now
@@ -31,6 +33,7 @@
   }
 
   function countdown(secondes: number): string {
+    if (secondes === -1) return 'Offre soumise'
     if (secondes <= 0) return 'Expiré'
     const j = Math.floor(secondes / 86400)
     const h = Math.floor((secondes % 86400) / 3600)
@@ -92,7 +95,12 @@
             </span>
           </div>
           <div class="flex items-center gap-1 lg:col-span-3">
-            {#if expire}
+            {#if secondes === -1}
+              <span class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">check_circle</span>
+                Offre soumise
+              </span>
+            {:else if expire}
               <span class="inline-flex items-center gap-1 text-xs font-semibold text-red-500">
                 <span class="material-symbols-outlined icon-filled" style="font-size: 14px;">timer_off</span>
                 Délai expiré
