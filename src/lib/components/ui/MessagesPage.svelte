@@ -28,8 +28,9 @@
         demandes = (res.data.data ?? [])
           .map((ao: any) => ({
             id: ao.demande?.id ?? ao.demandeId,
-            localisationAdresse: ao.demande?.localisation_adresse ?? `AO #${ao.id}`,
-            typeForage: ao.demande?.type_forage ?? '',
+            localisationAdresse: ao.demande?.localisation_adresse ?? ao.demande?.localisationAdresse ?? '',
+            typeForage: ao.demande?.type_forage ?? ao.demande?.typeForage ?? '',
+            _label: [ao.demande?.type_forage ?? ao.demande?.typeForage, ao.demande?.localisation_adresse ?? ao.demande?.localisationAdresse].filter(Boolean).join(' — ') || `Appel d'offre #${ao.id}`,
           }))
           .filter((d: any) => d.id)
       } else {
@@ -186,7 +187,7 @@
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-sm truncate {unread > 0 ? 'font-bold text-slate-900' : 'font-semibold text-slate-700'}">
-                {d.localisationAdresse ?? `Demande #${d.id}`}
+                {d._label ?? d.localisationAdresse ?? `Demande #${d.id}`}
               </p>
               <p class="text-xs truncate {unread > 0 ? 'text-red-500 font-medium' : 'text-slate-400 capitalize'}">
                 {unread > 0 ? `${unread} message${unread > 1 ? 's' : ''} non lu${unread > 1 ? 's' : ''}` : (d.typeForage ?? '')}
@@ -231,14 +232,14 @@
           </div>
           <div class="min-w-0 flex-1">
             {#if auth.user?.role === 'admin'}
-              <p class="font-semibold text-slate-800 text-sm truncate">{selectedDemande.localisationAdresse ?? `Demande #${selectedDemande.id}`}</p>
+              <p class="font-semibold text-slate-800 text-sm truncate">{selectedDemande._label ?? selectedDemande.localisationAdresse ?? `Demande #${selectedDemande.id}`}</p>
               <p class="text-xs text-slate-400">Mise à jour toutes les 15s</p>
             {:else}
               <p class="font-semibold text-slate-800 text-sm flex items-center gap-1.5 truncate">
                 Équipe Forage
                 <span class="material-symbols-outlined icon-filled text-slate-400 shrink-0" style="font-size: 13px;">verified</span>
               </p>
-              <p class="text-xs text-slate-400 truncate">{selectedDemande.localisationAdresse ?? `Demande #${selectedDemande.id}`}</p>
+              <p class="text-xs text-slate-400 truncate">{selectedDemande._label ?? selectedDemande.localisationAdresse ?? `Demande #${selectedDemande.id}`}</p>
             {/if}
           </div>
         </div>
