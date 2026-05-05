@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import api from '$lib/api'
   import Badge from '$lib/components/ui/Badge.svelte'
+  import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
 
   let demandes = $state<any[]>([])
   let loading = $state(true)
@@ -84,8 +85,8 @@
     </div>
   {:else}
     <div class="hidden lg:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-      <div class="col-span-3">Localisation</div>
       <div class="col-span-2">Client</div>
+      <div class="col-span-3">Localisation</div>
       <div class="col-span-2">Type</div>
       <div class="col-span-2">Budget</div>
       <div class="col-span-1">Date</div>
@@ -95,6 +96,13 @@
       {#each demandes as d}
         <a href="/admin/demandes/{d.id}"
           class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4 hover:bg-slate-50 transition-all">
+
+          <div class="flex items-center gap-2 pl-12 lg:pl-0 lg:col-span-2 min-w-0">
+            <span class="text-xs lg:hidden text-slate-400">Client :</span>
+            <UserAvatar user={d.client} size="sm" />
+            <span class="text-sm text-slate-600 truncate">{d.client?.fullName ?? d.client?.email ?? '—'}</span>
+          </div>
+
           <!-- Ligne 1 mobile : Localisation + Statut -->
           <div class="flex items-center gap-2 min-w-0 lg:col-span-3">
             <div class="w-9 h-9 rounded-xl bg-brand-50 flex items-center justify-center shrink-0">
@@ -105,10 +113,7 @@
               <Badge status={d.statut} />
             </div>
           </div>
-          <div class="flex items-center gap-1 pl-12 lg:pl-0 lg:col-span-2 min-w-0">
-            <span class="text-xs lg:hidden text-slate-400">Client :</span>
-            <span class="text-sm text-slate-600 truncate">{d.client?.fullName ?? d.client?.email ?? '—'}</span>
-          </div>
+          
           <div class="flex items-center gap-1 pl-12 lg:pl-0 lg:col-span-2">
             <span class="text-xs lg:hidden text-slate-400">Type :</span>
             <span class="text-sm text-slate-600 capitalize">{d.typeForage}</span>
@@ -121,12 +126,14 @@
               <span class="text-slate-300">—</span>
             {/if}
           </div>
+
           <div class="flex items-center gap-1 pl-12 lg:pl-0 lg:col-span-1">
             <span class="text-xs lg:hidden text-slate-400">Date :</span>
             <span class="text-xs text-slate-400">
               {new Date(d.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'short' })}
             </span>
           </div>
+          
           <div class="hidden lg:block lg:col-span-2">
             <Badge status={d.statut} />
           </div>

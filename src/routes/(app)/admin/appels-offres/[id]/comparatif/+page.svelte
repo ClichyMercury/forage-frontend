@@ -5,6 +5,7 @@
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
   import DownloadButton from '$lib/components/ui/DownloadButton.svelte'
+  import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
 
   const id = $derived($page.params.id)
   let data = $state<any>(null)
@@ -214,9 +215,7 @@
                 onclick={() => selectedOffreId = offre.offre_id}
                 class="flex items-center gap-2 min-w-0 lg:col-span-3 relative text-left lg:pointer-events-none"
               >
-                <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 text-xs font-bold shrink-0">
-                  {(offre.entreprise?.fullName ?? offre.entreprise?.email ?? '?').charAt(0).toUpperCase()}
-                </div>
+                <UserAvatar user={offre.entreprise} size="sm" shape="rounded-full" />
                 <div class="min-w-0 flex-1">
                   <p class="text-sm font-semibold text-slate-800 truncate">
                     {offre.entreprise?.fullName ?? offre.entreprise?.email ?? '—'}

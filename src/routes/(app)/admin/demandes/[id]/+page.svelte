@@ -6,6 +6,7 @@
   import { toast } from '$lib/stores/toast.svelte'
   import Badge from '$lib/components/ui/Badge.svelte'
   import DownloadButton from '$lib/components/ui/DownloadButton.svelte'
+  import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
 
   let demande = $state<any>(null)
   let documents = $state<any[]>([])
@@ -201,9 +202,7 @@
         <div class="bg-white rounded-2xl border border-slate-100 p-5">
           <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Client</p>
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shrink-0">
-              {(demande.client?.fullName ?? demande.client?.email ?? '?').charAt(0).toUpperCase()}
-            </div>
+            <UserAvatar user={demande.client} size="md" shape="rounded-full" />
             <div class="flex-1 min-w-0">
               <p class="font-semibold text-slate-800">{demande.client?.fullName ?? '—'}</p>
               <p class="text-sm text-slate-500">{demande.client?.email}</p>

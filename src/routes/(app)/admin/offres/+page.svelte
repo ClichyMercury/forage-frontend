@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import api from '$lib/api'
   import Badge from '$lib/components/ui/Badge.svelte'
+  import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
 
   let toutesOffres = $state<any[]>([])
   let loading = $state(true)
@@ -84,61 +85,107 @@
       <p class="text-slate-600 font-medium text-sm">Aucune offre trouvée</p>
     </div>
   {:else}
+    <!-- En-têtes desktop -->
     <div class="hidden lg:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-      <div class="col-span-1">#</div>
       <div class="col-span-3">Entreprise</div>
-      <div class="col-span-2">Demande</div>
+      <div class="col-span-3">Demande</div>
       <div class="col-span-2 text-right">Prix TTC</div>
       <div class="col-span-1 text-right">Délai</div>
       <div class="col-span-1">Budget</div>
       <div class="col-span-2">Statut</div>
     </div>
+    
     <div class="divide-y divide-slate-50">
       {#each offres as o}
         <a href="/admin/appels-offres/{o.appel_offre_id}/comparatif"
-          class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4 hover:bg-slate-50 transition-all">
-          <!-- Ligne 1 mobile : Entreprise + Statut + ID -->
-          <div class="flex items-center gap-2 min-w-0 lg:col-span-1">
-            <span class="text-xs lg:hidden text-slate-400">Offre</span>
-            <span class="text-sm text-slate-500">#{o.offre_id}</span>
-          </div>
-          <div class="flex items-center gap-2 min-w-0 lg:col-span-3">
-            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0" style="background-color: #475569">
-              {(o.entreprise?.fullName ?? o.entreprise?.email ?? '?').charAt(0).toUpperCase()}
+          class="block px-5 py-4 hover:bg-slate-50 transition-all">
+          
+          <!-- Version mobile : colonnes empilées verticalement -->
+          <div class="lg:hidden space-y-3">
+            <!-- Ligne 1 : Entreprise + statut -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 min-w-0 flex-1">
+                <UserAvatar user={o.entreprise} size="sm" />
+                <span class="text-sm font-semibold text-slate-800 truncate">
+                  {o.entreprise?.fullName ?? o.entreprise?.email ?? '—'}
+                </span>
+              </div>
+              <Badge status={o.statut} />
             </div>
-            <span class="text-sm font-semibold text-slate-800 truncate flex-1">
-              {o.entreprise?.fullName ?? o.entreprise?.email ?? '—'}
-            </span>
-            <div class="lg:hidden shrink-0"><Badge status={o.statut} /></div>
-          </div>
-          <!-- Demande -->
-          <div class="flex items-center gap-1 min-w-0 pl-12 lg:pl-0 lg:col-span-2 lg:flex-col lg:items-start">
-            <span class="text-xs lg:hidden text-slate-400">Demande :</span>
-            <p class="text-xs text-slate-600 truncate">{o.demande_adresse}</p>
-            <p class="text-xs text-slate-400 capitalize hidden lg:block">{o.demande_type}</p>
-          </div>
-          <!-- Prix TTC -->
-          <div class="flex items-center justify-between gap-2 pl-12 lg:pl-0 lg:col-span-2 lg:justify-end">
-            <span class="text-xs lg:hidden text-slate-400">Prix TTC :</span>
+            
+            <!-- Ligne 2 : Adresse complète (peut revenir à la ligne) -->
             <div>
+              <span class="text-xs text-slate-400">Demande :</span>
+              <p class="text-xs text-slate-600 mt-0.5 whitespace-normal break-words">
+                {o.demande_adresse}
+              </p>
+              <p class="text-xs text-slate-400 capitalize mt-0.5">{o.demande_type}</p>
+            </div>
+            
+            <!-- Ligne 3 : Prix + Délai + Budget -->
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <span class="text-xs text-slate-400">Prix TTC :</span>
+                <div>
+                  <span class="text-sm font-semibold text-slate-900">{fmt(o.prix_ttc)}</span>
+                  <span class="text-xs text-slate-400 ml-1">FCFA</span>
+                </div>
+              </div>
+              <div>
+                <span class="text-xs text-slate-400">Délai :</span>
+                <div class="text-sm text-slate-600">{o.delai_execution_jours}j</div>
+              </div>
+              <div>
+                <span class="text-xs text-slate-400">Dans budget :</span>
+                <div>
+                  <span class="text-xs font-semibold {o.dans_budget ? 'text-emerald-600' : 'text-red-500'}">
+                    {o.dans_budget ? '✓ Oui' : '✗ Non'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Version desktop : grille 12 colonnes rigide -->
+          <div class="hidden lg:grid lg:grid-cols-12 lg:gap-4 lg:items-start">
+            <!-- Colonne 1 : Entreprise -->
+            <div class="col-span-3 flex items-center gap-2 min-w-0">
+              <UserAvatar user={o.entreprise} size="sm" />
+              <span class="text-sm font-semibold text-slate-800 truncate">
+                {o.entreprise?.fullName ?? o.entreprise?.email ?? '—'}
+              </span>
+            </div>
+            
+            <!-- Colonne 2 : Demande (adresse complète, peut revenir à la ligne) -->
+            <div class="col-span-3">
+              <p class="text-xs text-slate-600 whitespace-normal break-words leading-relaxed">
+                {o.demande_adresse}
+              </p>
+              <p class="text-xs text-slate-400 capitalize mt-1">{o.demande_type}</p>
+            </div>
+            
+            <!-- Colonne 3 : Prix TTC (aligné à droite) -->
+            <div class="col-span-2 text-right">
               <span class="text-sm font-semibold text-slate-900">{fmt(o.prix_ttc)}</span>
               <span class="text-xs text-slate-400 ml-1">FCFA</span>
             </div>
-          </div>
-          <!-- Délai + Budget : ligne unique mobile -->
-          <div class="flex items-center gap-4 pl-12 lg:pl-0 lg:col-span-1 lg:justify-end">
-            <span class="text-xs lg:hidden text-slate-400">Délai :</span>
-            <span class="text-sm text-slate-600">{o.delai_execution_jours}j</span>
-          </div>
-          <div class="flex items-center gap-2 pl-12 lg:pl-0 lg:col-span-1">
-            <span class="text-xs lg:hidden text-slate-400">Dans budget :</span>
-            <span class="text-xs font-semibold {o.dans_budget ? 'text-emerald-600' : 'text-red-500'}">
-              {o.dans_budget ? '✓' : '✗'}
-            </span>
-          </div>
-          <!-- Statut desktop only -->
-          <div class="hidden lg:block lg:col-span-2">
-            <Badge status={o.statut} />
+            
+            <!-- Colonne 4 : Délai (aligné à droite) -->
+            <div class="col-span-1 text-right">
+              <span class="text-sm text-slate-600">{o.delai_execution_jours}j</span>
+            </div>
+            
+            <!-- Colonne 5 : Budget -->
+            <div class="col-span-1">
+              <span class="text-xs font-semibold {o.dans_budget ? 'text-emerald-600' : 'text-red-500'}">
+                {o.dans_budget ? '✓ Oui' : '✗ Non'}
+              </span>
+            </div>
+            
+            <!-- Colonne 6 : Statut -->
+            <div class="col-span-2">
+              <Badge status={o.statut} />
+            </div>
           </div>
         </a>
       {/each}

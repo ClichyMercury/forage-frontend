@@ -3,6 +3,7 @@
   import { goto } from '$app/navigation'
   import api from '$lib/api'
   import Badge from '$lib/components/ui/Badge.svelte'
+  import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
 
   let appelsOffres = $state<any[]>([])
   let loading = $state(true)
@@ -67,10 +68,9 @@
   {:else}
     <!-- En-tête tableau desktop -->
     <div class="hidden lg:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-      <div class="col-span-1">#</div>
+      <div class="col-span-2">Entreprises</div>
       <div class="col-span-3">Demande</div>
       <div class="col-span-2">Type</div>
-      <div class="col-span-2">Entreprises</div>
       <div class="col-span-2">Date limite</div>
       <div class="col-span-2">Statut</div>
     </div>
@@ -85,10 +85,25 @@
           class="w-full flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4 text-left transition-all
             {estClos ? 'opacity-50 cursor-not-allowed bg-slate-50' : 'hover:bg-slate-50'}">
 
-          <!-- ID -->
-          <div class="lg:col-span-1">
-            <span class="text-xs font-bold text-slate-400">#{ao.id}</span>
-          </div>
+          <!-- Nb entreprises avec avatars -->
+          <div class="lg:col-span-2 pl-10 lg:pl-0">
+            {#if ao.entreprises?.length > 0}
+              <div class="flex items-center gap-1.5">
+                <div class="flex -space-x-2">
+                  {#each ao.entreprises.slice(0, 3) as e}
+                    <div class="ring-2 ring-white rounded-full">
+                      <UserAvatar user={e} size="sm" shape="rounded-full" />
+                    </div>
+                  {/each}
+                </div>
+                <span class="text-xs text-slate-500">
+                  {ao.entreprises.length} invitée{ao.entreprises.length > 1 ? 's' : ''}
+                </span>
+              </div>
+            {:else}
+              <span class="text-sm text-slate-400">—</span>
+            {/if}
+          </div>  
 
           <!-- Demande -->
           <div class="flex items-center gap-2 min-w-0 lg:col-span-3">
@@ -104,13 +119,6 @@
           <div class="lg:col-span-2 pl-10 lg:pl-0">
             <span class="text-sm text-slate-600 capitalize">
               {ao.demande?.typeForage ?? ao.demande?.type_forage ?? '—'}
-            </span>
-          </div>
-
-          <!-- Nb entreprises -->
-          <div class="lg:col-span-2 pl-10 lg:pl-0">
-            <span class="text-sm text-slate-600">
-              {ao.entreprises?.length ?? 0} invitée{(ao.entreprises?.length ?? 0) > 1 ? 's' : ''}
             </span>
           </div>
 
