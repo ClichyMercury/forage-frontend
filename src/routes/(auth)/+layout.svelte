@@ -82,9 +82,9 @@
           { value: fmt(statsData.utilisateurs), label: 'Utilisateurs inscrits', accent: false },
           { value: fmt(statsData.entreprises), label: 'Entreprises actives', accent: false },
         ] as stat}
-          <div class="pl-3 border-l-2" style="border-color: {stat.accent ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.3)'}">
+          <div class="p-3 rounded-xl" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2)">
             <p class="font-display font-black text-2xl tracking-tight text-white">{stat.value}</p>
-            <p class="text-xs mt-1 text-white/70">{stat.label}</p>
+            <p class="text-xs mt-1 font-medium text-white/90">{stat.label}</p>
           </div>
         {/each}
       </div>
