@@ -3,12 +3,14 @@
   import { goto } from '$app/navigation'
   import { auth } from '$lib/stores/auth.svelte'
   import Logo from '$lib/components/ui/Logo.svelte'
+  import { BASE_URL } from '$lib/api'
 
   let mouseX = $state(0)
   let mouseY = $state(0)
   let scrollY = $state(0)
   let isLogged = $state(false)
   let userRole = $state<string | null>(null)
+  let statsData = $state({ utilisateurs: 0, demandes: 0, entreprises: 0 })
 
   function onMouseMove(e: MouseEvent) {
     mouseX = (e.clientX / window.innerWidth - 0.5) * 2
@@ -22,6 +24,12 @@
     userRole = auth.user?.role ?? null
     window.addEventListener('mousemove', onMouseMove)
     window.addEventListener('scroll', onScroll, { passive: true })
+
+    // Stats réelles
+    fetch(`${BASE_URL}/public/stats`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) statsData = d })
+      .catch(() => {})
 
     const obs = new IntersectionObserver((entries) => {
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-visible') })
@@ -45,6 +53,11 @@
   }
 
   function px(amp: number) { return `translate(${mouseX * amp}px, ${mouseY * amp}px)` }
+
+  function fmt(n: number): string {
+    if (n === 0) return '—'
+    return n.toString()
+  }
 </script>
 
 <svelte:head>
@@ -194,12 +207,12 @@
       <div class="mt-20 grid grid-cols-3 gap-6 max-w-2xl animate-reveal-up" style="animation-delay: 0.55s">
         {#each [
           { value: '100%', label: 'Budget protégé', accent: true },
-          { value: '3', label: 'Acteurs cloisonnés', accent: false },
-          { value: '8', label: 'Étapes contrôlées', accent: false },
+          { value: fmt(statsData.utilisateurs), label: 'Utilisateurs inscrits', accent: false },
+          { value: fmt(statsData.entreprises), label: 'Entreprises actives', accent: false },
         ] as stat}
-          <div class="pl-4 border-l-2" style="border-color: {stat.accent ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.3)'}">
+          <div class="p-4 rounded-2xl" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2)">
             <p class="font-display text-3xl lg:text-4xl font-black tracking-tight text-white">{stat.value}</p>
-            <p class="text-xs lg:text-sm mt-1 text-white/70">{stat.label}</p>
+            <p class="text-sm mt-1.5 font-medium text-white/90">{stat.label}</p>
           </div>
         {/each}
       </div>

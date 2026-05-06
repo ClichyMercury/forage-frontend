@@ -46,6 +46,15 @@ class AuthStore {
     }
   }
 
+  // Met à jour les données user et persiste dans localStorage
+  update(partial: Partial<AuthUser>) {
+    if (!this.user) return
+    this.user = { ...this.user, ...partial }
+    if (typeof localStorage !== 'undefined' && this.token) {
+      localStorage.setItem('auth', JSON.stringify({ user: this.user, token: this.token }))
+    }
+  }
+
   getToken() {
     return this.token
   }

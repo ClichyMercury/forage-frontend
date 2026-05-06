@@ -31,10 +31,7 @@
       api.get('/account/profile').then((res) => {
         const u = res.data?.data ?? res.data
         if (auth.user && u?.avatarUrl !== undefined) {
-          auth.user = { ...auth.user, avatarUrl: u.avatarUrl ?? u.avatar_url ?? null }
-          if (typeof localStorage !== 'undefined' && auth.token) {
-            localStorage.setItem('auth', JSON.stringify({ user: auth.user, token: auth.token }))
-          }
+          auth.update({ avatarUrl: u.avatarUrl ?? u.avatar_url ?? null })
         }
       }).catch(() => {})
     })

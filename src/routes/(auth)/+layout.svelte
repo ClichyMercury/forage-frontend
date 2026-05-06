@@ -1,8 +1,25 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
   import Toast from '$lib/components/ui/Toast.svelte'
   import Logo from '$lib/components/ui/Logo.svelte'
+  import { BASE_URL } from '$lib/api'
   import '../../app.css'
+
   let { children } = $props()
+
+  let statsData = $state({ utilisateurs: 0, demandes: 0, entreprises: 0 })
+
+  onMount(() => {
+    fetch(`${BASE_URL}/public/stats`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) statsData = d })
+      .catch(() => {})
+  })
+
+  function fmt(n: number): string {
+    if (n === 0) return '—'
+    return n.toString()
+  }
 </script>
 
 <Toast />
@@ -61,12 +78,12 @@
       <div class="mt-10 grid grid-cols-3 gap-4 max-w-md">
         {#each [
           { value: '100%', label: 'Budget protégé', accent: true },
-          { value: '500+', label: 'Demandes', accent: false },
-          { value: '80+', label: 'Entreprises', accent: false },
+          { value: fmt(statsData.utilisateurs), label: 'Utilisateurs inscrits', accent: false },
+          { value: fmt(statsData.entreprises), label: 'Entreprises actives', accent: false },
         ] as stat}
-          <div class="pl-3 border-l-2" style="border-color: {stat.accent ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.3)'}">
+          <div class="p-3 rounded-xl" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2)">
             <p class="font-display font-black text-2xl tracking-tight text-white">{stat.value}</p>
-            <p class="text-xs mt-1 text-white/70">{stat.label}</p>
+            <p class="text-xs mt-1 font-medium text-white/90">{stat.label}</p>
           </div>
         {/each}
       </div>
