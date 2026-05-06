@@ -10,8 +10,7 @@
   let statsData = $state({ utilisateurs: 0, demandes: 0, entreprises: 0 })
 
   onMount(() => {
-    const backendUrl = BASE_URL.replace('/api/v1', '')
-    fetch(`${backendUrl}/api/v1/public/stats`)
+    fetch(`${BASE_URL}/public/stats`)
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) statsData = d })
       .catch(() => {})

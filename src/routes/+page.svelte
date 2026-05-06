@@ -26,8 +26,7 @@
     window.addEventListener('scroll', onScroll, { passive: true })
 
     // Stats réelles
-    const backendUrl = BASE_URL.replace('/api/v1', '')
-    fetch(`${backendUrl}/api/v1/public/stats`)
+    fetch(`${BASE_URL}/public/stats`)
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) statsData = d })
       .catch(() => {})
