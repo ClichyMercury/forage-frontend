@@ -15,7 +15,7 @@
     enCours: demandes.filter(d => ['validee','appel_offre_lance','offres_recues','offre_envoyee'].includes(d.statut)).length,
     offresRecues: demandes.filter(d => ['offre_envoyee','acceptee','cloturee'].includes(d.statut)).length,
     aTraiter: demandes.filter(d => d.statut === 'offre_envoyee').length,
-    acceptees: demandes.filter(d => d.statut === 'acceptee').length,
+    acceptees: demandes.filter(d => ['acceptee','cloturee'].includes(d.statut) && d.offre_finale?.statut !== 'refusee').length,
     refusees: demandes.filter(d => d.statut === 'cloturee' && d.offre_finale?.statut === 'refusee').length,
     cloturees: demandes.filter(d => d.statut === 'cloturee').length,
   }))
