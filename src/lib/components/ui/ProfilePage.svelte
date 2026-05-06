@@ -52,10 +52,7 @@
       avatarPreview = null
       // Mettre à jour le store → sidebar + header se rafraîchissent
       if (auth.user) {
-        auth.user = { ...auth.user, avatarUrl: newAvatarUrl }
-        if (typeof localStorage !== 'undefined' && auth.token) {
-          localStorage.setItem('auth', JSON.stringify({ user: auth.user, token: auth.token }))
-        }
+        auth.update({ avatarUrl: newAvatarUrl })
       }
       toast.success('Photo mise à jour', 'Votre photo de profil a été enregistrée.')
     } catch (err: any) {
@@ -75,10 +72,7 @@
       user = { ...user, avatarUrl: null }
       avatarPreview = null
       if (auth.user) {
-        auth.user = { ...auth.user, avatarUrl: null }
-        if (typeof localStorage !== 'undefined' && auth.token) {
-          localStorage.setItem('auth', JSON.stringify({ user: auth.user, token: auth.token }))
-        }
+        auth.update({ avatarUrl: null })
       }
       toast.success('Photo supprimée', 'Votre photo de profil a été retirée.')
     } catch (err: any) {
@@ -122,10 +116,7 @@
 
 
       if (auth.user) {
-        auth.user = { ...auth.user, fullName: user.fullName, telephone: user.telephone, userType: user.userType }
-        if (typeof localStorage !== 'undefined' && auth.token) {
-          localStorage.setItem('auth', JSON.stringify({ user: auth.user, token: auth.token }))
-        }
+        auth.update({ fullName: user.fullName, telephone: user.telephone, userType: user.userType })
       }
 
       toast.success('Profil mis à jour', 'Vos informations ont bien été enregistrées.')

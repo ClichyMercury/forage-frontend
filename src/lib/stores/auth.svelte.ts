@@ -19,8 +19,8 @@ class AuthStore {
   loading = $state(false)
 
   init() {
-    if (typeof localStorage === 'undefined') return
-    const stored = localStorage.getItem('auth')
+    if (typeof sessionStorage === 'undefined') return
+    const stored = sessionStorage.getItem('auth')
     if (stored) {
       try {
         const parsed = JSON.parse(stored)
@@ -33,16 +33,25 @@ class AuthStore {
   login(u: AuthUser, t: string) {
     this.user = u
     this.token = t
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('auth', JSON.stringify({ user: u, token: t }))
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('auth', JSON.stringify({ user: u, token: t }))
     }
   }
 
   logout() {
     this.user = null
     this.token = null
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('auth')
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('auth')
+    }
+  }
+
+  // Met à jour les données user et persiste dans sessionStorage
+  update(partial: Partial<AuthUser>) {
+    if (!this.user) return
+    this.user = { ...this.user, ...partial }
+    if (typeof sessionStorage !== 'undefined' && this.token) {
+      sessionStorage.setItem('auth', JSON.stringify({ user: this.user, token: this.token }))
     }
   }
 
