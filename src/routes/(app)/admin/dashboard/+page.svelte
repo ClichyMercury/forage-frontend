@@ -19,17 +19,14 @@
   const mapPoints = $derived(
     allDemandes
       .filter((d: any) => d.localisationLat && d.localisationLng)
-      .map((d: any) => {
-        console.log('Map point:', d.id, d.localisationLat, d.localisationLng, d.localisationAdresse)
-        return {
-          id: d.id,
-          lat: Number(d.localisationLat),
-          lng: Number(d.localisationLng),
-          adresse: d.localisationAdresse ?? '',
-          statut: d.statut ?? '',
-          typeForage: d.typeForage ?? '',
-        }
-      })
+      .map((d: any) => ({
+        id: d.id,
+        lat: Number(d.localisationLat),
+        lng: Number(d.localisationLng),
+        adresse: d.localisationAdresse ?? '',
+        statut: d.statut ?? '',
+        typeForage: d.typeForage ?? '',
+      }))
   )
 
   function fmt(n: any) {
