@@ -4,6 +4,7 @@
   import { page } from '$app/stores'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
+  import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
 
   const demandeId = $derived(Number($page.url.searchParams.get('demandeId')))
   let entreprises = $state<any[]>([])
@@ -122,8 +123,8 @@
         </button>
       </div>
 
-      <form onsubmit={handleSubmit} class="p-6 space-y-5">
-        <!-- Date limite -->
+      <form onsubmit={handleSubmit} class="p-6 space-y-5"> 
+        <!-- Date limite --> 
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1.5" for="delai">Date limite de réponse *</label>
           <input id="delai" type="datetime-local" bind:value={delaiReponse} required
@@ -151,12 +152,10 @@
                 <button type="button" onclick={() => toggleEntreprise(e.id)}
                   class="w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left
                     {selectedIds.includes(e.id) ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-blue-300'}">
-                  <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 text-xs font-bold shrink-0">
-                    {e.email.charAt(0).toUpperCase()}
-                  </div>
+                  <UserAvatar user={e} size="sm" shape="rounded-full" />
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-slate-800 truncate">
-                      {e.entrepriseProfile?.raisonSociale ?? e.email}
+                      {e.entrepriseProfile?.raisonSociale ?? e.fullName ?? e.email}
                     </p>
                     <p class="text-xs text-slate-400 truncate">{e.email}</p>
                   </div>

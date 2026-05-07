@@ -11,6 +11,8 @@
   let localisationLat = $state<number | null>(null)
   let localisationLng = $state<number | null>(null)
   let profondeurEstimee = $state('')
+  let etudeGeophysiqueRealisee = $state<'oui' | 'non' | null>(null)
+  let souhaitEtude = $state<'oui' | 'non' | null>(null)
   let budgetMax = $state('')
   let delaiSouhaite = $state('')
   let files = $state<FileList | null>(null)
@@ -32,7 +34,12 @@
       formData.append('localisationAdresse', localisationAdresse)
       if (localisationLat !== null) formData.append('localisationLat', String(localisationLat))
       if (localisationLng !== null) formData.append('localisationLng', String(localisationLng))
-      if (profondeurEstimee) formData.append('profondeurEstimee', profondeurEstimee)
+      if (profondeurEstimee && souhaitEtude !== 'oui') formData.append('profondeurEstimee', profondeurEstimee)
+      // Étude géophysique
+      const aEtude = etudeGeophysiqueRealisee === 'oui'
+      const veutEtude = etudeGeophysiqueRealisee === 'non' && souhaitEtude === 'oui'
+      formData.append('etudeGeophysiqueRealisee', String(aEtude))
+      formData.append('inclureEtudeGeotechnique', String(veutEtude))
       formData.append('budgetMax', budgetMax)
       if (delaiSouhaite) formData.append('delaiSouhaite', delaiSouhaite)
       if (files) Array.from(files).forEach(f => formData.append('documents', f))
@@ -68,6 +75,7 @@
   <form onsubmit={handleSubmit}>
     <div class="bg-white rounded-2xl border border-slate-100 p-6 space-y-6">
 
+      <!-- Type de forage -->
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-2" for="typeForage">
           <span class="flex items-center gap-1.5">
@@ -89,6 +97,7 @@
 
       <div class="border-t border-slate-100"></div>
 
+      <!-- Description -->
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-2" for="description">
           <span class="flex items-center gap-1.5">
@@ -105,6 +114,7 @@
 
       <div class="border-t border-slate-100"></div>
 
+      <!-- Localisation -->
       <div>
         <div class="flex items-center justify-between mb-2">
           <span class="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
@@ -132,6 +142,7 @@
 
       <div class="border-t border-slate-100"></div>
 
+      <!-- Profondeur + Délai -->
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2" for="profondeur">
@@ -140,9 +151,13 @@
               Profondeur (m)
             </span>
           </label>
-          <input id="profondeur" type="number" bind:value={profondeurEstimee} placeholder="Ex: 50" min="1"
-            class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm" />
-          <p class="text-xs text-slate-400 mt-1">Optionnel</p>
+          <input id="profondeur" type="number" bind:value={profondeurEstimee}
+            placeholder="Ex: 50" min="1"
+            disabled={souhaitEtude === 'oui'}
+            class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed" />
+          <p class="text-xs text-slate-400 mt-1">
+            {souhaitEtude === 'oui' ? 'Déterminée après l\'étude' : 'Optionnel'}
+          </p>
         </div>
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2" for="delai">
@@ -159,6 +174,81 @@
 
       <div class="border-t border-slate-100"></div>
 
+      <!-- Étude géophysique — flux conditionnel -->
+      <div class="space-y-4">
+        <p class="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 18px;">science</span>
+          Avez-vous déjà réalisé une étude géophysique ou hydrogéophysique du sol ?
+        </p>
+        <div class="grid grid-cols-2 gap-3">
+          <button type="button"
+            onclick={() => { etudeGeophysiqueRealisee = 'oui'; souhaitEtude = null }}
+            class="flex items-center gap-2 p-3 rounded-xl border-2 transition-all text-left
+              {etudeGeophysiqueRealisee === 'oui' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-blue-300'}">
+            <span class="material-symbols-outlined icon-filled {etudeGeophysiqueRealisee === 'oui' ? 'text-blue-500' : 'text-slate-300'}" style="font-size: 18px;">
+              {etudeGeophysiqueRealisee === 'oui' ? 'check_circle' : 'radio_button_unchecked'}
+            </span>
+            <span class="text-sm font-medium text-slate-700">Oui</span>
+          </button>
+          <button type="button"
+            onclick={() => { etudeGeophysiqueRealisee = 'non'; souhaitEtude = null }}
+            class="flex items-center gap-2 p-3 rounded-xl border-2 transition-all text-left
+              {etudeGeophysiqueRealisee === 'non' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-blue-300'}">
+            <span class="material-symbols-outlined icon-filled {etudeGeophysiqueRealisee === 'non' ? 'text-blue-500' : 'text-slate-300'}" style="font-size: 18px;">
+              {etudeGeophysiqueRealisee === 'non' ? 'check_circle' : 'radio_button_unchecked'}
+            </span>
+            <span class="text-sm font-medium text-slate-700">Non</span>
+          </button>
+        </div>
+
+        <!-- Cas OUI : joindre le rapport -->
+        {#if etudeGeophysiqueRealisee === 'oui'}
+          <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+            <p class="text-sm font-medium text-blue-800 flex items-center gap-1.5">
+              <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">info</span>
+              Veuillez joindre le rapport de l'étude dans la section "Documents joints" ci-dessous.
+            </p>
+          </div>
+        {/if}
+
+        <!-- Cas NON : souhait d'étude -->
+        {#if etudeGeophysiqueRealisee === 'non'}
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="text-sm font-medium text-slate-700">
+              Souhaitez-vous que notre entreprise réalise l'étude avant le forage ?
+            </p>
+            <div class="grid grid-cols-2 gap-3">
+              <button type="button"
+                onclick={() => souhaitEtude = 'oui'}
+                class="flex items-center gap-2 p-3 rounded-xl border-2 transition-all text-left
+                  {souhaitEtude === 'oui' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-blue-300'}">
+                <span class="material-symbols-outlined icon-filled {souhaitEtude === 'oui' ? 'text-blue-500' : 'text-slate-300'}" style="font-size: 18px;">
+                  {souhaitEtude === 'oui' ? 'check_circle' : 'radio_button_unchecked'}
+                </span>
+                <span class="text-sm font-medium text-slate-700">Oui, je souhaite une étude</span>
+              </button>
+              <button type="button"
+                onclick={() => souhaitEtude = 'non'}
+                class="flex items-center gap-2 p-3 rounded-xl border-2 transition-all text-left
+                  {souhaitEtude === 'non' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-blue-300'}">
+                <span class="material-symbols-outlined icon-filled {souhaitEtude === 'non' ? 'text-blue-500' : 'text-slate-300'}" style="font-size: 18px;">
+                  {souhaitEtude === 'non' ? 'check_circle' : 'radio_button_unchecked'}
+                </span>
+                <span class="text-sm font-medium text-slate-700">Non, aller directement au forage</span>
+              </button>
+            </div>
+            {#if souhaitEtude === 'oui'}
+              <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+                L'étude géophysique sera incluse dans la prestation. La profondeur sera déterminée après l'étude.
+              </p>
+            {/if}
+          </div>
+        {/if}
+      </div>
+
+      <div class="border-t border-slate-100"></div>
+
+      <!-- Budget -->
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-2" for="budget">
           <span class="flex items-center gap-1.5">
@@ -175,15 +265,19 @@
 
       <div class="border-t border-slate-100"></div>
 
+      <!-- Documents joints -->
       <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-2">
+        <p class="block text-sm font-semibold text-slate-700 mb-2">
           <span class="flex items-center gap-1.5">
             <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 18px;">attach_file</span>
             Documents joints
-            <span class="text-xs text-slate-400 font-normal ml-1">Optionnel</span>
+            <span class="text-xs text-slate-400 font-normal ml-1">
+              {etudeGeophysiqueRealisee === 'oui' ? 'Rapport d\'étude requis' : 'Optionnel'}
+            </span>
           </span>
-        </label>
-        <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-all group">
+        </p>
+        <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-xl cursor-pointer hover:bg-blue-50/50 transition-all group
+          {etudeGeophysiqueRealisee === 'oui' ? 'border-blue-400 bg-blue-50/30' : 'border-slate-300 hover:border-blue-400'}">
           <span class="material-symbols-outlined text-slate-400 group-hover:text-blue-400 mb-1" style="font-size: 24px;">cloud_upload</span>
           <span class="text-sm text-slate-500">Glissez ou <span class="text-blue-600 font-medium">parcourir</span></span>
           <input type="file" multiple bind:files class="hidden" accept=".pdf,.jpg,.jpeg,.png,.dwg,.dxf,.doc,.docx,.zip" />
@@ -220,4 +314,3 @@
     </div>
   </form>
 </FormPage>
-
