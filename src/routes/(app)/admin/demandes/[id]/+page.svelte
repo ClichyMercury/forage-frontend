@@ -220,7 +220,7 @@
             {#each [
               { label: 'Type de forage', value: demande.typeForage, icon: 'water_drop' },
               { label: 'Localisation', value: demande.localisationAdresse, icon: 'location_on' },
-              { label: 'Profondeur estimée', value: demande.profondeurEstimee ? `${demande.profondeurEstimee} m` : '—', icon: 'straighten' },
+              { label: 'Profondeur estimée', value: demande.profondeurEstimee ? `${demande.profondeurEstimee} m` : (demande.inclureEtudeGeotechnique ? 'À déterminer par étude' : '—'), icon: 'straighten' },
               { label: 'Délai souhaité', value: demande.delaiSouhaite ? new Date(demande.delaiSouhaite).toLocaleDateString('fr-CM') : '—', icon: 'calendar_today' },
             ] as info}
               <div class="flex items-start gap-2 p-3 bg-slate-50 rounded-xl">
@@ -232,6 +232,18 @@
               </div>
             {/each}
           </div>
+          {#if demande.inclureEtudeGeotechnique}
+            <div class="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl mb-3">
+              <span class="material-symbols-outlined text-amber-600 icon-filled shrink-0" style="font-size: 16px;">science</span>
+              <p class="text-xs font-semibold text-amber-700">Étude géophysique à inclure dans la prestation — le client n'a pas encore fait d'étude du sol.</p>
+            </div>
+          {/if}
+          {#if demande.etudeGeophysiqueRealisee}
+            <div class="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-xl mb-3">
+              <span class="material-symbols-outlined text-blue-600 icon-filled shrink-0" style="font-size: 16px;">task_alt</span>
+              <p class="text-xs font-semibold text-blue-700">Le client a déjà réalisé une étude géophysique — le rapport est joint aux documents.</p>
+            </div>
+          {/if}
           {#if demande.description}
             <div class="p-3 bg-slate-50 rounded-xl">
               <p class="text-xs text-slate-400 mb-1">Description</p>
