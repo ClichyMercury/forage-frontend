@@ -259,7 +259,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         {#each [
-          { num: '01', title: 'Le client soumet', text: "Type de forage, localisation, budget confidentiel et délai souhaité. Téléversement de plans et rapports géologiques.", icon: 'edit_document', accent: 'brand' },
+          { num: '01', title: 'Le client soumet', text: "Type de forage, localisation, budget confidentiel et délai souhaité. Téléversement de plans et rapports géophysique ou hidrogeophysique.", icon: 'edit_document', accent: 'brand' },
           { num: '02', title: 'Les offres arrivent', text: "Des prestataires qualifiés étudient votre projet et soumettent leurs propositions techniques et tarifaires.", icon: 'compare_arrows', accent: 'terre' },
           { num: '03', title: 'Le chantier démarre', text: "Le client accepte l'offre finale, les parties sont mises en relation officiellement et le chantier peut commencer.", icon: 'rocket_launch', accent: 'brand' },
         ] as step, i}
