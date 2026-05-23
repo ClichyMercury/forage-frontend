@@ -3,7 +3,7 @@
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
   import { fileUrl } from '$lib/utils/file-url'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
 
   let users = $state<any[]>([])
   let loading = $state(true)
@@ -219,7 +219,7 @@
           <div class="flex items-center gap-1 pl-13 lg:pl-0 lg:col-span-2">
             <span class="text-xs lg:hidden text-slate-400">{$t('admin.users.registered')}</span>
             <span class="text-xs text-slate-400">
-              {new Date(u.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'short', year: 'numeric' })}
+              {new Date(u.createdAt).toLocaleDateString($intlLocale, { day: 'numeric', month: 'short', year: 'numeric' })}
             </span>
           </div>
           <div class="flex items-center gap-1 lg:justify-end lg:col-span-2 pl-13 lg:pl-0 flex-wrap">

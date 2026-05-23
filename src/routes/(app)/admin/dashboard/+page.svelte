@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import api from '$lib/api'
   import { auth } from '$lib/stores/auth.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
   import StatCard from '$lib/components/ui/StatCard.svelte'
   import Badge from '$lib/components/ui/Badge.svelte'
   import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
@@ -35,13 +35,13 @@
     if (isNaN(num)) return '—'
     if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + ' M'
     if (num >= 1_000) return (num / 1_000).toFixed(0) + ' K'
-    return num.toLocaleString('fr-CM')
+    return num.toLocaleString($intlLocale)
   }
 
   function fmtMoney(n: any) {
     const num = Number(n)
     if (isNaN(num)) return '—'
-    return num.toLocaleString('fr-CM', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+    return num.toLocaleString($intlLocale, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
   }
 
   async function loadData() {

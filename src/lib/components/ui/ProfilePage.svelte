@@ -3,7 +3,7 @@
   import api from '$lib/api'
   import { auth } from '$lib/stores/auth.svelte'
   import { toast } from '$lib/stores/toast.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
   import { fileUrl } from '$lib/utils/file-url'
 
   let loading = $state(true)
@@ -117,7 +117,7 @@
   }
 
   function fmtDate(d: string) {
-    return new Date(d).toLocaleDateString('fr-CM', { day: 'numeric', month: 'long', year: 'numeric' })
+    return new Date(d).toLocaleDateString($intlLocale, { day: 'numeric', month: 'long', year: 'numeric' })
   }
 </script>
 

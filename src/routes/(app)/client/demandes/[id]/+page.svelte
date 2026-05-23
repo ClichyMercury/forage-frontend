@@ -4,7 +4,7 @@
   import { page } from '$app/stores'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
   import Badge from '$lib/components/ui/Badge.svelte'
   import FormPage from '$lib/components/layout/FormPage.svelte'
   import DownloadButton from '$lib/components/ui/DownloadButton.svelte'
@@ -40,9 +40,9 @@
     { label: $t('demande.detail.info_type'),  value: demande.typeForage,                                                                                           icon: 'water_drop' },
     { label: $t('demande.detail.info_loc'),   value: demande.localisationAdresse,                                                                                  icon: 'location_on' },
     { label: $t('demande.detail.info_depth'), value: demande.profondeurEstimee ? `${demande.profondeurEstimee} m` : '—',                                            icon: 'straighten' },
-    { label: $t('demande.detail.info_delay'), value: demande.delaiSouhaite ? new Date(demande.delaiSouhaite).toLocaleDateString('fr-CM') : '—',                     icon: 'calendar_today' },
-    { label: $t('demande.detail.info_date'),  value: new Date(demande.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'long', year: 'numeric' }),   icon: 'schedule' },
-    { label: $t('demande.detail.info_budget'),value: `${Number(demande.budgetMax).toLocaleString('fr-CM')} FCFA`,                                                   icon: 'payments' },
+    { label: $t('demande.detail.info_delay'), value: demande.delaiSouhaite ? new Date(demande.delaiSouhaite).toLocaleDateString($intlLocale) : '—',                     icon: 'calendar_today' },
+    { label: $t('demande.detail.info_date'),  value: new Date(demande.createdAt).toLocaleDateString($intlLocale, { day: 'numeric', month: 'long', year: 'numeric' }),   icon: 'schedule' },
+    { label: $t('demande.detail.info_budget'),value: `${Number(demande.budgetMax).toLocaleString($intlLocale)} FCFA`,                                                   icon: 'payments' },
   ] : [])
 
   onMount(async () => {
@@ -158,7 +158,7 @@
         <div class="grid grid-cols-2 gap-3 mb-4">
           <div class="p-3 bg-slate-50 rounded-xl">
             <p class="text-xs text-slate-400">{$t('demande.detail.total_price')}</p>
-            <p class="text-lg font-bold text-slate-900 mt-0.5">{Number(offreFinale.prixFinalClient ?? offreFinale.prix_final_client).toLocaleString('fr-CM')} FCFA</p>
+            <p class="text-lg font-bold text-slate-900 mt-0.5">{Number(offreFinale.prixFinalClient ?? offreFinale.prix_final_client).toLocaleString($intlLocale)} FCFA</p>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl">
             <p class="text-xs text-slate-400">{$t('demande.detail.exec_time')}</p>

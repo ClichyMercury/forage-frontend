@@ -4,7 +4,7 @@
   import { page } from '$app/stores'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
   import Badge from '$lib/components/ui/Badge.svelte'
   import DownloadButton from '$lib/components/ui/DownloadButton.svelte'
   import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
@@ -62,7 +62,7 @@
     finally { acting = false }
   }
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
+  function fmt(n: any) { return Number(n).toLocaleString($intlLocale) }
 
   const workflowSteps = $derived([
     { statut: 'en_attente',        label: $t('admin.demande_detail.step_received'),  icon: 'inbox' },
@@ -85,7 +85,7 @@
         ? `${demande.profondeurEstimee} m`
         : (demande.inclureEtudeGeotechnique ? $t('admin.demande_detail.depth_study') : '—'), icon: 'straighten' },
     { label: $t('demande.detail.info_delay'), value: demande.delaiSouhaite
-        ? new Date(demande.delaiSouhaite).toLocaleDateString('fr-CM') : '—',               icon: 'calendar_today' },
+        ? new Date(demande.delaiSouhaite).toLocaleDateString($intlLocale) : '—',               icon: 'calendar_today' },
   ] : [])
 </script>
 

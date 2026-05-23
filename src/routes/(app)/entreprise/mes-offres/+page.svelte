@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import api from '$lib/api'
   import Badge from '$lib/components/ui/Badge.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
 
   let offres = $state<any[]>([])
   let loading = $state(true)
@@ -14,7 +14,7 @@
     } catch {} finally { loading = false }
   })
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
+  function fmt(n: any) { return Number(n).toLocaleString($intlLocale) }
 </script>
 
 <svelte:head><title>{$t('entreprise.offres.title')} — Forage</title></svelte:head>
@@ -83,7 +83,7 @@
           <div class="flex items-center justify-between lg:block lg:col-span-1">
             <span class="text-xs lg:hidden text-slate-400">{$t('entreprise.offres.date_mobile')}</span>
             <span class="text-xs text-slate-400">
-              {new Date(o.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'short' })}
+              {new Date(o.createdAt).toLocaleDateString($intlLocale, { day: 'numeric', month: 'short' })}
             </span>
           </div>
           <div class="hidden lg:block lg:col-span-2">

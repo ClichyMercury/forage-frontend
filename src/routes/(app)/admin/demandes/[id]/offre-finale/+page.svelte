@@ -4,7 +4,7 @@
   import { page } from '$app/stores'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
   import Badge from '$lib/components/ui/Badge.svelte'
 
   const id = $derived($page.params.id)
@@ -89,7 +89,7 @@
     }
   }
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
+  function fmt(n: any) { return Number(n).toLocaleString($intlLocale) }
 </script>
 
 <svelte:head><title>{$t('admin.offre_finale.title')} — Admin Forage</title></svelte:head>

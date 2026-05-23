@@ -4,7 +4,7 @@
   import { goto } from '$app/navigation'
   import { auth } from '$lib/stores/auth.svelte'
   import { notifStore } from '$lib/stores/notifications.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
   import LanguageSwitcher from '$lib/components/ui/LanguageSwitcher.svelte'
   import api from '$lib/api'
   import { fileUrl } from '$lib/utils/file-url'
@@ -261,7 +261,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="text-xs text-slate-700 leading-snug line-clamp-2">{notif.contenu}</p>
-                      <p class="text-xs text-slate-400 mt-1">{new Date(notif.createdAt).toLocaleDateString('fr-CM')}</p>
+                      <p class="text-xs text-slate-400 mt-1">{new Date(notif.createdAt).toLocaleDateString($intlLocale)}</p>
                     </div>
                     {#if !notif.lu}
                       <div class="w-1.5 h-1.5 rounded-full bg-brand-600 shrink-0 mt-1.5"></div>

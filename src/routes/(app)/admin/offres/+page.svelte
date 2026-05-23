@@ -3,7 +3,7 @@
   import api from '$lib/api'
   import Badge from '$lib/components/ui/Badge.svelte'
   import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
 
   let toutesOffres = $state<any[]>([])
   let loading = $state(true)
@@ -46,7 +46,7 @@
 
   onMount(load)
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
+  function fmt(n: any) { return Number(n).toLocaleString($intlLocale) }
 </script>
 
 <svelte:head><title>{$t('admin.offres.title')} — Forage</title></svelte:head>

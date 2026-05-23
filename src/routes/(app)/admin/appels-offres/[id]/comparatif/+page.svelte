@@ -4,7 +4,7 @@
   import { page } from '$app/stores'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
   import DownloadButton from '$lib/components/ui/DownloadButton.svelte'
   import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
 
@@ -66,7 +66,7 @@
     } catch (err: any) {
       const d = err.response?.data
       if (d?.calcul) {
-        toast.error($t('admin.comparatif.budget_exceeded'), `${$t('admin.comparatif.max_allowed', { amount: Number(d.calcul.marge_maximum_autorisee).toLocaleString('fr-CM') })}`)
+        toast.error($t('admin.comparatif.budget_exceeded'), `${$t('admin.comparatif.max_allowed', { amount: Number(d.calcul.marge_maximum_autorisee).toLocaleString($intlLocale) })}`)
       } else {
         toast.error($t('toast.save_error'), d?.message)
       }
@@ -103,7 +103,7 @@
     }
   })
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
+  function fmt(n: any) { return Number(n).toLocaleString($intlLocale) }
 </script>
 
 <svelte:head><title>{$t('admin.comparatif.title')} — Admin Forage</title></svelte:head>

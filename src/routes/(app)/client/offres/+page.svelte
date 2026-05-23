@@ -4,7 +4,7 @@
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
   import Badge from '$lib/components/ui/Badge.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
 
   let offres = $state<any[]>([])
   let loading = $state(true)
@@ -35,7 +35,7 @@
     } finally { deciding = null }
   }
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
+  function fmt(n: any) { return Number(n).toLocaleString($intlLocale) }
   function getStatut(o: any) { return o.demande?.statut ?? o.statut ?? 'envoyee' }
 </script>
 
@@ -94,7 +94,7 @@
                 <span class="text-xs text-slate-400">·</span>
                 <span class="text-xs text-slate-500">{delai} {$t('common.days')}</span>
                 <span class="text-xs text-slate-400">·</span>
-                <span class="text-xs text-slate-400">{new Date(o.created_at ?? o.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'short' })}</span>
+                <span class="text-xs text-slate-400">{new Date(o.created_at ?? o.createdAt).toLocaleDateString($intlLocale, { day: 'numeric', month: 'short' })}</span>
               </div>
             </div>
           </div>

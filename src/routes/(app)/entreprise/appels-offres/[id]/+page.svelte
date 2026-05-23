@@ -4,7 +4,7 @@
   import { page } from '$app/stores'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
   import Badge from '$lib/components/ui/Badge.svelte'
   import DownloadButton from '$lib/components/ui/DownloadButton.svelte'
 
@@ -124,7 +124,7 @@
           <p class="text-xs text-slate-400 mb-1">{$t('demande.detail.info_delay')}</p>
           <p class="text-sm font-semibold text-slate-700">
             {(ao.demande?.delaiSouhaite ?? ao.demande?.delai_souhaite)
-              ? new Date(ao.demande?.delaiSouhaite ?? ao.demande?.delai_souhaite).toLocaleDateString('fr-CM')
+              ? new Date(ao.demande?.delaiSouhaite ?? ao.demande?.delai_souhaite).toLocaleDateString($intlLocale)
               : '—'}
           </p>
         </div>
@@ -159,7 +159,7 @@
             </p>
             {#if !ao.compte_a_rebours.expire}
               <p class="text-xs text-amber-600">
-                {new Date(ao.compte_a_rebours.delai_reponse ?? ao.delaiReponse).toLocaleString('fr-CM')}
+                {new Date(ao.compte_a_rebours.delai_reponse ?? ao.delaiReponse).toLocaleString($intlLocale)}
               </p>
             {/if}
           </div>

@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import api from '$lib/api'
   import { auth } from '$lib/stores/auth.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
   import StatCard from '$lib/components/ui/StatCard.svelte'
   import Badge from '$lib/components/ui/Badge.svelte'
 
@@ -18,7 +18,7 @@
     nonRetenues: mesOffres.filter((o: any) => o.statut === 'non_retenue').length,
   }))
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
+  function fmt(n: any) { return Number(n).toLocaleString($intlLocale) }
 
   onMount(async () => {
     try {

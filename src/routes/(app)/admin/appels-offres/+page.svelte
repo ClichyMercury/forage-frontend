@@ -4,7 +4,7 @@
   import api from '$lib/api'
   import Badge from '$lib/components/ui/Badge.svelte'
   import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
-  import { t } from '$lib/stores/locale'
+  import { t, intlLocale } from '$lib/stores/locale'
 
   let appelsOffres = $state<any[]>([])
   let loading = $state(true)
@@ -120,7 +120,7 @@
           <div class="lg:col-span-2 pl-10 lg:pl-0">
             <span class="text-sm {expire ? 'text-red-500 font-medium' : 'text-slate-500'}">
               {ao.delaiReponse ?? ao.delai_reponse
-                ? new Date(ao.delaiReponse ?? ao.delai_reponse).toLocaleDateString('fr-CM', { day: 'numeric', month: 'short', year: 'numeric' })
+                ? new Date(ao.delaiReponse ?? ao.delai_reponse).toLocaleDateString($intlLocale, { day: 'numeric', month: 'short', year: 'numeric' })
                 : '—'}
             </span>
             {#if expire}
