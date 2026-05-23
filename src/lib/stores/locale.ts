@@ -854,6 +854,79 @@ const fr: Record<string, string> = {
   'notif.settings.compte_valide_desc':    "Notification à l'entreprise après validation de son compte.",
   'notif.settings.nouveau_message':       "Nouveau message",
   'notif.settings.nouveau_message_desc':  "Notification à chaque nouveau message reçu dans la messagerie.",
+
+  // ── Landing publique ────────────────────────────────────────────────────────
+
+  'landing.meta.title':              'Forage — La plateforme de mise en relation pour le forage',
+  'landing.meta.description':        'Soumettez votre projet de forage, comparez les offres des prestataires, signez en confiance.',
+
+  'landing.nav.how_it_works':        'Comment ça marche',
+  'landing.nav.for_who':             'Pour qui',
+  'landing.nav.trust':                'Confiance',
+  'landing.nav.my_space':             'Mon espace',
+  'landing.nav.login':                'Connexion',
+  'landing.nav.register':             "S'inscrire",
+
+  'landing.hero.title_1':             'Le forage,',
+  'landing.hero.title_2':             'simplifié.',
+  'landing.hero.subtitle':            'Soumettez votre projet, recevez les meilleures offres de prestataires qualifiés, et signez en toute confiance — votre budget reste confidentiel.',
+  'landing.hero.cta_authed':          'Aller à mon espace',
+  'landing.hero.cta_register':        'Soumettre une demande',
+  'landing.hero.cta_discover':        'Découvrir le fonctionnement',
+  'landing.hero.scroll':              'Scroll',
+
+  'landing.stats.budget':             'Budget protégé',
+  'landing.stats.users':              'Utilisateurs inscrits',
+  'landing.stats.companies':          'Entreprises actives',
+
+  'landing.process.eyebrow':          'Comment ça marche',
+  'landing.process.title_1':          'Trois étapes.',
+  'landing.process.title_2':          'Zéro friction.',
+  'landing.process.step1.title':      'Le client soumet',
+  'landing.process.step1.text':       'Type de forage, localisation, budget confidentiel et délai souhaité. Téléversement de plans et rapports géophysiques ou hydrogéophysiques.',
+  'landing.process.step2.title':      'Les offres arrivent',
+  'landing.process.step2.text':       'Des prestataires qualifiés étudient votre projet et soumettent leurs propositions techniques et tarifaires.',
+  'landing.process.step3.title':      'Le chantier démarre',
+  'landing.process.step3.text':       "Le client accepte l'offre finale, les parties sont mises en relation officiellement et le chantier peut commencer.",
+
+  'landing.actors.eyebrow':           'Pour qui',
+  'landing.actors.title_1':           'Un espace dédié',
+  'landing.actors.title_2':           'par acteur.',
+  'landing.actors.client.label':      'Client',
+  'landing.actors.client.title':      'Particulier ou entreprise',
+  'landing.actors.client.feat1':      'Soumission rapide',
+  'landing.actors.client.feat2':      'Budget confidentiel',
+  'landing.actors.client.feat3':      'Suivi temps réel',
+  'landing.actors.client.feat4':      'Acceptation en 1 clic',
+  'landing.actors.client.cta':        'Devenir client',
+  'landing.actors.company.label':     'Prestataire',
+  'landing.actors.company.title':     'Entreprise de forage',
+  'landing.actors.company.feat1':     "Appels d'offres ciblés",
+  'landing.actors.company.feat2':     'Soumission structurée',
+  'landing.actors.company.feat3':     'Pas de mise en concurrence visible',
+  'landing.actors.company.feat4':     'Notifications prioritaires',
+  'landing.actors.company.cta':       "S'inscrire en tant qu'entreprise",
+
+  'landing.trust.eyebrow':            'Confiance & confidentialité',
+  'landing.trust.title_1':            'Un cloisonnement',
+  'landing.trust.title_2':            'strict, par design.',
+  'landing.trust.intro':              "Le budget du client n'est jamais visible des entreprises. Les offres sont masquées entre prestataires. Toutes les communications sont centralisées et sécurisées par la plateforme.",
+  'landing.trust.item1.title':        'Budget confidentiel',
+  'landing.trust.item1.text':         'Jamais communiqué aux prestataires.',
+  'landing.trust.item2.title':        "Pas d'enchères visibles",
+  'landing.trust.item2.text':         'Les offres entreprises sont cloisonnées.',
+  'landing.trust.item3.title':        'Messagerie centralisée',
+  'landing.trust.item3.text':         'Toutes les communications transitent par la plateforme.',
+  'landing.trust.item4.title':        'Workflow contrôlé',
+  'landing.trust.item4.text':         'Aucune transition de statut hors séquence.',
+
+  'landing.cta.title_1':              'Prêt à forer',
+  'landing.cta.title_2':              'en confiance ?',
+  'landing.cta.subtitle':             'Créez votre compte en quelques secondes. La première demande est gratuite.',
+  'landing.cta.register_client':      'Créer un compte client',
+  'landing.cta.register_company':     'Je suis une entreprise',
+
+  'landing.footer.copyright':         '© 2026 Forage · Plateforme de mise en relation pour prestations de forage au Cameroun',
 }
 
 // ── Dictionnaire EN ────────────────────────────────────────────────────────────
@@ -1641,6 +1714,79 @@ const en: Record<string, string> = {
   'notif.settings.compte_valide_desc':    "Notification to the company after their account is validated.",
   'notif.settings.nouveau_message':       "New message",
   'notif.settings.nouveau_message_desc':  "Notification for each new message received in the messaging center.",
+
+  // ── Landing publique ────────────────────────────────────────────────────────
+
+  'landing.meta.title':              'Forage — The matchmaking platform for drilling',
+  'landing.meta.description':        'Submit your drilling project, compare offers from contractors, and sign with confidence.',
+
+  'landing.nav.how_it_works':        'How it works',
+  'landing.nav.for_who':             'For whom',
+  'landing.nav.trust':                'Trust',
+  'landing.nav.my_space':             'My space',
+  'landing.nav.login':                'Log in',
+  'landing.nav.register':             'Sign up',
+
+  'landing.hero.title_1':             'Drilling,',
+  'landing.hero.title_2':             'simplified.',
+  'landing.hero.subtitle':            'Submit your project, receive the best offers from qualified contractors, and sign with full confidence — your budget stays confidential.',
+  'landing.hero.cta_authed':          'Go to my space',
+  'landing.hero.cta_register':        'Submit a request',
+  'landing.hero.cta_discover':        'Discover how it works',
+  'landing.hero.scroll':              'Scroll',
+
+  'landing.stats.budget':             'Protected budget',
+  'landing.stats.users':              'Registered users',
+  'landing.stats.companies':          'Active companies',
+
+  'landing.process.eyebrow':          'How it works',
+  'landing.process.title_1':          'Three steps.',
+  'landing.process.title_2':          'Zero friction.',
+  'landing.process.step1.title':      'The client submits',
+  'landing.process.step1.text':       'Type of drilling, location, confidential budget and desired timeline. Upload of plans and geophysical or hydrogeophysical reports.',
+  'landing.process.step2.title':      'Offers come in',
+  'landing.process.step2.text':       'Qualified contractors review your project and submit their technical and pricing proposals.',
+  'landing.process.step3.title':      'The site starts',
+  'landing.process.step3.text':       'The client accepts the final offer, the parties are officially connected and the work can begin.',
+
+  'landing.actors.eyebrow':           'For whom',
+  'landing.actors.title_1':           'A dedicated space',
+  'landing.actors.title_2':           'for each actor.',
+  'landing.actors.client.label':      'Client',
+  'landing.actors.client.title':      'Individual or company',
+  'landing.actors.client.feat1':      'Quick submission',
+  'landing.actors.client.feat2':      'Confidential budget',
+  'landing.actors.client.feat3':      'Real-time tracking',
+  'landing.actors.client.feat4':      'One-click acceptance',
+  'landing.actors.client.cta':        'Become a client',
+  'landing.actors.company.label':     'Contractor',
+  'landing.actors.company.title':     'Drilling company',
+  'landing.actors.company.feat1':     'Targeted tenders',
+  'landing.actors.company.feat2':     'Structured submission',
+  'landing.actors.company.feat3':     'No visible bidding war',
+  'landing.actors.company.feat4':     'Priority notifications',
+  'landing.actors.company.cta':       'Register as a company',
+
+  'landing.trust.eyebrow':            'Trust & confidentiality',
+  'landing.trust.title_1':            'Strict partitioning,',
+  'landing.trust.title_2':            'by design.',
+  'landing.trust.intro':              'The client budget is never visible to companies. Offers are hidden between contractors. All communication is centralized and secured by the platform.',
+  'landing.trust.item1.title':        'Confidential budget',
+  'landing.trust.item1.text':         'Never disclosed to contractors.',
+  'landing.trust.item2.title':        'No visible bidding',
+  'landing.trust.item2.text':         'Company offers are kept partitioned.',
+  'landing.trust.item3.title':        'Centralized messaging',
+  'landing.trust.item3.text':         'All communication flows through the platform.',
+  'landing.trust.item4.title':        'Controlled workflow',
+  'landing.trust.item4.text':         'No out-of-sequence status transitions.',
+
+  'landing.cta.title_1':              'Ready to drill',
+  'landing.cta.title_2':              'with confidence?',
+  'landing.cta.subtitle':             'Create your account in seconds. The first request is free.',
+  'landing.cta.register_client':      'Create a client account',
+  'landing.cta.register_company':     "I'm a company",
+
+  'landing.footer.copyright':         '© 2026 Forage · Drilling services platform in Cameroon',
 }
 
 // ── Dictionnaires par code ────────────────────────────────────────────────────
@@ -1694,3 +1840,14 @@ export function setLocale(code: LocaleCode) {
 export function translate(key: string, vars?: Record<string, string | number>): string {
   return get(t)(key, vars)
 }
+
+// ── Locale Intl (pour toLocaleDateString / toLocaleString) ────────────────────
+
+// Mapping LocaleCode → tag BCP 47 utilisé par Intl.
+// FR : fr-CM (français camerounais). EN : en-GB.
+const INTL_LOCALES: Record<LocaleCode, string> = {
+  fr: 'fr-CM',
+  en: 'en-GB',
+}
+
+export const intlLocale = derived(locale, ($locale) => INTL_LOCALES[$locale] ?? 'fr-CM')
