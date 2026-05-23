@@ -3,6 +3,7 @@
   import api from '$lib/api'
   import { auth } from '$lib/stores/auth.svelte'
   import { toast } from '$lib/stores/toast.svelte'
+  import { t } from '$lib/stores/locale'
   import { fileUrl } from '$lib/utils/file-url'
 
   let loading = $state(true)
@@ -10,13 +11,12 @@
   let user = $state<any>(null)
   let errors = $state<Record<string, string>>({})
 
-  // Avatar
   let fileInput = $state<HTMLInputElement | null>(null)
   let avatarPreview = $state<string | null>(null)
   let uploadingAvatar = $state(false)
 
   const ACCEPTED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-  const MAX_SIZE = 2 * 1024 * 1024 // 2 MB
+  const MAX_SIZE = 2 * 1024 * 1024
 
   function triggerFilePicker() { fileInput?.click() }
 
@@ -24,14 +24,13 @@
     const file = (e.target as HTMLInputElement).files?.[0]
     if (!file) return
     if (!ACCEPTED.includes(file.type)) {
-      toast.error('Format invalide', 'Formats acceptés : JPG, PNG, WEBP, GIF')
+      toast.error($t('profile.avatar_format_err'), $t('profile.avatar_format_sub'))
       return
     }
     if (file.size > MAX_SIZE) {
-      toast.error('Fichier trop lourd', 'Taille maximale : 2 Mo')
+      toast.error($t('profile.avatar_size_err'), $t('profile.avatar_size_sub'))
       return
     }
-    // Preview local immédiat
     const reader = new FileReader()
     reader.onload = (ev) => { avatarPreview = ev.target?.result as string }
     reader.readAsDataURL(file)
@@ -50,14 +49,11 @@
       const newAvatarUrl = updated.avatarUrl ?? updated.avatar_url ?? null
       user = { ...user, avatarUrl: newAvatarUrl }
       avatarPreview = null
-      // Mettre à jour le store → sidebar + header se rafraîchissent
-      if (auth.user) {
-        auth.update({ avatarUrl: newAvatarUrl })
-      }
-      toast.success('Photo mise à jour', 'Votre photo de profil a été enregistrée.')
+      if (auth.user) auth.update({ avatarUrl: newAvatarUrl })
+      toast.success($t('profile.avatar_updated'), $t('profile.avatar_updated_sub'))
     } catch (err: any) {
       avatarPreview = null
-      toast.error('Erreur upload', err.response?.data?.message ?? 'Impossible d\'uploader la photo')
+      toast.error($t('profile.avatar_upload_err'), err.response?.data?.message ?? $t('common.error_save'))
     } finally {
       uploadingAvatar = false
       if (fileInput) fileInput.value = ''
@@ -65,18 +61,16 @@
   }
 
   async function removeAvatar() {
-    if (!confirm('Supprimer votre photo de profil ?')) return
+    if (!confirm($t('profile.avatar_removed') + ' ?')) return
     uploadingAvatar = true
     try {
       await api.delete('/account/profile/avatar')
       user = { ...user, avatarUrl: null }
       avatarPreview = null
-      if (auth.user) {
-        auth.update({ avatarUrl: null })
-      }
-      toast.success('Photo supprimée', 'Votre photo de profil a été retirée.')
+      if (auth.user) auth.update({ avatarUrl: null })
+      toast.success($t('profile.avatar_removed'), $t('profile.avatar_removed_sub'))
     } catch (err: any) {
-      toast.error('Erreur', err.response?.data?.message ?? 'Impossible de supprimer la photo')
+      toast.error($t('common.error_save'), err.response?.data?.message ?? $t('profile.avatar_delete_err'))
     } finally { uploadingAvatar = false }
   }
 
@@ -86,7 +80,6 @@
       : null)
   )
 
-  // Champs éditables
   let fullName = $state('')
   let telephone = $state('')
   let userType = $state<'particulier' | 'entreprise'>('particulier')
@@ -108,24 +101,17 @@
     try {
       const payload: any = { fullName, telephone }
       if (user?.role === 'client') payload.userType = userType
-
       const res = await api.patch('/account/profile', payload)
       const updated = res.data?.data ?? res.data
-      // Conserver l'avatarUrl existant — le PATCH profil ne le retourne pas forcément
       user = { ...user, ...updated, avatarUrl: updated.avatarUrl ?? updated.avatar_url ?? user.avatarUrl }
-
-
-      if (auth.user) {
-        auth.update({ fullName: user.fullName, telephone: user.telephone, userType: user.userType })
-      }
-
-      toast.success('Profil mis à jour', 'Vos informations ont bien été enregistrées.')
+      if (auth.user) auth.update({ fullName: user.fullName, telephone: user.telephone, userType: user.userType })
+      toast.success($t('profile.updated'), $t('profile.updated_sub'))
     } catch (err: any) {
       const data = err.response?.data
       if (err.response?.status === 422) {
         data.errors?.forEach((e: any) => { errors[e.field] = e.message })
       } else {
-        toast.error('Erreur', data?.message ?? 'Impossible de mettre à jour le profil')
+        toast.error($t('common.error_save'), data?.message ?? $t('profile.update_err'))
       }
     } finally { saving = false }
   }
@@ -136,12 +122,11 @@
 </script>
 
 <div class="max-w-3xl mx-auto">
-  <!-- Titre -->
   <div class="mb-8">
     <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900">
-      Mon <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #1e3fff">profil</span>.
+      {$t('profile.title')}
     </h2>
-    <p class="text-sm text-slate-500 mt-1">Gérez vos informations personnelles et vos préférences.</p>
+    <p class="text-sm text-slate-500 mt-1">{$t('profile.subtitle')}</p>
   </div>
 
   {#if loading}
@@ -150,32 +135,23 @@
     </div>
   {:else if user}
 
-    <!-- Carte identité -->
     <div class="bg-white rounded-2xl border border-slate-100 p-6 mb-5">
       <div class="flex items-center gap-4 mb-6">
-        <!-- Avatar cliquable -->
         <div class="relative shrink-0 group">
           <button type="button" onclick={triggerFilePicker} disabled={uploadingAvatar}
             class="w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all"
-            title="Changer la photo de profil">
+            title={$t('profile.avatar_title')}>
             {#if uploadingAvatar}
-              <!-- Spinner upload -->
-              <div class="w-16 h-16 rounded-2xl flex items-center justify-center"
-                   style="background-color: #1e3fff">
+              <div class="w-16 h-16 rounded-2xl flex items-center justify-center" style="background-color: #1e3fff">
                 <span class="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               </div>
             {:else if currentAvatar}
-              <!-- Photo de profil -->
-              <img src={currentAvatar} alt={user.fullName ?? 'Profil'}
-                class="w-16 h-16 rounded-2xl object-cover" />
+              <img src={currentAvatar} alt={user.fullName ?? 'Profil'} class="w-16 h-16 rounded-2xl object-cover" />
             {:else}
-              <!-- Fallback initiales -->
-              <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-xl font-display font-black"
-                   style="background-color: #1e3fff">
+              <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-xl font-display font-black" style="background-color: #1e3fff">
                 {user.initials ?? '?'}
               </div>
             {/if}
-            <!-- Overlay hover -->
             {#if !uploadingAvatar}
               <div class="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <span class="material-symbols-outlined text-white icon-filled" style="font-size: 20px;">photo_camera</span>
@@ -183,17 +159,15 @@
             {/if}
           </button>
 
-          <!-- Bouton supprimer (si photo présente) -->
           {#if currentAvatar && !uploadingAvatar}
             <button type="button" onclick={removeAvatar}
               class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-all shadow-sm"
-              title="Supprimer la photo">
+              title={$t('common.delete')}>
               <span class="material-symbols-outlined icon-filled" style="font-size: 12px;">close</span>
             </button>
           {/if}
         </div>
 
-        <!-- Input file caché -->
         <input bind:this={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/gif"
           class="hidden" onchange={onFileChange} />
 
@@ -208,12 +182,12 @@
             {#if user.isActive}
               <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1">
                 <span class="material-symbols-outlined icon-filled" style="font-size: 11px;">check_circle</span>
-                Actif
+                {$t('profile.active')}
               </span>
             {:else}
               <span class="text-xs bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1">
                 <span class="material-symbols-outlined icon-filled" style="font-size: 11px;">schedule</span>
-                En attente
+                {$t('profile.pending')}
               </span>
             {/if}
           </div>
@@ -222,26 +196,24 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-5 border-t border-slate-100">
         <div class="p-3 bg-slate-50 rounded-xl">
-          <p class="text-xs text-slate-400 mb-1">Membre depuis</p>
+          <p class="text-xs text-slate-400 mb-1">{$t('profile.member_since')}</p>
           <p class="text-sm font-semibold text-slate-700">{fmtDate(user.createdAt)}</p>
         </div>
         <div class="p-3 bg-slate-50 rounded-xl">
-          <p class="text-xs text-slate-400 mb-1">Dernière mise à jour</p>
+          <p class="text-xs text-slate-400 mb-1">{$t('profile.last_update')}</p>
           <p class="text-sm font-semibold text-slate-700">{fmtDate(user.updatedAt)}</p>
         </div>
       </div>
     </div>
 
-    <!-- Formulaire -->
     <form onsubmit={handleSubmit} class="bg-white rounded-2xl border border-slate-100 p-6 space-y-5">
       <div>
-        <h3 class="font-display font-bold text-slate-900 mb-1">Informations</h3>
-        <p class="text-xs text-slate-500">Mettez à jour votre nom, votre téléphone ou votre type de compte.</p>
+        <h3 class="font-display font-bold text-slate-900 mb-1">{$t('profile.info_section')}</h3>
+        <p class="text-xs text-slate-500">{$t('profile.info_sub')}</p>
       </div>
 
-      <!-- Nom complet -->
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1.5" for="profile-name">Nom complet</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5" for="profile-name">{$t('profile.full_name')}</label>
         <div class="relative">
           <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">person</span>
           <input id="profile-name" type="text" bind:value={fullName} placeholder="Jean Dupont"
@@ -251,7 +223,6 @@
         {#if errors.fullName}<p class="text-red-500 text-xs mt-1">{errors.fullName}</p>{/if}
       </div>
 
-      <!-- Email (read-only) -->
       <div>
         <label class="block text-sm font-medium text-slate-700 mb-1.5" for="profile-email">Email</label>
         <div class="relative">
@@ -260,12 +231,11 @@
             class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-100 bg-slate-50 text-sm text-slate-500 cursor-not-allowed" />
           <span class="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-300" style="font-size: 18px;">lock</span>
         </div>
-        <p class="text-xs text-slate-400 mt-1">L'email ne peut pas être modifié.</p>
+        <p class="text-xs text-slate-400 mt-1">{$t('profile.email_readonly')}</p>
       </div>
 
-      <!-- Téléphone -->
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1.5" for="profile-tel">Téléphone</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5" for="profile-tel">{$t('profile.phone')}</label>
         <div class="relative">
           <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">phone</span>
           <input id="profile-tel" type="tel" bind:value={telephone} placeholder="+237 6XX XXX XXX"
@@ -275,29 +245,27 @@
         {#if errors.telephone}<p class="text-red-500 text-xs mt-1">{errors.telephone}</p>{/if}
       </div>
 
-      <!-- Type de compte (clients seulement) -->
       {#if user.role === 'client'}
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="profile-type">Type de compte</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="profile-type">{$t('profile.account_type')}</label>
           <select id="profile-type" bind:value={userType}
             class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm transition-all">
-            <option value="particulier">Particulier</option>
-            <option value="entreprise">Entreprise</option>
+            <option value="particulier">{$t('profile.particulier')}</option>
+            <option value="entreprise">{$t('common.entreprise')}</option>
           </select>
           {#if errors.userType}<p class="text-red-500 text-xs mt-1">{errors.userType}</p>{/if}
         </div>
       {/if}
 
-      <!-- Bouton -->
       <div class="flex justify-end pt-2">
         <button type="submit" disabled={saving}
           class="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition-all shadow-sm disabled:opacity-60">
           {#if saving}
             <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-            Enregistrement...
+            {$t('profile.saving')}
           {:else}
             <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">check</span>
-            Enregistrer
+            {$t('profile.save')}
           {/if}
         </button>
       </div>

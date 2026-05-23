@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
+  import { t } from '$lib/stores/locale'
   import MapPicker from '$lib/components/ui/MapPicker.svelte'
   import FormPage from '$lib/components/layout/FormPage.svelte'
 
@@ -23,7 +24,7 @@
     e.preventDefault()
     errors = {}
     if (!localisationAdresse.trim()) {
-      errors.localisationAdresse = 'Veuillez saisir ou sélectionner une adresse'
+      errors.localisationAdresse = $t('demande.new.addr_required')
       return
     }
     loading = true
@@ -35,7 +36,6 @@
       if (localisationLat !== null) formData.append('localisationLat', String(localisationLat))
       if (localisationLng !== null) formData.append('localisationLng', String(localisationLng))
       if (profondeurEstimee && souhaitEtude !== 'oui') formData.append('profondeurEstimee', profondeurEstimee)
-      // Étude géophysique
       const aEtude = etudeGeophysiqueRealisee === 'oui'
       const veutEtude = etudeGeophysiqueRealisee === 'non' && souhaitEtude === 'oui'
       formData.append('etudeGeophysiqueRealisee', String(aEtude))
@@ -44,21 +44,21 @@
       if (delaiSouhaite) formData.append('delaiSouhaite', delaiSouhaite)
       if (files) Array.from(files).forEach(f => formData.append('documents', f))
       await api.post('/demandes', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
-      toast.success('Demande soumise !', 'Vous recevrez une confirmation par email.')
+      toast.success($t('demande.new.success'), $t('demande.new.success_sub'))
       goto('/client/demandes')
     } catch (err: any) {
       const data = err.response?.data
       if (err.response?.status === 422) {
         data.errors?.forEach((e: any) => { errors[e.field] = e.message })
-        toast.error('Formulaire invalide', 'Vérifiez les champs en rouge.')
+        toast.error($t('demande.new.invalid'), $t('demande.new.invalid_sub'))
       } else {
-        toast.error('Erreur', data?.message)
+        toast.error($t('toast.save_error'), data?.message)
       }
     } finally { loading = false }
   }
 </script>
 
-<svelte:head><title>Nouvelle demande — Forage</title></svelte:head>
+<svelte:head><title>{$t('demande.new.title')} — Forage</title></svelte:head>
 
 <FormPage maxWidth="max-w-2xl">
   <div class="flex items-center gap-3 mb-6">
@@ -67,8 +67,8 @@
       <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
     </button>
     <div>
-      <h2 class="text-xl font-bold text-slate-900">Nouvelle demande de forage</h2>
-      <p class="text-sm text-slate-500">Votre budget reste strictement confidentiel</p>
+      <h2 class="text-xl font-bold text-slate-900">{$t('demande.new.title')}</h2>
+      <p class="text-sm text-slate-500">{$t('demande.new.subtitle')}</p>
     </div>
   </div>
 
@@ -80,16 +80,16 @@
         <label class="block text-sm font-semibold text-slate-700 mb-2" for="typeForage">
           <span class="flex items-center gap-1.5">
             <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 18px;">category</span>
-            Type de forage *
+            {$t('demande.new.type')} *
           </span>
         </label>
         <div class="relative">
           <select id="typeForage" bind:value={typeForage}
             class="w-full appearance-none pl-4 pr-10 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-800 cursor-pointer">
-            <option value="eau">Eau</option>
-            <option value="geotechnique">Géotechnique</option>
-            <option value="petrolier">Pétrolier</option>
-            <option value="autre">Autre</option>
+            <option value="eau">{$t('domain.eau')}</option>
+            <option value="geotechnique">{$t('domain.geotechnique')}</option>
+            <option value="petrolier">{$t('domain.petrolier')}</option>
+            <option value="autre">{$t('domain.autre')}</option>
           </select>
           <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" style="font-size: 20px;">expand_more</span>
         </div>
@@ -102,7 +102,7 @@
         <label class="block text-sm font-semibold text-slate-700 mb-2" for="description">
           <span class="flex items-center gap-1.5">
             <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 18px;">description</span>
-            Description des besoins *
+            {$t('demande.new.description')} *
           </span>
         </label>
         <textarea id="description" bind:value={description} rows="4" required
@@ -119,9 +119,9 @@
         <div class="flex items-center justify-between mb-2">
           <span class="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 18px;">location_on</span>
-            Localisation du chantier *
+            {$t('demande.new.location')} *
           </span>
-          <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">Carte interactive</span>
+          <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">{$t('demande.new.map_hint')}</span>
         </div>
         <div class="relative mb-3">
           <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 20px;">edit_location</span>
@@ -148,7 +148,7 @@
           <label class="block text-sm font-semibold text-slate-700 mb-2" for="profondeur">
             <span class="flex items-center gap-1.5">
               <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 18px;">straighten</span>
-              Profondeur (m)
+              {$t('demande.new.depth')}
             </span>
           </label>
           <input id="profondeur" type="number" bind:value={profondeurEstimee}
@@ -156,29 +156,29 @@
             disabled={souhaitEtude === 'oui'}
             class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed" />
           <p class="text-xs text-slate-400 mt-1">
-            {souhaitEtude === 'oui' ? 'Déterminée après l\'étude' : 'Optionnel'}
+            {souhaitEtude === 'oui' ? $t('demande.new.depth_after') : $t('demande.new.optional')}
           </p>
         </div>
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2" for="delai">
             <span class="flex items-center gap-1.5">
               <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 18px;">calendar_today</span>
-              Délai souhaité
+              {$t('demande.new.deadline')}
             </span>
           </label>
           <input id="delai" type="date" bind:value={delaiSouhaite}
             class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm" />
-          <p class="text-xs text-slate-400 mt-1">Optionnel</p>
+          <p class="text-xs text-slate-400 mt-1">{$t('demande.new.optional')}</p>
         </div>
       </div>
 
       <div class="border-t border-slate-100"></div>
 
-      <!-- Étude géophysique — flux conditionnel -->
+      <!-- Étude géophysique -->
       <div class="space-y-4">
         <p class="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
           <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 18px;">science</span>
-          Avez-vous déjà réalisé une étude géophysique ou hydrogéophysique du sol ?
+          {$t('demande.new.study_q')}
         </p>
         <div class="grid grid-cols-2 gap-3">
           <button type="button"
@@ -188,7 +188,7 @@
             <span class="material-symbols-outlined icon-filled {etudeGeophysiqueRealisee === 'oui' ? 'text-blue-500' : 'text-slate-300'}" style="font-size: 18px;">
               {etudeGeophysiqueRealisee === 'oui' ? 'check_circle' : 'radio_button_unchecked'}
             </span>
-            <span class="text-sm font-medium text-slate-700">Oui</span>
+            <span class="text-sm font-medium text-slate-700">{$t('common.yes')}</span>
           </button>
           <button type="button"
             onclick={() => { etudeGeophysiqueRealisee = 'non'; souhaitEtude = null }}
@@ -197,25 +197,23 @@
             <span class="material-symbols-outlined icon-filled {etudeGeophysiqueRealisee === 'non' ? 'text-blue-500' : 'text-slate-300'}" style="font-size: 18px;">
               {etudeGeophysiqueRealisee === 'non' ? 'check_circle' : 'radio_button_unchecked'}
             </span>
-            <span class="text-sm font-medium text-slate-700">Non</span>
+            <span class="text-sm font-medium text-slate-700">{$t('common.no')}</span>
           </button>
         </div>
 
-        <!-- Cas OUI : joindre le rapport -->
         {#if etudeGeophysiqueRealisee === 'oui'}
           <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
             <p class="text-sm font-medium text-blue-800 flex items-center gap-1.5">
               <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">info</span>
-              Veuillez joindre le rapport de l'étude dans la section "Documents joints" ci-dessous.
+              {$t('demande.new.study_attach')}
             </p>
           </div>
         {/if}
 
-        <!-- Cas NON : souhait d'étude -->
         {#if etudeGeophysiqueRealisee === 'non'}
           <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
             <p class="text-sm font-medium text-slate-700">
-              Souhaitez-vous que notre entreprise réalise l'étude avant le forage ?
+              {$t('demande.new.study_want_q')}
             </p>
             <div class="grid grid-cols-2 gap-3">
               <button type="button"
@@ -225,7 +223,7 @@
                 <span class="material-symbols-outlined icon-filled {souhaitEtude === 'oui' ? 'text-blue-500' : 'text-slate-300'}" style="font-size: 18px;">
                   {souhaitEtude === 'oui' ? 'check_circle' : 'radio_button_unchecked'}
                 </span>
-                <span class="text-sm font-medium text-slate-700">Oui, je souhaite une étude</span>
+                <span class="text-sm font-medium text-slate-700">{$t('demande.new.yes_study')}</span>
               </button>
               <button type="button"
                 onclick={() => souhaitEtude = 'non'}
@@ -234,12 +232,12 @@
                 <span class="material-symbols-outlined icon-filled {souhaitEtude === 'non' ? 'text-blue-500' : 'text-slate-300'}" style="font-size: 18px;">
                   {souhaitEtude === 'non' ? 'check_circle' : 'radio_button_unchecked'}
                 </span>
-                <span class="text-sm font-medium text-slate-700">Non, aller directement au forage</span>
+                <span class="text-sm font-medium text-slate-700">{$t('demande.new.no_study')}</span>
               </button>
             </div>
             {#if souhaitEtude === 'oui'}
               <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2.5">
-                L'étude géophysique sera incluse dans la prestation. La profondeur sera déterminée après l'étude.
+                {$t('demande.new.study_included')}
               </p>
             {/if}
           </div>
@@ -253,8 +251,8 @@
         <label class="block text-sm font-semibold text-slate-700 mb-2" for="budget">
           <span class="flex items-center gap-1.5">
             <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 18px;">payments</span>
-            Budget maximum (FCFA) *
-            <span class="ml-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">🔒 Confidentiel</span>
+            {$t('demande.new.budget')} *
+            <span class="ml-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">{$t('demande.new.budget_conf')}</span>
           </span>
         </label>
         <input id="budget" type="number" bind:value={budgetMax} placeholder="Ex: 5 000 000" required min="1"
@@ -270,16 +268,16 @@
         <p class="block text-sm font-semibold text-slate-700 mb-2">
           <span class="flex items-center gap-1.5">
             <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 18px;">attach_file</span>
-            Documents joints
+            {$t('demande.new.docs')}
             <span class="text-xs text-slate-400 font-normal ml-1">
-              {etudeGeophysiqueRealisee === 'oui' ? 'Rapport d\'étude requis' : 'Optionnel'}
+              {etudeGeophysiqueRealisee === 'oui' ? $t('demande.new.docs_study') : $t('demande.new.optional')}
             </span>
           </span>
         </p>
         <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-xl cursor-pointer hover:bg-blue-50/50 transition-all group
           {etudeGeophysiqueRealisee === 'oui' ? 'border-blue-400 bg-blue-50/30' : 'border-slate-300 hover:border-blue-400'}">
           <span class="material-symbols-outlined text-slate-400 group-hover:text-blue-400 mb-1" style="font-size: 24px;">cloud_upload</span>
-          <span class="text-sm text-slate-500">Glissez ou <span class="text-blue-600 font-medium">parcourir</span></span>
+          <span class="text-sm text-slate-500">{$t('demande.new.drop_files')} <span class="text-blue-600 font-medium">{$t('demande.new.browse')}</span></span>
           <input type="file" multiple bind:files class="hidden" accept=".pdf,.jpg,.jpeg,.png,.dwg,.dxf,.doc,.docx,.zip" />
         </label>
         {#if files && files.length > 0}
@@ -298,16 +296,16 @@
       <div class="flex gap-3 pt-2">
         <button type="button" onclick={() => goto('/client/demandes')}
           class="flex-1 py-3.5 rounded-xl border border-slate-200 bg-white text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-all">
-          Annuler
+          {$t('common.cancel')}
         </button>
         <button type="submit" disabled={loading}
           class="flex-1 py-3.5 rounded-xl gradient-blue text-white font-semibold text-sm shadow-lg shadow-blue-500/30 hover:scale-[1.01] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
           {#if loading}
             <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-            Envoi...
+            {$t('demande.new.submitting')}
           {:else}
             <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">send</span>
-            Soumettre
+            {$t('demande.new.submit')}
           {/if}
         </button>
       </div>

@@ -4,6 +4,7 @@
   import { auth } from '$lib/stores/auth.svelte'
   import { msgStore } from '$lib/stores/messages.svelte'
   import { notifStore } from '$lib/stores/notifications.svelte'
+  import { t } from '$lib/stores/locale'
   import { goto } from '$app/navigation'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
@@ -49,35 +50,35 @@
 
   const navItems = $derived(() => {
     if (role === 'admin') return [
-      { href: '/admin/dashboard',     icon: 'grid_view',     label: 'Tableau de bord', badge: 0 },
-      { href: '/admin/demandes',       icon: 'assignment',    label: 'Demandes',         badge: 0 },
-      { href: '/admin/appels-offres',  icon: 'campaign',      label: "Appels d'offres",  badge: 0 },
-      { href: '/admin/offres',         icon: 'description',   label: 'Offres',           badge: 0 },
-      { href: '/admin/utilisateurs',   icon: 'group',         label: 'Utilisateurs',     badge: 0 },
-      { href: '/admin/messages',       icon: 'chat_bubble',   label: 'Messages',         badge: msgStore.unreadCount },
-      { href: '/admin/notifications',  icon: 'notifications', label: 'Notifications',    badge: notifStore.count },
+      { href: '/admin/dashboard',      icon: 'grid_view',     label: $t('nav.dashboard'),     badge: 0 },
+      { href: '/admin/demandes',        icon: 'assignment',    label: $t('nav.demandes'),      badge: 0 },
+      { href: '/admin/appels-offres',   icon: 'campaign',      label: $t('nav.appels_offres'), badge: 0 },
+      { href: '/admin/offres',          icon: 'description',   label: $t('nav.offres'),        badge: 0 },
+      { href: '/admin/utilisateurs',    icon: 'group',         label: $t('nav.utilisateurs'),  badge: 0 },
+      { href: '/admin/messages',        icon: 'chat_bubble',   label: $t('nav.messages'),      badge: msgStore.unreadCount },
+      { href: '/admin/notifications',   icon: 'notifications', label: $t('nav.notifications'), badge: notifStore.count },
     ]
     if (role === 'entreprise') return [
-      { href: '/entreprise/dashboard',     icon: 'grid_view',   label: 'Tableau de bord',  badge: 0 },
-      { href: '/entreprise/appels-offres', icon: 'campaign',    label: "Appels d'offres",  badge: 0 },
-      { href: '/entreprise/mes-offres',    icon: 'description', label: 'Mes offres',        badge: 0 },
-      { href: '/entreprise/messages',      icon: 'chat_bubble', label: 'Messages',          badge: msgStore.unreadCount },
-      { href: '/entreprise/notifications', icon: 'notifications',label: 'Notifications',   badge: notifStore.count },
+      { href: '/entreprise/dashboard',     icon: 'grid_view',    label: $t('nav.dashboard'),     badge: 0 },
+      { href: '/entreprise/appels-offres', icon: 'campaign',     label: $t('nav.appels_offres'), badge: 0 },
+      { href: '/entreprise/mes-offres',    icon: 'description',  label: $t('nav.my_offres'),     badge: 0 },
+      { href: '/entreprise/messages',      icon: 'chat_bubble',  label: $t('nav.messages'),      badge: msgStore.unreadCount },
+      { href: '/entreprise/notifications', icon: 'notifications',label: $t('nav.notifications'), badge: notifStore.count },
     ]
     return [
-      { href: '/client/dashboard',     icon: 'grid_view',     label: 'Tableau de bord',  badge: 0 },
-      { href: '/client/demandes',       icon: 'assignment',    label: 'Mes demandes',      badge: 0 },
-      { href: '/client/offres',         icon: 'description',   label: 'Mes offres',        badge: 0 },
-      { href: '/client/demandes/new',   icon: 'add_circle',    label: 'Nouvelle demande',  badge: 0 },
-      { href: '/client/messages',       icon: 'chat_bubble',   label: 'Messages',          badge: msgStore.unreadCount },
-      { href: '/client/notifications',  icon: 'notifications', label: 'Notifications',     badge: notifStore.count },
+      { href: '/client/dashboard',      icon: 'grid_view',     label: $t('nav.dashboard'),    badge: 0 },
+      { href: '/client/demandes',        icon: 'assignment',    label: $t('nav.my_demandes'),  badge: 0 },
+      { href: '/client/offres',          icon: 'description',   label: $t('nav.my_offres'),    badge: 0 },
+      { href: '/client/demandes/new',    icon: 'add_circle',    label: $t('nav.new_demande'),  badge: 0 },
+      { href: '/client/messages',        icon: 'chat_bubble',   label: $t('nav.messages'),     badge: msgStore.unreadCount },
+      { href: '/client/notifications',   icon: 'notifications', label: $t('nav.notifications'),badge: notifStore.count },
     ]
   })
 
   async function handleLogout() {
     try { await api.post('/account/logout') } catch {}
     auth.logout()
-    toast.info('Déconnexion', 'À bientôt !')
+    toast.info($t('toast.logout'), $t('toast.goodbye'))
     goto('/login')
   }
 
@@ -104,7 +105,7 @@
           type="button"
           onclick={() => collapsed = true}
           class="absolute right-4 w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-all text-slate-500 shrink-0"
-          aria-label="Fermer le menu"
+          aria-label={$t('common.close_menu')}
         >
           <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
         </button>
@@ -165,10 +166,10 @@
 
     <button onclick={handleLogout}
       class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all"
-      title={collapsed ? 'Déconnexion' : ''}>
+      title={collapsed ? $t('common.logout') : ''}>
       <span class="material-symbols-outlined shrink-0" style="font-size: 20px;">logout</span>
       {#if !collapsed}
-        <span class="text-sm font-medium">Déconnexion</span>
+        <span class="text-sm font-medium">{$t('common.logout')}</span>
       {/if}
     </button>
   </div>

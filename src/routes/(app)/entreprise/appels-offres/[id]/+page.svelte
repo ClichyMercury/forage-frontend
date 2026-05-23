@@ -4,6 +4,7 @@
   import { page } from '$app/stores'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
+  import { t } from '$lib/stores/locale'
   import Badge from '$lib/components/ui/Badge.svelte'
   import DownloadButton from '$lib/components/ui/DownloadButton.svelte'
 
@@ -14,7 +15,6 @@
   let submitting = $state(false)
   let showForm = $state(false)
 
-  // Champs du formulaire
   let prixHt = $state('')
   let prixTtc = $state('')
   let delaiExecution = $state('')
@@ -51,20 +51,19 @@
       await api.post(`/appels-offres/${id}/offres`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
-      toast.success('Offre soumise !', 'Votre offre a bien été transmise.')
+      toast.success($t('ao.detail.success'), $t('ao.detail.success_sub'))
       goto('/entreprise/mes-offres')
     } catch (err: any) {
-      toast.error('Erreur', err.response?.data?.message)
+      toast.error($t('toast.save_error'), err.response?.data?.message)
     } finally { submitting = false }
   }
 
-  // Nom de la demande pour le titre
   const titreDemande = $derived(
-    ao?.demande?.localisationAdresse ?? ao?.demande?.localisation_adresse ?? `Appel d'offre #${id}`
+    ao?.demande?.localisationAdresse ?? ao?.demande?.localisation_adresse ?? `${$t('ao.detail.tender_label')} #${id}`
   )
 </script>
 
-<svelte:head><title>Appel d'offre #{id} — Forage</title></svelte:head>
+<svelte:head><title>{$t('ao.detail.tender_label')} #{id} — Forage</title></svelte:head>
 
 <div class="max-w-3xl mx-auto">
   <!-- Header -->
@@ -76,16 +75,15 @@
       </button>
       <div>
         <h2 class="text-xl font-bold text-slate-900">{titreDemande}</h2>
-        <p class="text-sm text-slate-500">Appel d'offre — {ao?.demande?.typeForage ?? ao?.demande?.type_forage ?? ''}</p>
+        <p class="text-sm text-slate-500">{$t('ao.detail.tender_label')} — {ao?.demande?.typeForage ?? ao?.demande?.type_forage ?? ''}</p>
       </div>
     </div>
 
-    <!-- Bouton soumettre en haut à droite -->
     {#if ao && !ao.ma_reponse?.soumise && !ao.compte_a_rebours?.expire}
       <button onclick={() => showForm = true}
         class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-all shadow-sm shrink-0">
         <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">send</span>
-        Soumettre une offre
+        {$t('ao.detail.submit_offer')}
       </button>
     {/if}
   </div>
@@ -97,25 +95,25 @@
     <!-- Fiche de la demande -->
     <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-5">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="font-semibold text-slate-800">Fiche de la demande</h3>
+        <h3 class="font-semibold text-slate-800">{$t('ao.detail.request_info')}</h3>
         <Badge status={ao.statut} />
       </div>
 
       <div class="grid grid-cols-2 gap-3 mb-3">
         <div class="p-3 bg-slate-50 rounded-xl">
-          <p class="text-xs text-slate-400 mb-1">Type de forage</p>
+          <p class="text-xs text-slate-400 mb-1">{$t('demande.detail.info_type')}</p>
           <p class="text-sm font-semibold text-slate-700 capitalize">
             {ao.demande?.typeForage ?? ao.demande?.type_forage ?? '—'}
           </p>
         </div>
         <div class="p-3 bg-slate-50 rounded-xl">
-          <p class="text-xs text-slate-400 mb-1">Localisation</p>
+          <p class="text-xs text-slate-400 mb-1">{$t('demande.detail.info_loc')}</p>
           <p class="text-sm font-semibold text-slate-700 truncate">
             {ao.demande?.localisationAdresse ?? ao.demande?.localisation_adresse ?? '—'}
           </p>
         </div>
         <div class="p-3 bg-slate-50 rounded-xl">
-          <p class="text-xs text-slate-400 mb-1">Profondeur estimée</p>
+          <p class="text-xs text-slate-400 mb-1">{$t('demande.detail.info_depth')}</p>
           <p class="text-sm font-semibold text-slate-700">
             {(ao.demande?.profondeurEstimee ?? ao.demande?.profondeur_estimee)
               ? `${ao.demande?.profondeurEstimee ?? ao.demande?.profondeur_estimee} m`
@@ -123,7 +121,7 @@
           </p>
         </div>
         <div class="p-3 bg-slate-50 rounded-xl">
-          <p class="text-xs text-slate-400 mb-1">Délai souhaité</p>
+          <p class="text-xs text-slate-400 mb-1">{$t('demande.detail.info_delay')}</p>
           <p class="text-sm font-semibold text-slate-700">
             {(ao.demande?.delaiSouhaite ?? ao.demande?.delai_souhaite)
               ? new Date(ao.demande?.delaiSouhaite ?? ao.demande?.delai_souhaite).toLocaleDateString('fr-CM')
@@ -134,14 +132,14 @@
 
       {#if ao.demande?.description}
         <div class="p-3 bg-slate-50 rounded-xl mb-3">
-          <p class="text-xs text-slate-400 mb-1">Description du projet</p>
+          <p class="text-xs text-slate-400 mb-1">{$t('demande.detail.desc')}</p>
           <p class="text-sm text-slate-700 leading-relaxed">{ao.demande.description}</p>
         </div>
       {/if}
 
       {#if ao.demande?.documents?.length > 0}
         <div class="mb-3">
-          <p class="text-xs text-slate-400 mb-2">Documents du projet ({ao.demande.documents.length})</p>
+          <p class="text-xs text-slate-400 mb-2">{$t('demande.detail.docs')} ({ao.demande.documents.length})</p>
           <div class="space-y-1.5">
             {#each ao.demande.documents as doc}
               <DownloadButton docId={doc.id} nomFichier={doc.nomFichier} />
@@ -157,7 +155,7 @@
           </span>
           <div>
             <p class="text-xs font-semibold {ao.compte_a_rebours.expire ? 'text-red-700' : 'text-amber-700'}">
-              {ao.compte_a_rebours.expire ? 'Délai de réponse expiré' : 'Date limite de réponse'}
+              {ao.compte_a_rebours.expire ? $t('entreprise.ao.expired') : $t('ao.detail.deadline')}
             </p>
             {#if !ao.compte_a_rebours.expire}
               <p class="text-xs text-amber-600">
@@ -175,13 +173,13 @@
         <div class="flex items-center gap-3 mb-3">
           <span class="material-symbols-outlined text-emerald-500 icon-filled" style="font-size: 32px;">check_circle</span>
           <div>
-            <p class="font-bold text-emerald-800">Offre soumise</p>
+            <p class="font-bold text-emerald-800">{$t('ao.detail.offer_submitted')}</p>
             <div class="mt-1"><Badge status={ao.ma_reponse.statut} /></div>
           </div>
         </div>
         {#if offreDocuments.length > 0}
           <div class="mt-3 pt-3 border-t border-emerald-200">
-            <p class="text-xs font-semibold text-emerald-700 mb-2">Documents joints ({offreDocuments.length})</p>
+            <p class="text-xs font-semibold text-emerald-700 mb-2">{$t('ao.detail.docs')} ({offreDocuments.length})</p>
             <div class="space-y-1.5">
               {#each offreDocuments as doc}
                 <DownloadButton docId={doc.id} nomFichier={doc.nomFichier} />
@@ -196,7 +194,6 @@
 
 <!-- Modal formulaire -->
 {#if showForm}
-  <!-- Backdrop -->
   <div class="fixed inset-0 z-50 bg-white/40 backdrop-blur-sm flex items-center justify-center p-4"
     onclick={(e) => { if (e.target === e.currentTarget) showForm = false }}>
 
@@ -204,7 +201,7 @@
       <!-- Header modal -->
       <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
         <div>
-          <h3 class="text-lg font-bold text-slate-900">Soumettre une offre</h3>
+          <h3 class="text-lg font-bold text-slate-900">{$t('ao.detail.submit_offer')}</h3>
           <p class="text-xs text-slate-500 mt-0.5">{titreDemande}</p>
         </div>
         <button onclick={() => showForm = false}
@@ -215,39 +212,35 @@
 
       <!-- Formulaire -->
       <form onsubmit={handleSubmit} class="p-6 space-y-4">
-        <!-- Prix -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1.5" for="prixHt">Prix HT (FCFA) *</label>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5" for="prixHt">{$t('ao.detail.price_ht')} *</label>
             <input id="prixHt" type="number" bind:value={prixHt} placeholder="Ex: 1 500 000" required
               class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm transition-all" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1.5" for="prixTtc">Prix TTC (FCFA) *</label>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5" for="prixTtc">{$t('ao.detail.price_ttc')} *</label>
             <input id="prixTtc" type="number" bind:value={prixTtc} required
               class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm" />
-            <p class="text-xs text-slate-400 mt-1">TVA 18% calculée auto</p>
+            <p class="text-xs text-slate-400 mt-1">{$t('ao.detail.tax_note')}</p>
           </div>
         </div>
 
-        <!-- Délai -->
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="delai">Délai d'exécution (jours) *</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="delai">{$t('ao.detail.exec_time')} *</label>
           <input id="delai" type="number" bind:value={delaiExecution} placeholder="Ex: 30" required
             class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm" />
         </div>
 
-        <!-- Description technique -->
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="desc">Description technique</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="desc">{$t('ao.detail.tech_desc')}</label>
           <textarea id="desc" bind:value={descriptionTechnique} rows="3"
-            placeholder="Approche technique, matériel utilisé, garanties..."
+            placeholder={$t('ao.detail.tech_placeholder')}
             class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm resize-none"></textarea>
         </div>
 
-        <!-- Documents -->
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5">Documents joints <span class="text-slate-400 font-normal">(optionnel)</span></label>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">{$t('ao.detail.docs')}</label>
           <label class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-dashed border-slate-300 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-all">
             <span class="material-symbols-outlined text-slate-400" style="font-size: 20px;">cloud_upload</span>
             <span class="text-sm text-slate-500">
@@ -257,20 +250,20 @@
           </label>
         </div>
 
-        <!-- Boutons -->
         <div class="flex gap-3 pt-2">
           <button type="button" onclick={() => showForm = false}
             class="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-all">
-            Annuler
+            {$t('common.cancel')}
           </button>
           <button type="submit" disabled={submitting}
             class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
             {#if submitting}
               <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              {$t('ao.detail.submitting')}
             {:else}
               <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">send</span>
+              {$t('ao.detail.submit_offer')}
             {/if}
-            Soumettre l'offre
           </button>
         </div>
       </form>

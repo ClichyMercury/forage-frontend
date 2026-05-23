@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import api from '$lib/api'
   import { auth } from '$lib/stores/auth.svelte'
+  import { t } from '$lib/stores/locale'
   import StatCard from '$lib/components/ui/StatCard.svelte'
   import Badge from '$lib/components/ui/Badge.svelte'
   import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
@@ -68,20 +69,19 @@
 </script>
 
 <svelte:head>
-  <title>Tableau de bord — Admin Forage</title>
+  <title>{$t('dashboard.admin.title')}</title>
 </svelte:head>
 
-<!-- Header -->
 <div class="mb-6 flex items-start lg:items-center justify-between flex-wrap gap-3">
   <div class="min-w-0 flex-1">
     <h2 class="font-display font-black text-2xl lg:text-3xl leading-tight wrap-break-word" style="color: #0f1f5c; letter-spacing: -0.02em">
-      Bonjour, <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #1e3fff">{auth.user?.fullName?.split(' ')[0] ?? 'Admin'}</span>.
+      {$t('dashboard.admin.hello', { name: auth.user?.fullName?.split(' ')[0] ?? 'Admin' })}
     </h2>
-    <p class="text-sm text-slate-500 mt-1">Vue d'ensemble de la plateforme.</p>
+    <p class="text-sm text-slate-500 mt-1">{$t('dashboard.admin.subtitle')}</p>
   </div>
   <div class="flex items-center gap-2 flex-wrap">
     <div class="flex gap-1 bg-slate-100 rounded-xl p-1">
-      {#each [['semaine','Sem.'], ['mois','Mois'], ['annee','An.']] as [val, label]}
+      {#each [['semaine', $t('common.week')], ['mois', $t('common.month')], ['annee', $t('common.year')]] as [val, label]}
         <button 
           onclick={() => periode = val}
           class="px-3 py-1.5 rounded-lg text-sm font-semibold transition-all {periode === val ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}"
@@ -96,8 +96,8 @@
       style="background-color: #1e3fff; box-shadow: 0 4px 14px rgba(30,63,255,0.3)"
     >
       <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">assignment</span>
-      <span class="hidden sm:inline">Gérer les demandes</span>
-      <span class="sm:hidden">Gérer</span>
+      <span class="hidden sm:inline">{$t('dashboard.admin.manage_demandes')}</span>
+      <span class="sm:hidden">{$t('dashboard.admin.manage')}</span>
     </a>
   </div>
 </div>
@@ -111,23 +111,23 @@
   </div>
 {:else if stats}
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-    <StatCard title="Demandes ({periode})" value={stats.demandes.total_periode} icon="assignment" color="blue" />
-    <StatCard title="Taux de conversion" value={stats.demandes.taux_conversion} icon="trending_up" color="green" />
-    <StatCard title="Chiffre d'affaires" value="{fmtMoney(stats.finances.chiffre_affaires)} FCFA" icon="payments" color="purple" subtitle="Période en cours" />
-    <StatCard title="Marges générées" value="{fmtMoney(stats.finances.marges_cumulees)} FCFA" icon="account_balance" color="orange" />
+    <StatCard title={$t('dashboard.admin.stat_demandes', { periode })} value={stats.demandes.total_periode} icon="assignment" color="blue" />
+    <StatCard title={$t('dashboard.admin.stat_conversion')} value={stats.demandes.taux_conversion} icon="trending_up" color="green" />
+    <StatCard title={$t('dashboard.admin.stat_ca')} value="{fmtMoney(stats.finances.chiffre_affaires)} FCFA" icon="payments" color="purple" subtitle={$t('dashboard.admin.stat_ca_sub')} />
+    <StatCard title={$t('dashboard.admin.stat_marges')} value="{fmtMoney(stats.finances.marges_cumulees)} FCFA" icon="account_balance" color="orange" />
   </div>
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-    <StatCard title="Total demandes" value={stats.demandes.total_global} icon="folder_open" color="blue" />
-    <StatCard title="En attente" value={stats.demandes.en_attente} icon="hourglass_empty" color="orange" />
-    <StatCard title="Acceptées" value={stats.demandes.acceptees} icon="check_circle" color="green" />
-    <StatCard title="Refusées" value={stats.demandes.refusees} icon="cancel" color="red" />
+    <StatCard title={$t('dashboard.admin.stat_total')}    value={stats.demandes.total_global}          icon="folder_open"    color="blue" />
+    <StatCard title={$t('dashboard.admin.stat_pending')}  value={stats.demandes.en_attente}            icon="hourglass_empty" color="orange" />
+    <StatCard title={$t('dashboard.admin.stat_accepted')} value={stats.demandes.acceptees}             icon="check_circle"   color="green" />
+    <StatCard title={$t('dashboard.admin.stat_refused')}  value={stats.demandes.refusees}              icon="cancel"         color="red" />
 
     <StatCard
-      title="Sans réponse +7j"
+      title={$t('dashboard.admin.stat_no_response')}
       value={stats.alertes_sans_reponse.count}
       icon="warning"
       color="red"
-      subtitle={stats.alertes_sans_reponse.count > 0 ? 'Action requise' : 'Tout est à jour'}
+      subtitle={stats.alertes_sans_reponse.count > 0 ? $t('common.action_required') : $t('common.up_to_date')}
     />
   </div>
 {/if}
@@ -139,10 +139,10 @@
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-red-500 icon-filled" style="font-size: 18px;">warning</span>
         <p class="text-sm font-bold text-red-700">
-          {stats.alertes_sans_reponse.count} demande{stats.alertes_sans_reponse.count > 1 ? 's' : ''} sans réponse depuis +7 jours
+          {$t('dashboard.admin.demandes_no_response', { count: stats.alertes_sans_reponse.count, s: stats.alertes_sans_reponse.count > 1 ? 's' : '' })}
         </p>
       </div>
-      <span class="text-xs text-red-500 font-medium">Action requise</span>
+      <span class="text-xs text-red-500 font-medium">{$t('common.action_required')}</span>
     </div>
     <div class="divide-y divide-red-100">
       {#each stats.alertes_sans_reponse.demandes.slice(0, 4) as d}
@@ -158,11 +158,11 @@
             <p class="text-sm font-medium text-slate-800 truncate">
               {d.type_forage ? `Forage ${d.type_forage}` : `Demande #${d.id}`}{d.localisation_adresse ? ` — ${d.localisation_adresse.split(',')[0]}` : ''}
             </p>
-            <p class="text-xs text-red-500 mt-0.5">En attente depuis {jours} jour{jours > 1 ? 's' : ''}</p>
+            <p class="text-xs text-red-500 mt-0.5">{$t('dashboard.admin.pending_since', { jours, s: jours > 1 ? 's' : '' })}</p>
           </div>
           <span class="text-xs px-2 py-1 rounded-lg font-medium shrink-0
             {d.statut === 'en_attente' ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'}">
-            {d.statut === 'en_attente' ? 'À valider' : 'Appel d\'offre sans offre'}
+            {d.statut === 'en_attente' ? $t('status.a_valider') : $t('status.sans_offre')}
           </span>
           <span class="material-symbols-outlined text-red-300 shrink-0" style="font-size: 16px;">chevron_right</span>
         </a>
@@ -171,7 +171,7 @@
     {#if stats.alertes_sans_reponse.count > 4}
       <div class="px-5 py-2.5 border-t border-red-100">
         <a href="/admin/demandes" class="text-xs text-red-600 font-semibold hover:text-red-700">
-          Voir les {stats.alertes_sans_reponse.count - 4} autres →
+          {$t('dashboard.admin.see_n_more', { count: stats.alertes_sans_reponse.count - 4 })}
         </a>
       </div>
     {/if}
@@ -185,7 +185,7 @@
       <span class="material-symbols-outlined text-amber-600 icon-filled" style="font-size: 20px;">business</span>
       <div>
         <p class="text-sm font-semibold text-amber-800">
-          {pendingEntreprises.length} entreprise{pendingEntreprises.length > 1 ? 's' : ''} en attente de validation
+          {$t('dashboard.admin.pending_entreprises', { count: pendingEntreprises.length, s: pendingEntreprises.length > 1 ? 's' : '' })}
         </p>
         <p class="text-xs text-amber-600 mt-0.5">
           {pendingEntreprises.slice(0, 3).map((e: any) => e.entrepriseProfile?.raisonSociale ?? e.email).join(', ')}{pendingEntreprises.length > 3 ? '…' : ''}
@@ -196,7 +196,7 @@
       href="/admin/utilisateurs"
       class="shrink-0 px-4 py-2 rounded-xl bg-amber-600 text-white text-sm font-semibold hover:bg-amber-700 transition-all"
     >
-      Valider maintenant
+      {$t('common.validate_now')}
     </a>
   </div>
 {/if}
@@ -207,8 +207,8 @@
   <!-- Demandes récentes -->
   <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-100 overflow-hidden">
     <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-      <h3 class="font-display font-bold text-slate-900">Demandes récentes</h3>
-      <a href="/admin/demandes" class="text-sm text-brand-600 hover:text-brand-700 font-semibold">Voir tout</a>
+      <h3 class="font-display font-bold text-slate-900">{$t('dashboard.admin.recent_demandes')}</h3>
+      <a href="/admin/demandes" class="text-sm text-brand-600 hover:text-brand-700 font-semibold">{$t('common.see_all')}</a>
     </div>
     {#if loading}
       <div class="p-5 space-y-2">
@@ -221,15 +221,15 @@
         <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
           <span class="material-symbols-outlined text-slate-400" style="font-size: 20px;">assignment</span>
         </div>
-        <p class="text-slate-500 text-sm font-medium">Aucune demande</p>
+        <p class="text-slate-500 text-sm font-medium">{$t('dashboard.admin.no_demandes')}</p>
       </div>
     {:else}
       <!-- En-tête mini-tableau (desktop only) -->
       <div class="hidden lg:grid grid-cols-12 gap-3 px-5 py-2.5 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wide">
-        <div class="col-span-3">Client</div>
-        <div class="col-span-4">Localisation</div>
-        <div class="col-span-2">Type</div>
-        <div class="col-span-3">Statut</div>
+        <div class="col-span-3">{$t('dashboard.admin.col_client')}</div>
+        <div class="col-span-4">{$t('dashboard.admin.col_location')}</div>
+        <div class="col-span-2">{$t('dashboard.admin.col_type')}</div>
+        <div class="col-span-3">{$t('dashboard.admin.col_status')}</div>
       </div>
       <div class="divide-y divide-slate-50">
         {#each demandes as d}
@@ -239,7 +239,7 @@
           >
             <div class="flex items-center gap-1 pl-10 lg:pl-0 lg:col-span-3 min-w-0">
               <UserAvatar user={d.client} size="sm" />
-              <span class="text-xs lg:hidden text-slate-400">Client :</span>
+              <span class="text-xs lg:hidden text-slate-400">{$t('dashboard.admin.col_client')} :</span>
               <span class="text-sm text-slate-600 truncate">{d.client?.fullName ?? d.client?.email ?? '—'}</span>
             </div>
             <div class="flex items-center gap-2 min-w-0 lg:col-span-4">
@@ -251,7 +251,7 @@
             </div>
           
             <div class="flex items-center gap-1 pl-10 lg:pl-0 lg:col-span-2">
-              <span class="text-xs lg:hidden text-slate-400">Type :</span>
+              <span class="text-xs lg:hidden text-slate-400">{$t('dashboard.admin.col_type')} :</span>
               <span class="text-xs text-slate-500 capitalize">{d.typeForage}</span>
             </div>
             <div class="hidden lg:block lg:col-span-3">
@@ -266,8 +266,8 @@
   <!-- Classement entreprises -->
   <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
     <div class="px-5 py-4 border-b border-slate-100">
-      <h3 class="font-display font-bold text-slate-900">Top entreprises</h3>
-      <p class="text-xs text-slate-400 mt-0.5">Classées par taux de sélection</p>
+      <h3 class="font-display font-bold text-slate-900">{$t('dashboard.admin.top_entreprises')}</h3>
+      <p class="text-xs text-slate-400 mt-0.5">{$t('dashboard.admin.top_entreprises_sub')}</p>
     </div>
     {#if loading}
       <div class="p-5 space-y-3">
@@ -280,8 +280,8 @@
         <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
           <span class="material-symbols-outlined text-slate-400" style="font-size: 20px;">leaderboard</span>
         </div>
-        <p class="text-slate-500 text-sm font-medium">Aucune donnée</p>
-        <p class="text-slate-400 text-xs mt-1">Les entreprises apparaîtront après soumission d'offres</p>
+        <p class="text-slate-500 text-sm font-medium">{$t('dashboard.admin.no_classement')}</p>
+        <p class="text-slate-400 text-xs mt-1">{$t('dashboard.admin.no_classement_sub')}</p>
       </div>
     {:else}
       <div class="divide-y divide-slate-50">
@@ -334,7 +334,7 @@
             <!-- Nb offres -->
             <div class="text-right shrink-0">
               <p class="text-xs font-bold text-slate-700">{e.total_offres}</p>
-              <p class="text-xs text-slate-400">offre{e.total_offres > 1 ? 's' : ''}</p>
+              <p class="text-xs text-slate-400">{e.total_offres > 1 ? $t('common.offers') : $t('common.offer')}</p>
             </div>
           </div>
         {/each}
@@ -342,7 +342,7 @@
       {#if classement.length > 6}
         <div class="px-5 py-3 border-t border-slate-100">
           <a href="/admin/utilisateurs" class="text-sm text-brand-600 font-semibold hover:text-brand-700">
-            Voir tous les prestataires →
+            {$t('dashboard.admin.see_all_prestataires')}
           </a>
         </div>
       {/if}
@@ -357,20 +357,20 @@
   <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-100 overflow-hidden">
     <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
       <div>
-        <h3 class="font-display font-bold text-slate-900">Répartition géographique</h3>
+        <h3 class="font-display font-bold text-slate-900">{$t('dashboard.admin.geo_map')}</h3>
         <p class="text-xs text-slate-400 mt-0.5">
-          {mapPoints.length} chantier{mapPoints.length > 1 ? 's' : ''} localisé{mapPoints.length > 1 ? 's' : ''}
+          {$t('dashboard.admin.geo_map_sub', { count: mapPoints.length, s: mapPoints.length > 1 ? 's' : '', e: mapPoints.length > 1 ? 's' : '' })}
         </p>
       </div>
       <!-- Légende complète -->
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
         {#each [
-          { color: '#f59e0b', label: 'En attente' },
-          { color: '#3b82f6', label: 'Validée' },
-          { color: '#6366f1', label: "Appel d'offre lancé" },
-          { color: '#06b6d4', label: 'Offre envoyée' },
-          { color: '#10b981', label: 'Acceptée' },
-          { color: '#ef4444', label: 'Refusée' },
+          { color: '#f59e0b', label: $t('status.en_attente') },
+          { color: '#3b82f6', label: $t('status.valide') },
+          { color: '#6366f1', label: $t('status.appel_offre_lance') },
+          { color: '#06b6d4', label: $t('status.offre_envoyee') },
+          { color: '#10b981', label: $t('status.offre_acceptee') },
+          { color: '#ef4444', label: $t('status.refuse') },
         ] as leg}
           <div class="flex items-center gap-1">
             <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background:{leg.color}"></div>
@@ -387,9 +387,9 @@
           <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-3 shadow-sm">
             <span class="material-symbols-outlined text-slate-400" style="font-size: 28px;">map</span>
           </div>
-          <p class="text-sm font-medium text-slate-500">Aucune demande géolocalisée</p>
+          <p class="text-sm font-medium text-slate-500">{$t('dashboard.admin.no_geo')}</p>
           <p class="text-xs text-slate-400 mt-1 text-center max-w-xs">
-            Les demandes avec coordonnées GPS (saisies via la carte) apparaîtront ici
+            {$t('dashboard.admin.no_geo_sub')}
           </p>
         </div>
       {/if}
@@ -399,8 +399,8 @@
   <!-- Répartition type forage -->
   <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
     <div class="px-5 py-4 border-b border-slate-100">
-      <h3 class="font-display font-bold text-slate-900">Par type de forage</h3>
-      <p class="text-xs text-slate-400 mt-0.5">Répartition des demandes</p>
+      <h3 class="font-display font-bold text-slate-900">{$t('dashboard.admin.by_type')}</h3>
+      <p class="text-xs text-slate-400 mt-0.5">{$t('dashboard.admin.by_type_sub')}</p>
     </div>
     {#if loading}
       <div class="p-5 space-y-3">
@@ -433,8 +433,8 @@
           </div>
         {/each}
         <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-          <span class="text-xs text-slate-500">Total</span>
-          <span class="text-sm font-bold text-slate-900">{total} demande{total > 1 ? 's' : ''}</span>
+          <span class="text-xs text-slate-500">{$t('common.total')}</span>
+          <span class="text-sm font-bold text-slate-900">{total}</span>
         </div>
       </div>
     {:else}
@@ -442,7 +442,7 @@
         <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
           <span class="material-symbols-outlined text-slate-400" style="font-size: 20px;">pie_chart</span>
         </div>
-        <p class="text-slate-500 text-sm font-medium">Aucune donnée</p>
+        <p class="text-slate-500 text-sm font-medium">{$t('common.no_data')}</p>
       </div>
     {/if}
   </div>
