@@ -4,6 +4,7 @@
   import { page } from '$app/stores'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
+  import { t } from '$lib/stores/locale'
   import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
 
   const demandeId = $derived(Number($page.url.searchParams.get('demandeId')))
@@ -35,7 +36,7 @@
   async function handleSubmit(e: Event) {
     e.preventDefault()
     if (selectedIds.length === 0) {
-      toast.error('Sélection requise', 'Sélectionnez au moins une entreprise.')
+      toast.error($t('admin.ao_new.required'), $t('admin.ao_new.required_sub'))
       return
     }
     loading = true
@@ -45,23 +46,22 @@
         entrepriseIds: selectedIds,
         delaiReponse,
       })
-      toast.success("Appel d'offre lancé !", `${selectedIds.length} entreprise(s) notifiée(s).`)
+      toast.success($t('admin.ao_new.success'), $t('admin.ao_new.success_sub', { count: String(selectedIds.length) }))
       goto(`/admin/demandes/${demandeId}`)
     } catch (err: any) {
       const data = err.response?.data
       if (err.response?.status === 422) {
         const msgs = data.errors?.map((e: any) => e.message).join(', ')
-        toast.error('Erreur de validation', msgs ?? 'Vérifiez les champs')
+        toast.error($t('admin.ao_new.validation_err'), msgs ?? $t('common.error_save'))
       } else {
-        toast.error('Erreur', data?.message ?? err.message)
+        toast.error($t('toast.save_error'), data?.message ?? err.message)
       }
     } finally { loading = false }
   }
 </script>
 
-<svelte:head><title>Lancer un appel d'offre — Admin</title></svelte:head>
+<svelte:head><title>{$t('admin.ao_new.title')} — Admin Forage</title></svelte:head>
 
-<!-- Page de fond -->
 <div class="max-w-3xl mx-auto">
   <div class="flex items-center gap-3 mb-6">
     <button onclick={() => goto(`/admin/demandes/${demandeId}`)}
@@ -70,36 +70,36 @@
     </button>
     <div class="flex-1">
       <h2 class="text-xl font-bold text-slate-900">
-        {demande ? `Forage ${demande.typeForage} — ${demande.localisationAdresse?.split(',')[0]}` : 'Appel d\'offre'}
+        {demande ? `Forage ${demande.typeForage} — ${demande.localisationAdresse?.split(',')[0]}` : $t('admin.ao_new.title')}
       </h2>
-      <p class="text-sm text-slate-500">Lancer un appel d'offre</p>
+      <p class="text-sm text-slate-500">{$t('admin.ao_new.title')}</p>
     </div>
     <button onclick={() => showForm = true}
       class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-all shadow-sm">
       <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">campaign</span>
-      Lancer l'appel d'offre
+      {$t('admin.ao_new.launch_btn')}
     </button>
   </div>
 
   <div class="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400">
     {#if demande}
       <div class="text-left">
-        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Demande concernée</p>
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">{$t('admin.ao_new.demande_section')}</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div class="p-3 bg-slate-50 rounded-xl">
-            <p class="text-xs text-slate-400">Type</p>
+            <p class="text-xs text-slate-400">{$t('dashboard.admin.col_type')}</p>
             <p class="text-sm font-semibold text-slate-700 capitalize">{demande.typeForage}</p>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl">
-            <p class="text-xs text-slate-400">Localisation</p>
+            <p class="text-xs text-slate-400">{$t('common.location')}</p>
             <p class="text-sm font-semibold text-slate-700 truncate">{demande.localisationAdresse}</p>
           </div>
         </div>
       </div>
     {:else}
       <span class="material-symbols-outlined" style="font-size: 48px;">campaign</span>
-      <p class="text-slate-600 font-medium mt-3">Prêt à lancer l'appel d'offre</p>
-      <p class="text-sm mt-1">Cliquez sur le bouton en haut à droite pour configurer et lancer</p>
+      <p class="text-slate-600 font-medium mt-3">{$t('admin.ao_new.ready')}</p>
+      <p class="text-sm mt-1">{$t('admin.ao_new.ready_sub')}</p>
     {/if}
   </div>
 </div>
@@ -112,7 +112,7 @@
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto animate-fade-in-up">
       <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 sticky top-0 bg-white">
         <div>
-          <h3 class="text-lg font-bold text-slate-900">Lancer un appel d'offre</h3>
+          <h3 class="text-lg font-bold text-slate-900">{$t('admin.ao_new.title')}</h3>
           <p class="text-xs text-slate-500 mt-0.5">
             {demande ? `Forage ${demande.typeForage}` : ''}
           </p>
@@ -123,10 +123,10 @@
         </button>
       </div>
 
-      <form onsubmit={handleSubmit} class="p-6 space-y-5"> 
-        <!-- Date limite --> 
+      <form onsubmit={handleSubmit} class="p-6 space-y-5">
+        <!-- Date limite -->
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="delai">Date limite de réponse *</label>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5" for="delai">{$t('admin.ao_new.deadline')}</label>
           <input id="delai" type="datetime-local" bind:value={delaiReponse} required
             class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm" />
         </div>
@@ -134,10 +134,10 @@
         <!-- Entreprises -->
         <div>
           <div class="flex items-center justify-between mb-3">
-            <label class="text-sm font-medium text-slate-700">Entreprises à inviter *</label>
+            <label class="text-sm font-medium text-slate-700">{$t('admin.ao_new.companies')}</label>
             {#if selectedIds.length > 0}
               <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">
-                {selectedIds.length} sélectionnée(s)
+                {$t('admin.ao_new.selected', { count: String(selectedIds.length) })}
               </span>
             {/if}
           </div>
@@ -145,7 +145,7 @@
           {#if loadingEntreprises}
             <div class="space-y-2">{#each [1,2,3] as _}<div class="skeleton h-12 rounded-xl"></div>{/each}</div>
           {:else if entreprises.length === 0}
-            <div class="py-6 text-center text-slate-400 text-sm">Aucune entreprise active</div>
+            <div class="py-6 text-center text-slate-400 text-sm">{$t('admin.ao_new.no_companies')}</div>
           {:else}
             <div class="space-y-2 max-h-48 overflow-y-auto">
               {#each entreprises as e}
@@ -173,7 +173,7 @@
         <div class="flex gap-3 pt-2">
           <button type="button" onclick={() => goto(`/admin/demandes/${demandeId}`)}
             class="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-all">
-            Annuler
+            {$t('common.cancel')}
           </button>
           <button type="submit" disabled={loading || selectedIds.length === 0}
             class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
@@ -182,7 +182,7 @@
             {:else}
               <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">campaign</span>
             {/if}
-            Lancer ({selectedIds.length})
+            {$t('admin.ao_new.launch_count', { count: String(selectedIds.length) })}
           </button>
         </div>
       </form>

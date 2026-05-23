@@ -3,6 +3,8 @@
   import { goto } from '$app/navigation'
   import { auth } from '$lib/stores/auth.svelte'
   import Logo from '$lib/components/ui/Logo.svelte'
+  import LanguageSwitcher from '$lib/components/ui/LanguageSwitcher.svelte'
+  import { t } from '$lib/stores/locale'
   import { BASE_URL } from '$lib/api'
 
   let mouseX = $state(0)
@@ -61,8 +63,8 @@
 </script>
 
 <svelte:head>
-  <title>Forage — La plateforme de mise en relation pour le forage</title>
-  <meta name="description" content="Soumettez votre projet de forage, comparez les offres des prestataires, signez en confiance." />
+  <title>{$t('landing.meta.title')}</title>
+  <meta name="description" content={$t('landing.meta.description')} />
 </svelte:head>
 
 <!-- ============ Snippet étoile 4 branches ============ -->
@@ -114,24 +116,25 @@
     </a>
 
     <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-700">
-      <a href="#process" class="hover:text-brand transition-colors">Comment ça marche</a>
-      <a href="#acteurs" class="hover:text-brand transition-colors">Pour qui</a>
-      <a href="#confiance" class="hover:text-brand transition-colors">Confiance</a>
+      <a href="#process" class="hover:text-brand transition-colors">{$t('landing.nav.how_it_works')}</a>
+      <a href="#acteurs" class="hover:text-brand transition-colors">{$t('landing.nav.for_who')}</a>
+      <a href="#confiance" class="hover:text-brand transition-colors">{$t('landing.nav.trust')}</a>
     </div>
 
     <div class="flex items-center gap-3">
+      <LanguageSwitcher />
       {#if isLogged}
         <button onclick={goToDashboard}
           class="px-5 py-2.5 rounded-xl bg-brand text-white font-semibold text-sm hover:bg-brand-700 transition-all shadow-sm">
-          Mon espace
+          {$t('landing.nav.my_space')}
         </button>
       {:else}
         <a href="/login" class="hidden sm:inline text-sm font-semibold text-slate-700 hover:text-brand transition-colors">
-          Connexion
+          {$t('landing.nav.login')}
         </a>
         <a href="/register"
           class="px-5 py-2.5 rounded-xl bg-brand text-white font-semibold text-sm hover:bg-brand-700 transition-all shadow-sm">
-          S'inscrire
+          {$t('landing.nav.register')}
         </a>
       {/if}
     </div>
@@ -172,43 +175,43 @@
 
       <h1 class="font-display font-black text-white leading-[0.95] tracking-tight mb-8 animate-reveal-up"
           style="font-size: clamp(3rem, 9vw, 8rem); animation-delay: 0.1s">
-        Le forage,<br/>
+        {$t('landing.hero.title_1')}<br/>
         <span class="italic font-light relative inline-block" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: rgba(255,255,255,0.75)">
-          simplifié.
+          {$t('landing.hero.title_2')}
           <span class="absolute -bottom-2 left-0 right-0 h-0.5 rounded-full bg-white/40"></span>
         </span>
       </h1>
 
       <p class="max-w-2xl text-lg lg:text-xl text-white/85 leading-relaxed mb-10 animate-reveal-up"
          style="animation-delay: 0.25s">
-        Soumettez votre projet, recevez les meilleures offres de prestataires qualifiés, et signez en toute confiance — votre budget reste confidentiel.
+        {$t('landing.hero.subtitle')}
       </p>
 
       <div class="flex flex-wrap gap-4 animate-reveal-up" style="animation-delay: 0.4s">
         {#if isLogged}
           <button onclick={goToDashboard}
             class="group inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-white text-brand font-bold text-base hover:bg-slate-100 transition-all shadow-xl">
-            Aller à mon espace
+            {$t('landing.hero.cta_authed')}
             <span class="material-symbols-outlined icon-filled transition-transform group-hover:translate-x-1" style="font-size: 20px;">arrow_forward</span>
           </button>
         {:else}
           <a href="/register"
             class="group inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-white text-brand font-bold text-base hover:bg-slate-100 transition-all shadow-xl">
-            Soumettre une demande
+            {$t('landing.hero.cta_register')}
             <span class="material-symbols-outlined icon-filled transition-transform group-hover:translate-x-1" style="font-size: 20px;">arrow_forward</span>
           </a>
         {/if}
         <a href="#process"
           class="inline-flex items-center gap-2 px-7 py-4 rounded-2xl bg-transparent border-2 border-white/40 text-white font-semibold text-base hover:bg-white/10 transition-all">
-          Découvrir le fonctionnement
+          {$t('landing.hero.cta_discover')}
         </a>
       </div>
 
       <div class="mt-20 grid grid-cols-3 gap-6 max-w-2xl animate-reveal-up" style="animation-delay: 0.55s">
         {#each [
-          { value: '100%', label: 'Budget protégé', accent: true },
-          { value: fmt(statsData.utilisateurs), label: 'Utilisateurs inscrits', accent: false },
-          { value: fmt(statsData.entreprises), label: 'Entreprises actives', accent: false },
+          { value: '100%', label: $t('landing.stats.budget'), accent: true },
+          { value: fmt(statsData.utilisateurs), label: $t('landing.stats.users'), accent: false },
+          { value: fmt(statsData.entreprises), label: $t('landing.stats.companies'), accent: false },
         ] as stat}
           <div class="p-4 rounded-2xl" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2)">
             <p class="font-display text-3xl lg:text-4xl font-black tracking-tight text-white">{stat.value}</p>
@@ -219,7 +222,7 @@
     </div>
 
     <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/60">
-      <span class="text-[10px] font-semibold uppercase tracking-widest">Scroll</span>
+      <span class="text-[10px] font-semibold uppercase tracking-widest">{$t('landing.hero.scroll')}</span>
       <div class="w-px h-12 bg-gradient-to-b from-white/60 to-transparent"></div>
     </div>
   </section>
@@ -249,19 +252,19 @@
 
     <div class="max-w-7xl mx-auto relative">
       <div class="mb-20" data-reveal>
-        <p class="text-sm font-bold uppercase tracking-widest text-brand mb-4">Comment ça marche</p>
+        <p class="text-sm font-bold uppercase tracking-widest text-brand mb-4">{$t('landing.process.eyebrow')}</p>
         <h2 class="font-display font-black text-slate-900 leading-[1] tracking-tight"
             style="font-size: clamp(2.5rem, 6vw, 5rem)">
-          Trois étapes.<br/>
-          <span class="text-slate-300">Zéro friction.</span>
+          {$t('landing.process.title_1')}<br/>
+          <span class="text-slate-300">{$t('landing.process.title_2')}</span>
         </h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         {#each [
-          { num: '01', title: 'Le client soumet', text: "Type de forage, localisation, budget confidentiel et délai souhaité. Téléversement de plans et rapports géophysique ou hidrogeophysique.", icon: 'edit_document', accent: 'brand' },
-          { num: '02', title: 'Les offres arrivent', text: "Des prestataires qualifiés étudient votre projet et soumettent leurs propositions techniques et tarifaires.", icon: 'compare_arrows', accent: 'terre' },
-          { num: '03', title: 'Le chantier démarre', text: "Le client accepte l'offre finale, les parties sont mises en relation officiellement et le chantier peut commencer.", icon: 'rocket_launch', accent: 'brand' },
+          { num: '01', title: $t('landing.process.step1.title'), text: $t('landing.process.step1.text'), icon: 'edit_document', accent: 'brand' },
+          { num: '02', title: $t('landing.process.step2.title'), text: $t('landing.process.step2.text'), icon: 'compare_arrows', accent: 'terre' },
+          { num: '03', title: $t('landing.process.step3.title'), text: $t('landing.process.step3.text'), icon: 'rocket_launch', accent: 'brand' },
         ] as step, i}
           <div data-reveal
                class="step-card group relative bg-slate-50 rounded-3xl p-8 transition-all duration-500"
@@ -285,18 +288,18 @@
   <section id="acteurs" class="relative py-32 px-6 lg:px-12 bg-slate-50 overflow-hidden">
     <div class="max-w-7xl mx-auto">
       <div class="mb-20 max-w-3xl" data-reveal>
-        <p class="text-sm font-bold uppercase tracking-widest text-brand mb-4">Pour qui</p>
+        <p class="text-sm font-bold uppercase tracking-widest text-brand mb-4">{$t('landing.actors.eyebrow')}</p>
         <h2 class="font-display font-black text-slate-900 leading-[1] tracking-tight"
             style="font-size: clamp(2.5rem, 6vw, 5rem)">
-          Un espace dédié<br/>
-          <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif">par acteur.</span>
+          {$t('landing.actors.title_1')}<br/>
+          <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif">{$t('landing.actors.title_2')}</span>
         </h2>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {#each [
-          { label: 'Client', title: 'Particulier ou entreprise', bg: 'bg-brand', txt: 'text-white', features: ['Soumission rapide', 'Budget confidentiel', 'Suivi temps réel', 'Acceptation en 1 clic'], cta: 'Devenir client', href: '/register', ctaCls: 'bg-white text-[#1e3fff] hover:bg-slate-100' },
-          { label: 'Prestataire', title: 'Entreprise de forage', bg: 'bg-slate-800', txt: 'text-white', features: ['Appels d\'offres ciblés', 'Soumission structurée', 'Pas de mise en concurrence visible', 'Notifications prioritaires'], cta: "S'inscrire en tant qu'entreprise", href: '/register-entreprise', ctaCls: 'bg-white text-slate-800 hover:bg-slate-100' },
+          { label: $t('landing.actors.client.label'),  title: $t('landing.actors.client.title'),  bg: 'bg-brand',      txt: 'text-white', features: [$t('landing.actors.client.feat1'), $t('landing.actors.client.feat2'), $t('landing.actors.client.feat3'), $t('landing.actors.client.feat4')], cta: $t('landing.actors.client.cta'),  href: '/register',            ctaCls: 'bg-white text-[#1e3fff] hover:bg-slate-100' },
+          { label: $t('landing.actors.company.label'), title: $t('landing.actors.company.title'), bg: 'bg-slate-800',  txt: 'text-white', features: [$t('landing.actors.company.feat1'), $t('landing.actors.company.feat2'), $t('landing.actors.company.feat3'), $t('landing.actors.company.feat4')], cta: $t('landing.actors.company.cta'), href: '/register-entreprise', ctaCls: 'bg-white text-slate-800 hover:bg-slate-100' },
         ] as acteur, i}
           <div data-reveal class="rounded-3xl p-8 lg:p-10 {acteur.bg} {acteur.txt} transition-all duration-500 hover:scale-[1.02]"
                style="transition-delay: {i * 100}ms">
@@ -339,22 +342,22 @@
     <div class="max-w-7xl mx-auto relative">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div data-reveal>
-          <p class="text-sm font-bold uppercase tracking-widest text-brand-400 mb-4">Confiance & confidentialité</p>
+          <p class="text-sm font-bold uppercase tracking-widest text-brand-400 mb-4">{$t('landing.trust.eyebrow')}</p>
           <h2 class="font-display font-black leading-[1] tracking-tight mb-8"
               style="font-size: clamp(2.5rem, 5vw, 4rem)">
-            Un cloisonnement<br/>strict, par design.
+            {$t('landing.trust.title_1')}<br/>{$t('landing.trust.title_2')}
           </h2>
           <p class="text-lg text-slate-300 leading-relaxed">
-            Le budget du client n'est jamais visible des entreprises. Les offres sont masquées entre prestataires. Toutes les communications sont centralisées et sécurisées par la plateforme.
+            {$t('landing.trust.intro')}
           </p>
         </div>
 
         <div data-reveal class="space-y-4">
           {#each [
-            { icon: 'lock', title: 'Budget confidentiel', text: "Jamais communiqué aux prestataires.", color: '#1e3fff' },
-            { icon: 'shield', title: "Pas d'enchères visibles", text: 'Les offres entreprises sont cloisonnées.', color: '#475569' },
-            { icon: 'forum', title: 'Messagerie centralisée', text: "Toutes les communications transitent par la plateforme.", color: '#1e3fff' },
-            { icon: 'task_alt', title: 'Workflow contrôlé', text: 'Aucune transition de statut hors séquence.', color: '#1e3fff' },
+            { icon: 'lock',     title: $t('landing.trust.item1.title'), text: $t('landing.trust.item1.text'), color: '#1e3fff' },
+            { icon: 'shield',   title: $t('landing.trust.item2.title'), text: $t('landing.trust.item2.text'), color: '#475569' },
+            { icon: 'forum',    title: $t('landing.trust.item3.title'), text: $t('landing.trust.item3.text'), color: '#1e3fff' },
+            { icon: 'task_alt', title: $t('landing.trust.item4.title'), text: $t('landing.trust.item4.text'), color: '#1e3fff' },
           ] as item}
             <div class="flex items-start gap-4 p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors">
               <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background-color: {item.color}">
@@ -386,28 +389,28 @@
     <div class="max-w-4xl mx-auto text-center text-white relative" data-reveal>
       <h2 class="font-display font-black leading-[0.95] tracking-tight mb-8"
           style="font-size: clamp(2.5rem, 7vw, 6rem)">
-        Prêt à forer<br/>
-        <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif">en confiance ?</span>
+        {$t('landing.cta.title_1')}<br/>
+        <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif">{$t('landing.cta.title_2')}</span>
       </h2>
       <p class="text-lg lg:text-xl text-white/85 max-w-2xl mx-auto mb-10">
-        Créez votre compte en quelques secondes. La première demande est gratuite.
+        {$t('landing.cta.subtitle')}
       </p>
       <div class="flex flex-wrap gap-4 justify-center">
         {#if isLogged}
           <button onclick={goToDashboard}
             class="group inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-white text-brand font-bold text-base hover:bg-slate-100 transition-all shadow-xl">
-            Aller à mon espace
+            {$t('landing.hero.cta_authed')}
             <span class="material-symbols-outlined icon-filled transition-transform group-hover:translate-x-1" style="font-size: 20px;">arrow_forward</span>
           </button>
         {:else}
           <a href="/register"
             class="group inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-white text-brand font-bold text-base hover:bg-slate-100 transition-all shadow-xl">
-            Créer un compte client
+            {$t('landing.cta.register_client')}
             <span class="material-symbols-outlined icon-filled transition-transform group-hover:translate-x-1" style="font-size: 20px;">arrow_forward</span>
           </a>
           <a href="/register-entreprise"
             class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-transparent border-2 border-white/40 text-white font-semibold text-base hover:bg-white/10 transition-all">
-            Je suis une entreprise
+            {$t('landing.cta.register_company')}
           </a>
         {/if}
       </div>
@@ -420,7 +423,7 @@
       <div class="flex items-center gap-2.5">
         <Logo height="h-16" />
       </div>
-      <p class="text-xs">© 2026 Forage · Plateforme de mise en relation pour prestations de forage au Cameroun</p>
+      <p class="text-xs">{$t('landing.footer.copyright')}</p>
     </div>
   </footer>
 

@@ -4,6 +4,7 @@
   import { auth } from '$lib/stores/auth.svelte'
   import { toast } from '$lib/stores/toast.svelte'
   import { msgStore } from '$lib/stores/messages.svelte'
+  import { intlLocale } from '$lib/stores/locale'
 
   let demandes = $state<any[]>([])
   let selectedDemande = $state<any>(null)
@@ -312,7 +313,7 @@
                       <span class="truncate">Canal {canalRole === 'entreprise' ? `Entreprise · ${otherParty?.fullName ?? otherParty?.email ?? ''}` : 'Client'}</span>
                     </span>
                   {/if}
-                  <span>{new Date(msg.createdAt).toLocaleTimeString('fr-CM', { hour: '2-digit', minute: '2-digit' })}</span>
+                  <span>{new Date(msg.createdAt).toLocaleTimeString($intlLocale, { hour: '2-digit', minute: '2-digit' })}</span>
                   {#if isMine}
                     <span class="text-slate-300">✓</span>
                   {/if}

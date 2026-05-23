@@ -4,6 +4,7 @@
   import { page } from '$app/stores'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
+  import { t, intlLocale } from '$lib/stores/locale'
   import Badge from '$lib/components/ui/Badge.svelte'
   import FormPage from '$lib/components/layout/FormPage.svelte'
   import DownloadButton from '$lib/components/ui/DownloadButton.svelte'
@@ -16,26 +17,33 @@
 
   const id = $derived($page.params.id)
 
-  // Timeline — inclut refusee et cloturee comme états terminaux
-  const timelineSteps = [
-    { key: 'en_attente',        label: 'Soumise',               icon: 'send' },
-    { key: 'validee',           label: 'Validée',               icon: 'verified' },
-    { key: 'appel_offre_lance', label: "Appel d'offre lancé",   icon: 'campaign' },
-    { key: 'offres_recues',     label: 'Offres reçues',         icon: 'inbox' },
-    { key: 'offre_envoyee',     label: 'Offre reçue',           icon: 'mark_email_read' },
-    { key: 'acceptee',          label: 'Acceptée',              icon: 'check_circle' },
-    { key: 'cloturee',          label: 'Clôturée',              icon: 'lock' },
-  ]
+  const timelineSteps = $derived([
+    { key: 'en_attente',        label: $t('timeline.soumise'),       icon: 'send' },
+    { key: 'validee',           label: $t('timeline.validee'),       icon: 'verified' },
+    { key: 'appel_offre_lance', label: $t('timeline.ao_lance'),      icon: 'campaign' },
+    { key: 'offres_recues',     label: $t('timeline.offres_recues'), icon: 'inbox' },
+    { key: 'offre_envoyee',     label: $t('timeline.offre_recue'),   icon: 'mark_email_read' },
+    { key: 'acceptee',          label: $t('timeline.acceptee'),      icon: 'check_circle' },
+    { key: 'cloturee',          label: $t('timeline.cloturee'),      icon: 'lock' },
+  ])
 
   const isRefusee = $derived(demande?.statut === 'refusee')
 
-  // Pour refusee, on affiche la timeline jusqu'à offre_envoyee (idx 4)
-  const timelineOrder = timelineSteps.map(s => s.key)
+  const timelineOrder = $derived(timelineSteps.map(s => s.key))
   const currentIdx = $derived(
     !demande ? 0
     : demande.statut === 'refusee' ? 4
     : timelineOrder.indexOf(demande.statut)
   )
+
+  const infoItems = $derived(demande ? [
+    { label: $t('demande.detail.info_type'),  value: demande.typeForage,                                                                                           icon: 'water_drop' },
+    { label: $t('demande.detail.info_loc'),   value: demande.localisationAdresse,                                                                                  icon: 'location_on' },
+    { label: $t('demande.detail.info_depth'), value: demande.profondeurEstimee ? `${demande.profondeurEstimee} m` : '—',                                            icon: 'straighten' },
+    { label: $t('demande.detail.info_delay'), value: demande.delaiSouhaite ? new Date(demande.delaiSouhaite).toLocaleDateString($intlLocale) : '—',                     icon: 'calendar_today' },
+    { label: $t('demande.detail.info_date'),  value: new Date(demande.createdAt).toLocaleDateString($intlLocale, { day: 'numeric', month: 'long', year: 'numeric' }),   icon: 'schedule' },
+    { label: $t('demande.detail.info_budget'),value: `${Number(demande.budgetMax).toLocaleString($intlLocale)} FCFA`,                                                   icon: 'payments' },
+  ] : [])
 
   onMount(async () => {
     try {
@@ -58,17 +66,13 @@
       demande.statut = decision === 'refusee' ? 'cloturee' : decision
       if (offreFinale) offreFinale.statut = decision
       toast.success(
-        decision === 'acceptee' ? 'Offre acceptée !' : 'Offre refusée',
-        decision === 'acceptee'
-          ? 'Les parties vont être mises en contact.'
-          : 'Votre décision a été enregistrée. Le dossier est clôturé.'
+        decision === 'acceptee' ? $t('client.offres.accepted') : $t('client.offres.refused'),
+        decision === 'acceptee' ? $t('client.offres.contact_msg') : $t('client.offres.refused_msg')
       )
     } catch (err: any) {
-      toast.error('Erreur', err.response?.data?.message)
+      toast.error($t('toast.save_error'), err.response?.data?.message)
     } finally { deciding = false }
   }
-
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
 </script>
 
 <svelte:head><title>Demande #{id} — Forage</title></svelte:head>
@@ -99,17 +103,16 @@
 
     <!-- Timeline -->
     <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-4">
-      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">Suivi en temps réel</p>
+      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">{$t('demande.detail.tracking')}</p>
 
       {#if isRefusee}
-        <!-- Cas refus : bandeau explicite -->
         <div class="flex items-center gap-3 p-3 bg-red-50 rounded-xl border border-red-100 mb-3">
           <div class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined icon-filled text-white" style="font-size: 16px;">cancel</span>
           </div>
           <div>
-            <p class="text-sm font-semibold text-red-700">Vous avez refusé l'offre</p>
-            <p class="text-xs text-red-500 mt-0.5">Le dossier a été clôturé automatiquement.</p>
+            <p class="text-sm font-semibold text-red-700">{$t('demande.detail.refused_msg')}</p>
+            <p class="text-xs text-red-500 mt-0.5">{$t('demande.detail.closed_auto')}</p>
           </div>
         </div>
       {/if}
@@ -133,40 +136,43 @@
             </div>
             <p class="text-xs text-center mt-2 w-16 leading-tight
               {isTerminalRefus ? 'text-red-600 font-bold' : done ? 'text-brand-600 font-semibold' : active ? 'text-brand-700 font-bold' : 'text-slate-400'}">
-              {isTerminalRefus ? 'Refusée' : step.label}
+              {isTerminalRefus ? $t('timeline.refusee') : step.label}
             </p>
           </div>
         {/each}
       </div>
     </div>
 
-    <!-- Offre finale — si disponible -->
+    <!-- Offre finale -->
     {#if offreFinale && ['offre_envoyee', 'acceptee', 'refusee', 'cloturee'].includes(demande.statut)}
       <div class="bg-white rounded-2xl border {demande.statut === 'acceptee' ? 'border-emerald-200' : demande.statut === 'cloturee' && offreFinale.statut === 'refusee' ? 'border-red-200' : 'border-brand-200'} p-5 mb-4">
         <p class="text-xs font-semibold uppercase tracking-wide mb-3
           {demande.statut === 'acceptee' ? 'text-emerald-600' : demande.statut === 'cloturee' && offreFinale.statut === 'refusee' ? 'text-red-600' : 'text-brand-600'}">
-          {demande.statut === 'acceptee' ? '✓ Offre acceptée' : demande.statut === 'cloturee' && offreFinale.statut === 'refusee' ? '✗ Offre refusée' : 'Offre reçue — Action requise'}
+          {demande.statut === 'acceptee'
+            ? $t('demande.detail.offer_accepted')
+            : demande.statut === 'cloturee' && offreFinale.statut === 'refusee'
+              ? $t('demande.detail.offer_refused')
+              : $t('demande.detail.offer_pending')}
         </p>
 
         <div class="grid grid-cols-2 gap-3 mb-4">
           <div class="p-3 bg-slate-50 rounded-xl">
-            <p class="text-xs text-slate-400">Prix total</p>
-            <p class="text-lg font-bold text-slate-900 mt-0.5">{fmt(offreFinale.prixFinalClient ?? offreFinale.prix_final_client)} FCFA</p>
+            <p class="text-xs text-slate-400">{$t('demande.detail.total_price')}</p>
+            <p class="text-lg font-bold text-slate-900 mt-0.5">{Number(offreFinale.prixFinalClient ?? offreFinale.prix_final_client).toLocaleString($intlLocale)} FCFA</p>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl">
-            <p class="text-xs text-slate-400">Délai d'exécution</p>
-            <p class="text-lg font-bold text-slate-900 mt-0.5">{offreFinale.delaiExecution ?? offreFinale.delai_execution} jours</p>
+            <p class="text-xs text-slate-400">{$t('demande.detail.exec_time')}</p>
+            <p class="text-lg font-bold text-slate-900 mt-0.5">{offreFinale.delaiExecution ?? offreFinale.delai_execution} {$t('common.days')}</p>
           </div>
         </div>
 
         {#if offreFinale.resumePrestation ?? offreFinale.resume_prestation}
           <div class="p-3 bg-slate-50 rounded-xl mb-4">
-            <p class="text-xs text-slate-400 mb-1">Résumé de la prestation</p>
+            <p class="text-xs text-slate-400 mb-1">{$t('demande.detail.service_summary')}</p>
             <p class="text-sm text-slate-700 leading-relaxed">{offreFinale.resumePrestation ?? offreFinale.resume_prestation}</p>
           </div>
         {/if}
 
-        <!-- Boutons décision — seulement si offre_envoyee -->
         {#if demande.statut === 'offre_envoyee'}
           <div class="flex gap-3">
             <button onclick={() => handleDecision('refusee')} disabled={deciding}
@@ -174,7 +180,7 @@
               {#if deciding}
                 <span class="w-4 h-4 border-2 border-red-300 border-t-red-600 rounded-full animate-spin inline-block mr-2"></span>
               {/if}
-              Refuser
+              {$t('client.offres.refuse')}
             </button>
             <button onclick={() => handleDecision('acceptee')} disabled={deciding}
               class="flex-1 py-3 rounded-xl text-white font-semibold text-sm transition-all disabled:opacity-60 flex items-center justify-center gap-2"
@@ -184,7 +190,7 @@
               {:else}
                 <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">check_circle</span>
               {/if}
-              Accepter l'offre
+              {$t('demande.detail.accept')}
             </button>
           </div>
         {/if}
@@ -193,16 +199,9 @@
 
     <!-- Informations de la demande -->
     <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-4">
-      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">Informations</p>
+      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">{$t('demande.detail.info')}</p>
       <div class="grid grid-cols-2 gap-3">
-        {#each [
-          { label: 'Type de forage', value: demande.typeForage, icon: 'water_drop' },
-          { label: 'Localisation', value: demande.localisationAdresse, icon: 'location_on' },
-          { label: 'Profondeur estimée', value: demande.profondeurEstimee ? `${demande.profondeurEstimee} m` : '—', icon: 'straighten' },
-          { label: 'Délai souhaité', value: demande.delaiSouhaite ? new Date(demande.delaiSouhaite).toLocaleDateString('fr-CM') : '—', icon: 'calendar_today' },
-          { label: 'Date de soumission', value: new Date(demande.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'long', year: 'numeric' }), icon: 'schedule' },
-          { label: 'Budget maximum', value: `${fmt(demande.budgetMax)} FCFA`, icon: 'payments' },
-        ] as info}
+        {#each infoItems as info}
           <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-50">
             <span class="material-symbols-outlined text-slate-400 icon-filled mt-0.5" style="font-size: 16px;">{info.icon}</span>
             <div class="min-w-0">
@@ -214,7 +213,7 @@
       </div>
       {#if demande.description}
         <div class="mt-3 p-3 bg-slate-50 rounded-xl">
-          <p class="text-xs text-slate-500 mb-1">Description</p>
+          <p class="text-xs text-slate-500 mb-1">{$t('demande.detail.desc')}</p>
           <p class="text-sm text-slate-700 leading-relaxed">{demande.description}</p>
         </div>
       {/if}
@@ -224,7 +223,7 @@
     {#if documents.length > 0}
       <div class="bg-white rounded-2xl border border-slate-100 p-5">
         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
-          Documents joints ({documents.length})
+          {$t('demande.detail.docs')} ({documents.length})
         </p>
         <div class="space-y-2">
           {#each documents as doc}

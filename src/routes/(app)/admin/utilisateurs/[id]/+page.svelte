@@ -4,6 +4,7 @@
   import { page } from '$app/stores'
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
+  import { t, intlLocale } from '$lib/stores/locale'
 
   const id = $derived($page.params.id)
   let user = $state<any>(null)
@@ -27,10 +28,10 @@
     acting = true
     try {
       await api.patch(`/admin/users/${id}/valider`)
-      toast.success('Compte validé', "L'entreprise a été notifiée par email.")
+      toast.success($t('admin.users.validated'), $t('admin.users.validated_msg'))
       await loadUser()
     } catch (err: any) {
-      toast.error('Erreur', err.response?.data?.message)
+      toast.error($t('toast.save_error'), err.response?.data?.message)
     } finally { acting = false }
   }
 
@@ -39,10 +40,10 @@
     acting = true
     try {
       await api.patch(`/admin/users/${id}/suspendre`)
-      toast.success('Compte suspendu')
+      toast.success($t('admin.users.suspended'))
       await loadUser()
     } catch (err: any) {
-      toast.error('Erreur', err.response?.data?.message)
+      toast.error($t('toast.save_error'), err.response?.data?.message)
     } finally { acting = false }
   }
 
@@ -51,10 +52,10 @@
     acting = true
     try {
       await api.patch(`/admin/users/${id}/reactiver`)
-      toast.success('Compte réactivé')
+      toast.success($t('admin.users.reactivated'))
       await loadUser()
     } catch (err: any) {
-      toast.error('Erreur', err.response?.data?.message)
+      toast.error($t('toast.save_error'), err.response?.data?.message)
     } finally { acting = false }
   }
 
@@ -63,22 +64,22 @@
     acting = true
     try {
       await api.delete(`/admin/users/${id}`)
-      toast.success('Compte supprimé')
+      toast.success($t('admin.users.deleted'))
       goto('/admin/utilisateurs')
     } catch (err: any) {
-      toast.error('Erreur', err.response?.data?.message)
+      toast.error($t('toast.save_error'), err.response?.data?.message)
     } finally { acting = false }
   }
 
   function fmtDate(d: string | null | undefined) {
     if (!d) return '—'
-    return new Date(d).toLocaleDateString('fr-CM', { day: 'numeric', month: 'long', year: 'numeric' })
+    return new Date(d).toLocaleDateString($intlLocale, { day: 'numeric', month: 'long', year: 'numeric' })
   }
 
   const profile = $derived(user?.entreprise_profile ?? null)
 </script>
 
-<svelte:head><title>Détail utilisateur — Admin</title></svelte:head>
+<svelte:head><title>{$t('admin.user_detail.actions')} — Admin Forage</title></svelte:head>
 
 <div class="max-w-4xl mx-auto">
   <!-- Header -->
@@ -90,7 +91,7 @@
     <div class="flex-1 min-w-0">
       <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900 wrap-break-word">
         {#if loading}
-          Chargement…
+          {$t('admin.user_detail.loading')}
         {:else}
           {user?.fullName ?? user?.email ?? 'Utilisateur'}
         {/if}
@@ -125,17 +126,17 @@
             {#if user.isActive}
               <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1">
                 <span class="material-symbols-outlined icon-filled" style="font-size: 11px;">check_circle</span>
-                Actif
+                {$t('admin.users.active')}
               </span>
             {:else if user.role === 'entreprise'}
               <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1 bg-slate-100 text-slate-600">
                 <span class="material-symbols-outlined icon-filled" style="font-size: 11px;">schedule</span>
-                En attente de validation
+                {$t('admin.user_detail.pending')}
               </span>
             {:else}
               <span class="text-xs bg-red-50 text-red-700 px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1">
                 <span class="material-symbols-outlined icon-filled" style="font-size: 11px;">block</span>
-                Suspendu
+                {$t('admin.user_detail.suspended')}
               </span>
             {/if}
             {#if user.userType}
@@ -150,38 +151,38 @@
       <!-- Informations -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div class="p-3 bg-slate-50 rounded-xl">
-          <p class="text-xs text-slate-400 mb-1">Téléphone</p>
+          <p class="text-xs text-slate-400 mb-1">{$t('admin.user_detail.phone')}</p>
           <p class="text-sm font-semibold text-slate-700">{user.telephone ?? '—'}</p>
         </div>
         <div class="p-3 bg-slate-50 rounded-xl">
-          <p class="text-xs text-slate-400 mb-1">Inscrit le</p>
+          <p class="text-xs text-slate-400 mb-1">{$t('admin.user_detail.registered')}</p>
           <p class="text-sm font-semibold text-slate-700">{fmtDate(user.createdAt ?? user.created_at)}</p>
         </div>
       </div>
     </div>
 
-    <!-- Profil entreprise (si applicable) -->
+    <!-- Profil entreprise -->
     {#if profile}
       <div class="bg-white rounded-2xl border border-slate-100 p-6 mb-5">
         <h3 class="font-display font-bold text-slate-900 mb-4 flex items-center gap-2">
           <span class="material-symbols-outlined icon-filled text-brand-600" style="font-size: 18px;">business</span>
-          Profil entreprise
+          {$t('admin.user_detail.profile')}
         </h3>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
           <div class="p-3 bg-slate-50 rounded-xl">
-            <p class="text-xs text-slate-400 mb-1">Raison sociale</p>
+            <p class="text-xs text-slate-400 mb-1">{$t('admin.user_detail.raison_sociale')}</p>
             <p class="text-sm font-semibold text-slate-700">{profile.raisonSociale ?? profile.raison_sociale ?? '—'}</p>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl">
-            <p class="text-xs text-slate-400 mb-1">RCCM</p>
+            <p class="text-xs text-slate-400 mb-1">{$t('admin.user_detail.rccm')}</p>
             <p class="text-sm font-semibold text-slate-700">{profile.rccm ?? '—'}</p>
           </div>
         </div>
 
         {#if profile.domaines?.length > 0}
           <div class="mb-3">
-            <p class="text-xs text-slate-400 mb-2 px-1">Domaines d'intervention</p>
+            <p class="text-xs text-slate-400 mb-2 px-1">{$t('admin.user_detail.domaines')}</p>
             <div class="flex flex-wrap gap-2">
               {#each profile.domaines as d}
                 <span class="px-3 py-1 rounded-lg text-xs font-semibold capitalize bg-brand-50 text-brand-700">{d}</span>
@@ -192,7 +193,7 @@
 
         {#if (profile.zonesGeographiques ?? profile.zones_geographiques)?.length > 0}
           <div class="mb-3">
-            <p class="text-xs text-slate-400 mb-2 px-1">Zones géographiques couvertes</p>
+            <p class="text-xs text-slate-400 mb-2 px-1">{$t('admin.user_detail.zones')}</p>
             <div class="flex flex-wrap gap-2">
               {#each profile.zonesGeographiques ?? profile.zones_geographiques as z}
                 <span class="px-3 py-1 rounded-lg text-xs font-medium bg-brand-50 text-brand-700">{z}</span>
@@ -205,7 +206,7 @@
           <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2">
             <span class="material-symbols-outlined text-emerald-600 icon-filled" style="font-size: 16px;">verified</span>
             <p class="text-xs text-emerald-700">
-              Validé le {fmtDate(profile.validatedAt ?? profile.validated_at)}
+              {$t('admin.user_detail.validated_at', { date: fmtDate(profile.validatedAt ?? profile.validated_at) })}
             </p>
           </div>
         {/if}
@@ -215,16 +216,15 @@
     <!-- Actions -->
     {#if user.role !== 'admin'}
       <div class="bg-white rounded-2xl border border-slate-100 p-6">
-        <h3 class="font-display font-bold text-slate-900 mb-1">Actions</h3>
-        <p class="text-xs text-slate-500 mb-5">Gérez l'état de ce compte.</p>
+        <h3 class="font-display font-bold text-slate-900 mb-1">{$t('admin.user_detail.actions')}</h3>
+        <p class="text-xs text-slate-500 mb-5">{$t('admin.user_detail.actions_sub')}</p>
 
         <div class="flex flex-wrap gap-2">
           {#if !user.isActive && user.role === 'entreprise'}
-            <!-- Validation initiale -->
             <button onclick={valider} disabled={acting}
               class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 transition-all disabled:opacity-60">
               <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">verified</span>
-              Valider le compte
+              {$t('admin.user_detail.validate_btn')}
             </button>
           {/if}
 
@@ -232,21 +232,20 @@
             <button onclick={suspendre} disabled={acting}
               class="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-all disabled:opacity-60">
               <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">block</span>
-              Suspendre
+              {$t('admin.user_detail.suspend_btn')}
             </button>
           {:else if user.role !== 'entreprise' || (profile?.validatedAt ?? profile?.validated_at)}
-            <!-- Réactivation : seulement si suspendu (pas en attente initiale) -->
             <button onclick={reactiver} disabled={acting}
               class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition-all disabled:opacity-60">
               <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">restart_alt</span>
-              Réactiver
+              {$t('admin.user_detail.reactivate_btn')}
             </button>
           {/if}
 
           <button onclick={supprimer} disabled={acting}
             class="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-red-200 text-red-600 font-semibold text-sm hover:bg-red-50 transition-all disabled:opacity-60 ml-auto">
             <span class="material-symbols-outlined icon-filled" style="font-size: 16px;">delete</span>
-            Supprimer définitivement
+            {$t('admin.user_detail.delete_btn')}
           </button>
         </div>
       </div>

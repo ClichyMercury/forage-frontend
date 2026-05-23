@@ -3,12 +3,12 @@
   import api from '$lib/api'
   import Badge from '$lib/components/ui/Badge.svelte'
   import UserAvatar from '$lib/components/ui/UserAvatar.svelte'
+  import { t, intlLocale } from '$lib/stores/locale'
 
   let toutesOffres = $state<any[]>([])
   let loading = $state(true)
   let filtreStatut = $state('')
 
-  // Filtrage local — pas de rechargement API à chaque clic
   const offres = $derived(
     filtreStatut
       ? toutesOffres.filter(o => o.statut === filtreStatut)
@@ -46,25 +46,25 @@
 
   onMount(load)
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
+  function fmt(n: any) { return Number(n).toLocaleString($intlLocale) }
 </script>
 
-<svelte:head><title>Gestion des offres — Admin</title></svelte:head>
+<svelte:head><title>{$t('admin.offres.title')} — Forage</title></svelte:head>
 
 <div class="mb-5">
   <h2 class="font-display font-black text-2xl lg:text-3xl tracking-tight text-slate-900">
-    Offres des <span class="italic font-light" style="font-family: 'Instrument Serif', 'Satoshi', serif; color: #1e3fff">entreprises</span>.
+    {$t('admin.offres.title')}
   </h2>
-  <p class="text-sm text-slate-500 mt-1">Toutes les offres soumises sur les appels d'offres.</p>
+  <p class="text-sm text-slate-500 mt-1">{$t('admin.offres.subtitle')}</p>
 </div>
 
 <!-- Filtres -->
 <div class="flex gap-2 mb-5 flex-wrap">
   {#each [
-    { value: '', label: 'Toutes' },
-    { value: 'soumise', label: 'Soumises' },
-    { value: 'retenue', label: 'Retenues' },
-    { value: 'non_retenue', label: 'Non retenues' },
+    { value: '', label: $t('admin.offres.filter_all') },
+    { value: 'soumise',     label: $t('admin.offres.filter_submitted') },
+    { value: 'retenue',     label: $t('admin.offres.filter_retained') },
+    { value: 'non_retenue', label: $t('admin.offres.filter_rejected') },
   ] as f}
     <button onclick={() => filtreStatut = f.value}
       class="px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all border
@@ -82,27 +82,25 @@
       <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
         <span class="material-symbols-outlined text-slate-400" style="font-size: 24px;">description</span>
       </div>
-      <p class="text-slate-600 font-medium text-sm">Aucune offre trouvée</p>
+      <p class="text-slate-600 font-medium text-sm">{$t('admin.offres.no_data')}</p>
     </div>
   {:else}
-    <!-- En-têtes desktop -->
     <div class="hidden lg:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-      <div class="col-span-3">Entreprise</div>
-      <div class="col-span-3">Demande</div>
-      <div class="col-span-2 text-right">Prix TTC</div>
-      <div class="col-span-1 text-right">Délai</div>
-      <div class="col-span-1">Budget</div>
-      <div class="col-span-2">Statut</div>
+      <div class="col-span-3">{$t('admin.offres.col_company')}</div>
+      <div class="col-span-3">{$t('admin.offres.col_demande')}</div>
+      <div class="col-span-2 text-right">{$t('admin.offres.col_ttc')}</div>
+      <div class="col-span-1 text-right">{$t('admin.offres.col_delay')}</div>
+      <div class="col-span-1">{$t('admin.offres.col_budget')}</div>
+      <div class="col-span-2">{$t('common.status')}</div>
     </div>
-    
+
     <div class="divide-y divide-slate-50">
       {#each offres as o}
         <a href="/admin/appels-offres/{o.appel_offre_id}/comparatif"
           class="block px-5 py-4 hover:bg-slate-50 transition-all">
-          
-          <!-- Version mobile : colonnes empilées verticalement -->
+
+          <!-- Mobile -->
           <div class="lg:hidden space-y-3">
-            <!-- Ligne 1 : Entreprise + statut -->
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2 min-w-0 flex-1">
                 <UserAvatar user={o.entreprise} size="sm" />
@@ -112,85 +110,63 @@
               </div>
               <Badge status={o.statut} />
             </div>
-            
-            <!-- Ligne 2 : Adresse complète (peut revenir à la ligne) -->
+
             <div>
-              <span class="text-xs text-slate-400">Demande :</span>
-              <p class="text-xs text-slate-600 mt-0.5 whitespace-normal break-words">
-                {o.demande_adresse}
-              </p>
+              <span class="text-xs text-slate-400">{$t('admin.offres.demande_mobile')}</span>
+              <p class="text-xs text-slate-600 mt-0.5 whitespace-normal break-words">{o.demande_adresse}</p>
               <p class="text-xs text-slate-400 capitalize mt-0.5">{o.demande_type}</p>
             </div>
-            
-            <!-- Ligne 3 : Prix + Délai + Budget (tous alignés verticalement et centrés) -->
+
             <div class="flex items-center justify-between flex-wrap gap-4">
-              <!-- Prix TTC -->
               <div class="flex flex-col items-center text-center min-w-[100px]">
-                <span class="text-xs text-slate-400">Prix TTC</span>
+                <span class="text-xs text-slate-400">{$t('admin.offres.col_ttc')}</span>
                 <div class="flex items-baseline justify-center gap-0.5 mt-0.5">
                   <span class="text-sm font-bold text-slate-900">{fmt(o.prix_ttc)}</span>
                   <span class="text-xs text-slate-400">FCFA</span>
                 </div>
               </div>
-              
-              <!-- Délai -->
               <div class="flex flex-col items-center text-center min-w-[70px]">
-                <span class="text-xs text-slate-400">Délai</span>
+                <span class="text-xs text-slate-400">{$t('admin.offres.col_delay')}</span>
                 <div class="flex items-baseline justify-center gap-0.5 mt-0.5">
                   <span class="text-sm font-bold text-slate-900">{o.delai_execution_jours}</span>
-                  <span class="text-xs text-slate-400">j</span>
+                  <span class="text-xs text-slate-400">{$t('common.days_short')}</span>
                 </div>
               </div>
-              
-              <!-- Budget -->
               <div class="flex flex-col items-center text-center min-w-[80px]">
-                <span class="text-xs text-slate-400">Budget</span>
+                <span class="text-xs text-slate-400">{$t('admin.offres.col_budget')}</span>
                 <div class="mt-0.5">
                   <span class="text-sm font-semibold {o.dans_budget ? 'text-emerald-600' : 'text-red-500'}">
-                    {o.dans_budget ? '✓ Oui' : '✗ Non'}
+                    {o.dans_budget ? $t('admin.offres.in_budget') : $t('admin.offres.out_budget')}
                   </span>
                 </div>
               </div>
             </div>
           </div>
-          
-          <!-- Version desktop : grille 12 colonnes rigide -->
+
+          <!-- Desktop -->
           <div class="hidden lg:grid lg:grid-cols-12 lg:gap-4 lg:items-start">
-            <!-- Colonne 1 : Entreprise -->
             <div class="col-span-3 flex items-center gap-2 min-w-0">
               <UserAvatar user={o.entreprise} size="sm" />
               <span class="text-sm font-semibold text-slate-800 truncate">
                 {o.entreprise?.fullName ?? o.entreprise?.email ?? '—'}
               </span>
             </div>
-            
-            <!-- Colonne 2 : Demande (adresse complète, peut revenir à la ligne) -->
             <div class="col-span-3">
-              <p class="text-xs text-slate-600 whitespace-normal break-words leading-relaxed">
-                {o.demande_adresse}
-              </p>
+              <p class="text-xs text-slate-600 whitespace-normal break-words leading-relaxed">{o.demande_adresse}</p>
               <p class="text-xs text-slate-400 capitalize mt-1">{o.demande_type}</p>
             </div>
-            
-            <!-- Colonne 3 : Prix TTC (aligné à droite) -->
             <div class="col-span-2 text-right">
               <span class="text-sm font-semibold text-slate-900">{fmt(o.prix_ttc)}</span>
               <span class="text-xs text-slate-400 ml-1">FCFA</span>
             </div>
-            
-            <!-- Colonne 4 : Délai (aligné à droite) -->
             <div class="col-span-1 text-right">
-              <span class="text-sm text-slate-600">{o.delai_execution_jours}j</span>
+              <span class="text-sm text-slate-600">{o.delai_execution_jours}{$t('common.days_short')}</span>
             </div>
-            
-            <!-- Colonne 5 : Budget -->
             <div class="col-span-1">
               <span class="text-sm font-semibold {o.dans_budget ? 'text-emerald-600' : 'text-red-500'}">
-                {o.dans_budget ? '✓ Oui' : '✗ Non'}
+                {o.dans_budget ? $t('admin.offres.in_budget') : $t('admin.offres.out_budget')}
               </span>
             </div>
-            
-            <!-- Colonne 6 : Statut -->
             <div class="col-span-2">
               <Badge status={o.statut} />
             </div>

@@ -4,6 +4,8 @@
   import { goto } from '$app/navigation'
   import { auth } from '$lib/stores/auth.svelte'
   import { notifStore } from '$lib/stores/notifications.svelte'
+  import { t, intlLocale } from '$lib/stores/locale'
+  import LanguageSwitcher from '$lib/components/ui/LanguageSwitcher.svelte'
   import api from '$lib/api'
   import { fileUrl } from '$lib/utils/file-url'
 
@@ -21,23 +23,21 @@
 
   const pageTitle = $derived(() => {
     const path = $page.url.pathname
-    if (path.includes('dashboard')) return 'Tableau de bord'
-    if (path.includes('demandes/new')) return 'Nouvelle demande'
-    if (path.includes('demandes')) return 'Demandes'
-    if (path.includes('appels-offres')) return "Appels d'offres"
-    if (path.includes('mes-offres')) return 'Mes offres'
-    if (path.includes('utilisateurs')) return 'Utilisateurs'
-    if (path.includes('messages')) return 'Messages'
-    if (path.includes('notifications')) return 'Notifications'
-    if (path.includes('comparatif')) return 'Comparatif des offres'
-    if (path.includes('offre-finale')) return 'Offre finale'
-    return 'Forage'
+    if (path.includes('dashboard'))    return $t('nav.dashboard')
+    if (path.includes('demandes/new')) return $t('nav.new_demande')
+    if (path.includes('demandes'))     return $t('nav.demandes')
+    if (path.includes('appels-offres'))return $t('nav.appels_offres')
+    if (path.includes('mes-offres'))   return $t('nav.my_offres')
+    if (path.includes('utilisateurs')) return $t('nav.utilisateurs')
+    if (path.includes('messages'))     return $t('nav.messages')
+    if (path.includes('notifications'))return $t('nav.notifications')
+    if (path.includes('comparatif'))   return $t('nav.comparatif')
+    if (path.includes('offre-finale')) return $t('nav.offre_finale')
+    return $t('common.app_name')
   })
 
   onMount(() => {
     notifStore.load()
-    // La classe .dark est déjà appliquée par le script anti-FOUC dans app.html ;
-    // on synchronise juste l'état local avec le DOM pour piloter l'icône du toggle.
     darkMode = document.documentElement.classList.contains('dark')
   })
 
@@ -60,8 +60,6 @@
     }
     if (searchTimeout) clearTimeout(searchTimeout)
     searchTimeout = setTimeout(async () => {
-      // Annule la requête précédente encore en vol — évite les race conditions
-      // où un résultat plus ancien écrase un résultat plus récent.
       searchAbort?.abort()
       searchAbort = new AbortController()
       const signal = searchAbort.signal
@@ -141,29 +139,28 @@
   }
 </script>
 
-<header class="sticky top-0 z-30 border-b border-slate-100 px-4 lg:px-6 py-3 flex items-center gap-3" style="background-color: #fafbff">
+<header class="sticky top-0 z-30 border-b border-slate-100 px-4 lg:px-6 py-3 flex items-center gap-4" style="background-color: #fafbff">
 
-  <!-- Gauche : toggle + titre -->
-  <div class="flex items-center gap-3 w-1/3 min-w-0">
+  <!-- Gauche : toggle + recherche -->
+  <div class="flex items-center gap-3 flex-1 min-w-0">
     <button onclick={onToggleSidebar}
       class="w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-all text-slate-600 shrink-0">
       <span class="material-symbols-outlined" style="font-size: 20px;">menu</span>
     </button>
-    <h1 class="font-display font-bold text-lg tracking-tight shrink-0 hidden sm:block" style="color: #0f1f5c; letter-spacing: -0.02em">
+    
+    <h1 class="font-display font-bold text-lg tracking-tight shrink-0 hidden lg:block" style="color: #0f1f5c; letter-spacing: -0.02em">
       {pageTitle()}
     </h1>
-  </div>
 
-  <!-- Centre : recherche -->
-  <div class="w-1/3 relative hidden md:flex justify-center">
-    <div class="relative w-full max-w-md">
+    <!-- Barre de recherche -->
+    <div class="relative flex-1 max-w-md">
       <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 18px;">search</span>
       <input
         type="text"
         bind:value={searchQuery}
         oninput={() => handleSearch(searchQuery)}
         onfocus={() => searchQuery.length >= 2 && (showSearch = true)}
-        placeholder="Rechercher…"
+        placeholder={$t('common.search')}
         class="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 text-sm text-slate-700 placeholder-slate-400 transition-all"
         style="background-color: #f0f2f5"
       />
@@ -177,12 +174,12 @@
       {/if}
 
       {#if showSearch}
-        <button class="fixed inset-0 z-40" onclick={closeSearch} aria-label="Fermer la recherche"></button>
+        <button class="fixed inset-0 z-40" onclick={closeSearch} aria-label={$t('common.close_search')}></button>
         <div class="absolute left-0 right-0 top-11 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-fade-in-down">
           {#if searchResults.length === 0 && !searchLoading}
             <div class="px-4 py-6 text-center text-slate-400">
               <span class="material-symbols-outlined" style="font-size: 24px;">search_off</span>
-              <p class="text-xs mt-1">Aucun résultat pour "{searchQuery}"</p>
+              <p class="text-xs mt-1">{$t('common.no_result', { query: searchQuery })}</p>
             </div>
           {:else}
             {#each searchResults as result}
@@ -204,14 +201,16 @@
     </div>
   </div>
 
-  <!-- Droite : dark mode + notifs + avatar -->
-  <div class="flex items-center gap-1 w-1/3 justify-end">
+  <!-- Droite : langue + dark mode + notifs + avatar -->
+  <div class="flex items-center gap-2 shrink-0">
+    <!-- Sélecteur de langue -->
+    <LanguageSwitcher />
 
-    <!-- Bouton dark mode — gris -->
+    <!-- Bouton dark mode -->
     <button
       onclick={toggleDark}
-      title={darkMode ? 'Mode clair' : 'Mode sombre'}
-      class="w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:opacity-80"
+      title={darkMode ? $t('common.light_mode') : $t('common.dark_mode')}
+      class="w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-slate-100 shrink-0"
       style="background-color: {darkMode ? '#363c4a' : '#e2e8f0'}; color: {darkMode ? '#94a3b8' : '#475569'}">
       <span class="material-symbols-outlined icon-filled" style="font-size: 18px;">
         {darkMode ? 'light_mode' : 'dark_mode'}
@@ -219,7 +218,7 @@
     </button>
 
     <!-- Notifications -->
-    <div class="relative">
+    <div class="relative shrink-0">
       <button
         onclick={() => { showNotifs = !showNotifs; if (showNotifs) notifStore.load() }}
         class="relative w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-all text-slate-600">
@@ -232,16 +231,16 @@
       </button>
 
       {#if showNotifs}
-        <button class="fixed inset-0 z-40" onclick={() => showNotifs = false} aria-label="Fermer"></button>
+        <button class="fixed inset-0 z-40" onclick={() => showNotifs = false} aria-label={$t('common.close')}></button>
         <div class="absolute right-0 top-10 w-80 bg-white rounded-xl shadow-lg border border-slate-100 z-50 overflow-hidden animate-fade-in-down">
           <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-            <span class="font-display font-bold text-slate-900 text-sm">Notifications</span>
+            <span class="font-display font-bold text-slate-900 text-sm">{$t('common.notifications')}</span>
             <div class="flex items-center gap-2">
               {#if notifStore.count > 0}
-                <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background-color: #1e3fff">{notifStore.count} non lues</span>
+                <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background-color: #1e3fff">{notifStore.count} {$t('common.unread')}</span>
                 <button onclick={() => notifStore.markAllRead()}
                   class="text-xs text-slate-400 hover:text-brand-600 transition-colors">
-                  Tout lire
+                  {$t('common.read_all')}
                 </button>
               {/if}
             </div>
@@ -250,7 +249,7 @@
             {#if notifStore.items.length === 0}
               <div class="py-8 text-center text-slate-400">
                 <span class="material-symbols-outlined" style="font-size: 28px;">notifications_none</span>
-                <p class="text-xs mt-1">Aucune notification</p>
+                <p class="text-xs mt-1">{$t('common.no_notification')}</p>
               </div>
             {:else}
               {#each notifStore.items.slice(0, 8) as notif}
@@ -262,7 +261,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="text-xs text-slate-700 leading-snug line-clamp-2">{notif.contenu}</p>
-                      <p class="text-xs text-slate-400 mt-1">{new Date(notif.createdAt).toLocaleDateString('fr-CM')}</p>
+                      <p class="text-xs text-slate-400 mt-1">{new Date(notif.createdAt).toLocaleDateString($intlLocale)}</p>
                     </div>
                     {#if !notif.lu}
                       <div class="w-1.5 h-1.5 rounded-full bg-brand-600 shrink-0 mt-1.5"></div>
@@ -275,7 +274,7 @@
           <div class="px-4 py-2.5 border-t border-slate-100">
             <a href="/{auth.user?.role}/notifications" onclick={() => showNotifs = false}
               class="text-xs text-brand-600 font-semibold hover:text-brand-700">
-              Voir toutes les notifications →
+              {$t('common.see_all_notifs')}
             </a>
           </div>
         </div>
@@ -284,7 +283,7 @@
 
     <!-- Avatar -->
     <a href="/{auth.user?.role}/profile"
-      class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition-all ml-1">
+      class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition-all shrink-0 ml-1">
       <div class="w-8 h-8 rounded-full overflow-hidden bg-brand-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
         {#if auth.user?.avatarUrl}
           <img src={fileUrl(auth.user.avatarUrl)} alt={auth.user.fullName ?? 'Profil'} class="w-8 h-8 object-cover" />

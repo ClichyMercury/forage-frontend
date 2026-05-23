@@ -4,6 +4,7 @@
   import api from '$lib/api'
   import { toast } from '$lib/stores/toast.svelte'
   import Badge from '$lib/components/ui/Badge.svelte'
+  import { t, intlLocale } from '$lib/stores/locale'
 
   let offres = $state<any[]>([])
   let loading = $state(true)
@@ -26,27 +27,29 @@
           : o
       )
       toast.success(
-        decision === 'acceptee' ? 'Offre acceptée' : 'Offre refusée',
-        decision === 'acceptee' ? 'Les parties vont être mises en contact.' : 'Votre décision a été enregistrée.'
+        decision === 'acceptee' ? $t('client.offres.accepted') : $t('client.offres.refused'),
+        decision === 'acceptee' ? $t('client.offres.contact_msg') : $t('client.offres.refused_msg')
       )
     } catch (err: any) {
-      toast.error('Erreur', err.response?.data?.message)
+      toast.error($t('toast.save_error'), err.response?.data?.message)
     } finally { deciding = null }
   }
 
-  function fmt(n: any) { return Number(n).toLocaleString('fr-CM') }
+  function fmt(n: any) { return Number(n).toLocaleString($intlLocale) }
   function getStatut(o: any) { return o.demande?.statut ?? o.statut ?? 'envoyee' }
 </script>
 
-<svelte:head><title>Mes offres — Forage</title></svelte:head>
+<svelte:head><title>{$t('client.offres.title')} — Forage</title></svelte:head>
 
 <div class="mb-5 flex items-center justify-between">
   <div>
-    <h2 class="text-xl font-bold text-slate-900">Mes offres reçues</h2>
-    <p class="text-sm text-slate-500 mt-0.5">Offres finales préparées pour vos demandes</p>
+    <h2 class="text-xl font-bold text-slate-900">{$t('client.offres.title')}</h2>
+    <p class="text-sm text-slate-500 mt-0.5">{$t('client.offres.subtitle')}</p>
   </div>
   {#if offres.length > 0}
-    <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium">{offres.length} offre{offres.length > 1 ? 's' : ''}</span>
+    <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium">
+      {$t('client.offres.count', { count: offres.length, s: offres.length > 1 ? 's' : '' })}
+    </span>
   {/if}
 </div>
 
@@ -56,11 +59,11 @@
 {:else if offres.length === 0}
   <div class="bg-white rounded-2xl border border-slate-100 py-14 text-center px-6">
     <span class="material-symbols-outlined text-slate-300 icon-filled" style="font-size: 40px;">description</span>
-    <p class="text-slate-600 font-medium text-sm mt-3">Aucune offre reçue pour le moment</p>
-    <p class="text-slate-400 text-xs mt-1 mb-4">Les offres apparaîtront ici dès leur préparation</p>
+    <p class="text-slate-600 font-medium text-sm mt-3">{$t('client.offres.no_data')}</p>
+    <p class="text-slate-400 text-xs mt-1 mb-4">{$t('client.offres.no_data_sub')}</p>
     <button onclick={() => goto('/client/demandes')}
       class="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all">
-      Voir mes demandes
+      {$t('client.offres.see_demandes')}
     </button>
   </div>
 
@@ -77,7 +80,6 @@
 
       <div class="{i > 0 ? 'border-t border-slate-100' : ''} px-5 py-4 {statut === 'offre_envoyee' ? 'bg-blue-50/40' : ''}">
 
-        <!-- Ligne principale -->
         <div class="flex items-start justify-between gap-4">
           <div class="flex items-center gap-3 min-w-0">
             <div class="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
@@ -90,19 +92,18 @@
               <div class="flex items-center gap-3 mt-1 flex-wrap">
                 <span class="text-xs font-semibold text-blue-700">{fmt(prix)} FCFA</span>
                 <span class="text-xs text-slate-400">·</span>
-                <span class="text-xs text-slate-500">{delai} jours</span>
+                <span class="text-xs text-slate-500">{delai} {$t('common.days')}</span>
                 <span class="text-xs text-slate-400">·</span>
-                <span class="text-xs text-slate-400">{new Date(o.created_at ?? o.createdAt).toLocaleDateString('fr-CM', { day: 'numeric', month: 'short' })}</span>
+                <span class="text-xs text-slate-400">{new Date(o.created_at ?? o.createdAt).toLocaleDateString($intlLocale, { day: 'numeric', month: 'short' })}</span>
               </div>
             </div>
           </div>
 
-          <!-- Statut + actions -->
           <div class="flex items-center gap-2 shrink-0">
             {#if statut === 'offre_envoyee'}
               <button onclick={() => handleDecision(demandeId, 'refusee')} disabled={deciding === demandeId}
                 class="px-3 py-1.5 rounded-lg border border-red-200 text-red-600 text-xs font-semibold hover:bg-red-50 transition-all disabled:opacity-50">
-                Refuser
+                {$t('client.offres.refuse')}
               </button>
               <button onclick={() => handleDecision(demandeId, 'acceptee')} disabled={deciding === demandeId}
                 class="px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all disabled:opacity-50 flex items-center gap-1">
@@ -111,7 +112,7 @@
                 {:else}
                   <span class="material-symbols-outlined icon-filled" style="font-size: 13px;">check</span>
                 {/if}
-                Accepter
+                {$t('client.offres.accept')}
               </button>
             {:else}
               <Badge status={statut} />
@@ -119,15 +120,13 @@
           </div>
         </div>
 
-        <!-- Résumé (si présent, compact) -->
         {#if resume}
           <p class="text-xs text-slate-500 mt-2.5 ml-12 leading-relaxed line-clamp-2">{resume}</p>
         {/if}
 
-        <!-- Lien discret -->
         <div class="mt-2 ml-12">
           <a href="/client/demandes/{demandeId}" class="text-xs text-slate-400 hover:text-blue-600 transition-colors flex items-center gap-0.5 w-fit">
-            Voir la demande <span class="material-symbols-outlined" style="font-size: 13px;">chevron_right</span>
+            {$t('client.offres.see_demande')} <span class="material-symbols-outlined" style="font-size: 13px;">chevron_right</span>
           </a>
         </div>
 
