@@ -14,7 +14,6 @@
   let profondeurEstimee = $state('')
   let etudeGeophysiqueRealisee = $state<'oui' | 'non' | null>(null)
   let souhaitEtude = $state<'oui' | 'non' | null>(null)
-  let budgetMax = $state('')
   let delaiSouhaite = $state('')
   let files = $state<FileList | null>(null)
   let loading = $state(false)
@@ -40,7 +39,6 @@
       const veutEtude = etudeGeophysiqueRealisee === 'non' && souhaitEtude === 'oui'
       formData.append('etudeGeophysiqueRealisee', String(aEtude))
       formData.append('inclureEtudeGeotechnique', String(veutEtude))
-      formData.append('budgetMax', budgetMax)
       if (delaiSouhaite) formData.append('delaiSouhaite', delaiSouhaite)
       if (files) Array.from(files).forEach(f => formData.append('documents', f))
       await api.post('/demandes', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
@@ -242,23 +240,6 @@
             {/if}
           </div>
         {/if}
-      </div>
-
-      <div class="border-t border-slate-100"></div>
-
-      <!-- Budget -->
-      <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-2" for="budget">
-          <span class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-blue-500 icon-filled" style="font-size: 18px;">payments</span>
-            {$t('demande.new.budget')} *
-            <span class="ml-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">{$t('demande.new.budget_conf')}</span>
-          </span>
-        </label>
-        <input id="budget" type="number" bind:value={budgetMax} placeholder="Ex: 5 000 000" required min="1"
-          class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm transition-all"
-          class:border-red-400={errors.budgetMax} />
-        {#if errors.budgetMax}<p class="text-red-500 text-xs mt-1">{errors.budgetMax}</p>{/if}
       </div>
 
       <div class="border-t border-slate-100"></div>

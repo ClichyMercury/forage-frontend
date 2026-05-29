@@ -214,6 +214,7 @@
             <div class="flex-1 min-w-0">
               <p class="font-semibold text-slate-800">{demande.client?.fullName ?? '—'}</p>
               <p class="text-sm text-slate-500">{demande.client?.email}</p>
+              {#if demande.client?.telephone}<p class="text-sm text-slate-500">{demande.client.telephone}</p>{/if}
             </div>
             <span class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600 capitalize shrink-0">
               {demande.client?.userType ?? '—'}
@@ -269,16 +270,6 @@
 
       <!-- Colonne droite : budget + actions -->
       <div class="space-y-4">
-
-        <!-- Budget confidentiel -->
-        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="material-symbols-outlined text-amber-600 icon-filled" style="font-size: 18px;">lock</span>
-            <p class="text-xs font-bold text-amber-700 uppercase tracking-wide">{$t('admin.demande_detail.budget_label')}</p>
-          </div>
-          <p class="text-2xl font-bold text-amber-800">{fmt(demande.budgetMax)}</p>
-          <p class="text-xs text-amber-600 mt-1">{$t('admin.demande_detail.budget_note')}</p>
-        </div>
 
         <!-- Prochaine action selon statut -->
         {#if demande.statut === 'validee'}

@@ -87,18 +87,17 @@
       <p class="text-sm mt-2">{$t('admin.demandes.no_data')}</p>
     </div>
   {:else}
-    <div class="hidden lg:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+    <div class="hidden lg:grid grid-cols-10 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
       <div class="col-span-2">{$t('dashboard.admin.col_client')}</div>
       <div class="col-span-3">{$t('dashboard.admin.col_location')}</div>
       <div class="col-span-2">{$t('dashboard.admin.col_type')}</div>
-      <div class="col-span-2">{$t('admin.demandes.col_budget')}</div>
       <div class="col-span-1">{$t('common.date')}</div>
       <div class="col-span-2">{$t('common.status')}</div>
     </div>
     <div class="divide-y divide-slate-50">
       {#each demandes as d}
         <a href="/admin/demandes/{d.id}"
-          class="flex flex-col gap-2 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center px-5 py-4 hover:bg-slate-50 transition-all">
+          class="flex flex-col gap-2 lg:grid lg:grid-cols-10 lg:gap-4 lg:items-center px-5 py-4 hover:bg-slate-50 transition-all">
 
           <div class="flex items-center gap-2 pl-12 lg:pl-0 lg:col-span-2 min-w-0">
             <span class="text-xs lg:hidden text-slate-400">{$t('dashboard.admin.col_client')} :</span>
@@ -120,15 +119,6 @@
             <span class="text-xs lg:hidden text-slate-400">{$t('dashboard.admin.col_type')} :</span>
             <span class="text-sm text-slate-600 capitalize">{d.typeForage}</span>
           </div>
-          <div class="flex items-center gap-1 pl-12 lg:pl-0 lg:col-span-2">
-            <span class="text-xs lg:hidden text-slate-400">{$t('admin.demandes.col_budget')} :</span>
-            {#if d.budgetMax}
-              <span class="text-sm font-semibold text-brand-600">{fmt(d.budgetMax)} FCFA</span>
-            {:else}
-              <span class="text-slate-300">—</span>
-            {/if}
-          </div>
-
           <div class="flex items-center gap-1 pl-12 lg:pl-0 lg:col-span-1">
             <span class="text-xs lg:hidden text-slate-400">{$t('common.date')} :</span>
             <span class="text-xs text-slate-400">
