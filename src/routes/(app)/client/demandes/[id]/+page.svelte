@@ -42,7 +42,6 @@
     { label: $t('demande.detail.info_depth'), value: demande.profondeurEstimee ? `${demande.profondeurEstimee} m` : '—',                                            icon: 'straighten' },
     { label: $t('demande.detail.info_delay'), value: demande.delaiSouhaite ? new Date(demande.delaiSouhaite).toLocaleDateString($intlLocale) : '—',                     icon: 'calendar_today' },
     { label: $t('demande.detail.info_date'),  value: new Date(demande.createdAt).toLocaleDateString($intlLocale, { day: 'numeric', month: 'long', year: 'numeric' }),   icon: 'schedule' },
-    { label: $t('demande.detail.info_budget'),value: `${Number(demande.budgetMax).toLocaleString($intlLocale)} FCFA`,                                                   icon: 'payments' },
   ] : [])
 
   onMount(async () => {
